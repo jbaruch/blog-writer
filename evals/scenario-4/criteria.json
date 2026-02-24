@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent correctly applies TLDR formatting rules (bullets not prose, provocation style, 2-4 items) and fixes placeholder numbering to use independent per-type counters with zero-padding instead of a shared sequential counter.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "TLDR is bullet points",
+      "description": "The TLDR section uses bullet points (lines starting with - or *), NOT prose paragraphs",
+      "max_score": 12
+    },
+    {
+      "name": "TLDR bullet count",
+      "description": "The TLDR contains 2, 3, or 4 bullet items (not 1, not 5+)",
+      "max_score": 8
+    },
+    {
+      "name": "TLDR bullets are not summaries",
+      "description": "NONE of the TLDR bullets are dry summaries of what the post covers (e.g., 'We built a caching layer and improved performance'). Each bullet should contain a specific detail, number, or surprising claim from the post rather than a generic description of the topic.",
+      "max_score": 10
+    },
+    {
+      "name": "TLDR recurring character bullet",
+      "description": "At least one TLDR bullet references the recurring character Tomoko, and if present it appears as the last bullet",
+      "max_score": 8
+    },
+    {
+      "name": "Screenshot numbering independent",
+      "description": "Screenshot placeholders are numbered independently starting at 01 (Screenshot 01, Screenshot 02, etc.) with their own sequence separate from Code and Link",
+      "max_score": 12
+    },
+    {
+      "name": "Code numbering independent",
+      "description": "Code placeholders are numbered independently starting at 01 (Code 01, Code 02, etc.) with their own sequence separate from Screenshot and Link",
+      "max_score": 12
+    },
+    {
+      "name": "Link numbering independent",
+      "description": "Link placeholders are numbered independently starting at 01 (Link 01, Link 02, etc.) with their own sequence separate from Screenshot and Code",
+      "max_score": 10
+    },
+    {
+      "name": "Zero-padded numbers",
+      "description": "All placeholder numbers use zero-padding (01, 02, 03, etc.) not bare digits (1, 2, 3)",
+      "max_score": 10
+    },
+    {
+      "name": "No shared counter",
+      "description": "There is NO shared sequential counter across placeholder types -- e.g., no pattern like Screenshot 01, Code 02, Screenshot 03 where the numbers share a sequence",
+      "max_score": 10
+    },
+    {
+      "name": "Content preserved",
+      "description": "The body content of the post (sections, code blocks, prose between placeholders) is preserved and not deleted or substantially rewritten",
+      "max_score": 8
+    }
+  ]
+}

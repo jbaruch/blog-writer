@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent follows the persona onboarding structure from the skill's setup flow, producing voice.md, bio.md, and examples.md with the correct sections, analysis depth, and format requirements.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Voice one-paragraph section",
+      "description": "persona/voice.md contains a section titled 'The Voice in One Paragraph' (or closely equivalent) with a synthesized description of the author's voice",
+      "max_score": 10
+    },
+    {
+      "name": "Rhetorical devices with quotes",
+      "description": "persona/voice.md contains a section on rhetorical devices with at least 3 named devices, each illustrated with direct quotes pulled from the writing samples",
+      "max_score": 10
+    },
+    {
+      "name": "Cultural reference analysis",
+      "description": "persona/voice.md contains a section analyzing the cultural reference style (domains, frequency, whether explained or left for reader)",
+      "max_score": 8
+    },
+    {
+      "name": "Recurring characters identified",
+      "description": "persona/voice.md contains a section on recurring characters that identifies Prashant as a recurring figure and describes his role/dynamic",
+      "max_score": 10
+    },
+    {
+      "name": "Voice consistency notes",
+      "description": "persona/voice.md contains a section on voice consistency (how the voice behaves in technical sections)",
+      "max_score": 8
+    },
+    {
+      "name": "Bio schema present",
+      "description": "persona/bio.md contains a bio template/schema with variable parts marked, incorporating the provided info (name, role at Meridian Health, gaming company background)",
+      "max_score": 10
+    },
+    {
+      "name": "Bio kicker notes",
+      "description": "persona/bio.md contains a section on kicker notes specifying that the kicker should be rotating and describing the expected tone",
+      "max_score": 8
+    },
+    {
+      "name": "Examples file created",
+      "description": "persona/examples.md exists and lists all three writing samples with their titles and/or URLs",
+      "max_score": 8
+    },
+    {
+      "name": "Examples have pattern annotations",
+      "description": "Each entry in persona/examples.md includes a note about what voice patterns that sample demonstrates (not just the title/URL)",
+      "max_score": 10
+    },
+    {
+      "name": "Humor analysis present",
+      "description": "persona/voice.md analyzes the author's humor style (type, frequency, calibration) -- either as a standalone section or integrated into the rhetorical devices section",
+      "max_score": 8
+    },
+    {
+      "name": "Product context skipped",
+      "description": "No persona/product.md file is created, OR it exists but is empty/explicitly states no product context -- since the author said to skip product context",
+      "max_score": 10
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "context": "Tests whether the agent identifies and corrects specific AI writing anti-patterns that are seeded throughout the draft. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Preamble removed",
+      "description": "The cleaned draft does NOT contain 'In this post, we'll explore' or 'What follows is' in the opening",
+      "max_score": 8
+    },
+    {
+      "name": "Contrastive negation fixed",
+      "description": "The 'Not a broken pipeline. A broken process.' and 'Not just a tool. A methodology.' patterns are rewritten as direct statements instead of 'Not X. Y.' pairs",
+      "max_score": 8
+    },
+    {
+      "name": "Self-answering fragments fixed",
+      "description": "The 'The result? A complete rewrite. The best part? It actually worked.' pattern is rewritten without the noun-phrase-question-then-answer structure",
+      "max_score": 8
+    },
+    {
+      "name": "Parallel binary comparisons fixed",
+      "description": "The 'Where manual deploys give you control, automated pipelines give you speed' mirrored clauses are rewritten without structural parallelism",
+      "max_score": 8
+    },
+    {
+      "name": "Copula avoidance fixed",
+      "description": "Phrases like 'served as the backbone', 'boasted a grand total', 'stands as a single source', 'showcases real-time' are replaced with simpler verbs like 'is', 'has', 'was'",
+      "max_score": 8
+    },
+    {
+      "name": "Sycophantic hedging removed",
+      "description": "Phrases like 'It's worth noting that', 'Interestingly enough', 'To be fair', 'It bears mentioning' are deleted or the point is stated directly",
+      "max_score": 8
+    },
+    {
+      "name": "AI vocabulary cleaned",
+      "description": "Words from the AI contamination list are removed: at minimum 'leveraged', 'streamlined', 'robust', 'delves', 'navigates', 'illuminates', 'pivotal', 'transformative', 'fostering', 'seamless', 'landscape'",
+      "max_score": 10
+    },
+    {
+      "name": "Emojis removed",
+      "description": "The cleaned draft contains zero emoji characters (the rocket, flexed bicep, and party popper from the original are all removed)",
+      "max_score": 8
+    },
+    {
+      "name": "Choppy fragments fixed",
+      "description": "The 'Purple gradients. Chat interface. Zero tests. Pure vibes.' fragment chain is rewritten as actual sentences",
+      "max_score": 8
+    },
+    {
+      "name": "False ranges fixed",
+      "description": "The 'from junior developers to seasoned platform engineers' and 'from beginners to experts, from startups to enterprises' false range claims are replaced with specific audience targeting",
+      "max_score": 8
+    },
+    {
+      "name": "Synonym cycling fixed",
+      "description": "The cycling of 'Developers/Engineers/Practitioners/Builders' referring to the same audience is replaced with consistent terminology",
+      "max_score": 8
+    },
+    {
+      "name": "Fabricated experience removed",
+      "description": "Phrases like 'I keep coming back to this idea' and 'Something feels off about how we've been thinking' that simulate personal experience not grounded in the narrative are rewritten as direct claims",
+      "max_score": 10
+    }
+  ]
+}

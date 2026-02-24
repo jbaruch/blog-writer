@@ -1,0 +1,17 @@
+{
+  "total_infeasible": 3,
+  "infeasible_scenarios": [
+    {
+      "scenarios": "Interactive clarification round",
+      "reasoning": "Phase 1 of the blog-writer workflow requires back-and-forth with the author to resolve narrative, technical, visual, and context gaps. The eval sandbox is one-shot with no user interaction, so the iterative clarification loop cannot be tested as a live interaction. Scenario 3 tests the clarification question format as a static artifact instead."
+    },
+    {
+      "scenarios": "Interactive revision loop",
+      "reasoning": "Phase 4 requires the author to provide feedback, the agent to edit the draft file surgically, and then re-run anti-pattern/accuracy/tightening checks. This iterative loop requires multiple rounds of human-in-the-loop interaction that cannot be simulated in a one-shot eval."
+    },
+    {
+      "scenarios": "WebFetch of product documentation and published posts",
+      "reasoning": "The skill instructs the agent to use WebFetch to pull product documentation pages from persona/product.md URLs and to fetch previously published series posts. These require real, accessible URLs to specific documentation sites. The eval sandbox has network access but cannot guarantee that arbitrary external URLs will be available or return meaningful content for grading."
+    }
+  ]
+}

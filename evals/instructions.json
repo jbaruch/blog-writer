@@ -1,0 +1,346 @@
+{
+  "instructions": [
+    {
+      "instruction": "Check if persona/voice.md exists and has content before doing anything else",
+      "original_snippets": "**Before anything else**, check if `persona/voice.md` exists and contains content. ... If `persona/voice.md` is empty or missing: Read `references/setup.md` and run the interactive onboarding flow.",
+      "relevant_when": "Starting any blog writing session",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Run the interactive onboarding flow from setup.md if persona/voice.md is empty or missing",
+      "original_snippets": "If `persona/voice.md` is empty or missing: Read `references/setup.md` and run the interactive onboarding flow. Do not proceed with blog writing until the persona is set up.",
+      "relevant_when": "First-time setup when no persona exists yet",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Read reference files in a specific order: voice.md first, then tone-guide.md, ai-anti-patterns.md, process.md, product.md",
+      "original_snippets": "Read these reference files in order: 1. `persona/voice.md` ... 2. `references/tone-guide.md` ... 3. `references/ai-anti-patterns.md` ... 4. `references/process.md` ... 5. `persona/product.md`",
+      "relevant_when": "Starting a blog writing session with a configured persona",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Do NOT read product.md upfront; scan to know what's available, then fetch specific pages during Phase 0",
+      "original_snippets": "Do NOT read the whole thing upfront. Scan it to know what's available, then fetch only the specific pages relevant to the post's topic during Phase 0.",
+      "relevant_when": "When product context is configured and a blog session starts",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Follow the 5-phase workflow (0: Intake, 1: Clarification, 2: Planning, 3: First Draft, 4: Revision) in order with gates",
+      "original_snippets": "Do not skip phases. Do not write prose before Phase 3.",
+      "relevant_when": "Writing any blog post from source material",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Do not write prose before Phase 3",
+      "original_snippets": "Do not skip phases. Do not write prose before Phase 3.",
+      "relevant_when": "During Phases 0-2 of the blog writing workflow",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "TLDR must be 2-4 bullet points, never prose paragraphs",
+      "original_snippets": "**TLDR** -- 2-4 bullet points. Sells the 'so what' without spoiling the journey. Bullets, not prose. ... Write the TLDR last. ALWAYS bullets, 2-4 items. Never prose paragraphs.",
+      "relevant_when": "Writing or reviewing any blog post draft",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Each TLDR bullet should make the reader think 'wait, really?' -- provocation not summary",
+      "original_snippets": "Each bullet should make the reader think 'wait, really?' not 'yeah, obvious.' ... Each bullet is a standalone provocation -- something that makes the reader think 'wait, really?'",
+      "relevant_when": "Writing TLDR bullets for a blog post",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "TLDR is written last but placed first in the post",
+      "original_snippets": "Written last, placed first. ... Start with the opening hook, NOT the TLDR. Write the TLDR last.",
+      "relevant_when": "Writing a blog post draft",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "TLDR should not explain the mechanism; compress, don't miniaturize",
+      "original_snippets": "Don't explain the mechanism. If the post teaches the reader how something works, the TLDR should make them want to know how, not spoil it. ... Compress, don't miniaturize. A good TLDR bullet takes a whole section's argument and restates it as a provocation.",
+      "relevant_when": "Writing TLDR bullets for a blog post",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "If the post has a recurring character, one TLDR bullet should belong to them and it should be last",
+      "original_snippets": "The recurring character bullet rule. If the post has a recurring character or foil, one bullet should belong to them. It humanizes the TLDR and breaks the pattern of technical claims. The character bullet is always last.",
+      "relevant_when": "Writing TLDR for a post with a recurring character or collaborator",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Three TLDR bullets is usually right",
+      "original_snippets": "Three bullets is usually right. Two feels thin. Four starts explaining too much.",
+      "relevant_when": "Writing TLDR bullets",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Opening hook must be a personal story, public embarrassment, or confession -- never a thesis statement",
+      "original_snippets": "**Opening hook** -- A personal story, a public embarrassment, a confession. Never a thesis statement. Never 'In this post, we'll explore...'",
+      "relevant_when": "Writing the opening of any blog post",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "CTA must be practical, specific, and low-friction",
+      "original_snippets": "**CTA** -- Practical, specific, low-friction. Usually: install something, try something, read the next post.",
+      "relevant_when": "Writing the call to action at the end of a blog post",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Author bio must follow fixed schema with a rotating kicker that connects to THIS post's content",
+      "original_snippets": "**Author bio** -- Fixed schema, rotating kicker. The kicker is a dry joke that connects to the post's content. See the bio format in `persona/bio.md`.",
+      "relevant_when": "Writing the author bio at the end of any blog post",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Each post in a series must stand alone -- a reader hitting part 2 first should not be lost",
+      "original_snippets": "Each post must stand alone -- a reader hitting part 2 first should not be lost",
+      "relevant_when": "Writing a post that belongs to a series",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Placeholder numbering must be independent per type (Screenshot, Code, Link, Fact) with NO shared counter",
+      "original_snippets": "Insert placeholders with **INDEPENDENT numbering per type**. Screenshots count separately from Code, which counts separately from Links, which counts separately from Facts. There is NO shared counter. Each type starts at 01 ... WRONG: Screenshot 01, Code 02, Link 03. RIGHT: Screenshot 01, Code 01, Link 01.",
+      "relevant_when": "Any blog draft that includes placeholders for screenshots, code, links, or facts",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Placeholders must be zero-padded (01, 02, etc.)",
+      "original_snippets": "[Screenshot 01: the agent's terminal output showing it re-ingested 100 files] [Code 01: config file dependency block after plugin install] [Screenshot 02: the app UI showing outdated information]",
+      "relevant_when": "Any blog draft that includes placeholders",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Code placeholders must include best-guess content and a VERIFY comment",
+      "original_snippets": "For code placeholders, include best-guess content and flag: `<!-- VERIFY: reconstructed from transcript, confirm actual code -->`",
+      "relevant_when": "Writing code placeholders in a blog draft from a transcript",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Ask the author for a short slug (kebab-case, 2-4 words) before anything else in Phase 0",
+      "original_snippets": "First thing: Ask the author for a short slug (kebab-case, 2-4 words) to identify this post. Examples: `deep-dive-ep4`, `never-trust-llm`, `intent-chain`. ... Do not proceed until you have the slug.",
+      "relevant_when": "Starting Phase 0 of the blog writing workflow",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Create a research memory bank file named blog-research-[slug].md with specific 5-section structure",
+      "original_snippets": "File: `blog-research-[slug].md` in the current working directory. ... Structure: ... ## Source Material Summary ... ## Product Context ... ## Clarification Log ... ## Editorial Plan ... ## Draft Notes",
+      "relevant_when": "Starting Phase 0 of the blog writing workflow",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Number all clarification questions so the author can reply efficiently",
+      "original_snippets": "Ask clarification questions. Ask as many as you need. **Always number them** so the author can reply efficiently with '1: yes, 2: it was actually React, 3: yes' etc.",
+      "relevant_when": "Phase 1 clarification round",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Include your best guess in clarification questions so the author can just confirm",
+      "original_snippets": "When you have a reasonable guess from context, **include it in the question** so the author can just confirm instead of typing out an explanation.",
+      "relevant_when": "Phase 1 clarification round",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Group clarification questions by type: narrative, technical, visual, context gaps",
+      "original_snippets": "Group questions by type for easier scanning: **Narrative gaps** (what happened when) **Technical gaps** (exact commands, outputs, configurations) **Visual gaps** (what was on screen) **Context gaps** (references to other work, people, previous posts)",
+      "relevant_when": "Phase 1 clarification round",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Main idea must be expressible as: 'This post shows that [specific claim], demonstrated by [specific evidence].'",
+      "original_snippets": "Answer this in one sentence: 'This post shows that [specific claim], demonstrated by [specific evidence].' If you can't fill that template, the post isn't focused enough.",
+      "relevant_when": "Phase 2 editorial planning",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Structure outline must include proposed placeholder locations with independently numbered types",
+      "original_snippets": "Include proposed placeholder locations in the outline -- each type numbered independently: '[Screenshot 01: ...]', '[Screenshot 02: ...]', '[Code 01: ...]', '[Link 01: ...]', etc.",
+      "relevant_when": "Phase 2 editorial planning",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Aim for 1,500-2,000 words; 2,000 is a target not a cliff",
+      "original_snippets": "A typical post runs 1,500-2,000 words. 2,000 is a target, not a cliff -- a tight 2,200 that earns every sentence is better than a padded 1,800.",
+      "relevant_when": "Writing any blog post draft",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Run the anti-pattern check against all 18 patterns after writing and after every revision",
+      "original_snippets": "Run the anti-pattern check. Open `references/ai-anti-patterns.md` and scan the draft for all 18 patterns. Rewrite any hits. This is not optional. ... Re-run the anti-pattern check after changes (new writing can introduce new patterns)",
+      "relevant_when": "After completing Phase 3 first draft or any Phase 4 revision",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Run a tightening pass: cut redundancies, kill bloated transitions, remove hedging filler",
+      "original_snippets": "Run the tightening pass. Re-read the draft sentence by sentence ... For every sentence, ask: 'would the reader miss this if it vanished?' ... Kill bloated transitions: 'Now that we've seen X, let's look at Y' ... Check for hedging filler: 'basically,' 'essentially,' 'in order to.'",
+      "relevant_when": "After writing or revising a blog draft",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Write the first draft to blog-draft-[slug].md and display a summary with word count, placeholder counts by type, and flags",
+      "original_snippets": "Write the first draft to `blog-draft-[slug].md` in the working directory. Tell the author the file is ready for review. Also display a summary in conversation: word count, placeholder counts by type, and any open questions or flags.",
+      "relevant_when": "Completing Phase 3 first draft",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Phase 4 revisions: edit the file surgically with Edit tool, don't rewrite in conversation",
+      "original_snippets": "All revisions happen in `blog-draft-[slug].md` using the Edit tool. ... Don't rewrite the entire draft in conversation -- edit the file surgically.",
+      "relevant_when": "Phase 4 revision based on author feedback",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Maintain narrative density in EVERY section, not just the opening hook",
+      "original_snippets": "Maintain narrative density in EVERY section, not just the opening. This is the most common quality failure. The opening hook always has personality because writers focus there. But by mid-post, the voice drifts toward report/analyst style.",
+      "relevant_when": "Writing any blog post draft, especially technical middle sections",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Paragraphs that could be rewritten as bullet points without losing anything are summaries -- rewrite as moments",
+      "original_snippets": "Could I rewrite this paragraph as three bullet points in a status update and lose nothing? If yes, it's a summary. Rewrite it as a moment the reader experiences.",
+      "relevant_when": "Writing or reviewing any blog post section",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Voice consistency: the author's voice doesn't turn off in technical sections; rhetorical devices continue into code examples",
+      "original_snippets": "The author's voice doesn't turn off when the content gets technical. The rhetorical devices from `persona/voice.md` ... should continue into the code examples and the architecture discussion.",
+      "relevant_when": "Writing technical sections of a blog post",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use rhetorical contrastive negation ('Not X. Y.' or 'It's not about X. It's about Y.')",
+      "original_snippets": "The tell: 'Not X. Y.' or 'Not X. Just Y.' or 'It's not about X. It's about Y.' ... This is the single most common LLM writing pattern.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use parallel binary comparisons (balanced A/B sentences with mirrored structure)",
+      "original_snippets": "Balanced A/B sentence pairs with mirrored structure. ... 'Where X gives you A, Y gives you B'",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use asyndetic tricolon with kicker ('X. Y. Z. And then [dramatic conclusion].')",
+      "original_snippets": "Three short fragments in sequence, followed by a punchline. 'X. Y. Z. And then [dramatic conclusion].'",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use choppy fragment chains (multiple sentence fragments for dramatic effect)",
+      "original_snippets": "Multiple sentence fragments in sequence for 'dramatic effect.' Each fragment is 1-5 words, usually noun phrases. ... 'Purple gradients. Chat interface. Zero tests. Pure vibes.'",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use symmetrical LLM patterns (fortune-cookie balanced clauses)",
+      "original_snippets": "Any sentence where the two halves mirror each other structurally. ... Chiasmus or antithesis that reads like a fortune cookie.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use self-answering fragment questions ('The result? Great.' pattern)",
+      "original_snippets": "'And the UI? No purple gradients.' 'The result? A cleaner architecture.' 'The best part? It just works.' ... It creates fake dramatic tension where none exists.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use parenthetical em-dashes (paired em-dashes as fancy commas); single em-dash for hard break is fine",
+      "original_snippets": "Paired em-dashes used to set off an aside, where commas or parentheses would do the same job. ... 'The agent -- which had already failed twice -- tried again.' ... A single em-dash for a hard break at the end of a clause is fine.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "No more than two em-dashes per section",
+      "original_snippets": "More than two em-dashes per section, even when used correctly.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use preamble announcements ('In this post, we'll explore...')",
+      "original_snippets": "'In this post, we'll explore...' 'Let's take a look at...' 'What follows is...' ... The TLDR handles the preview.",
+      "relevant_when": "Writing or reviewing any blog post opening",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use sycophantic hedging ('It's worth noting that...', 'Interestingly enough...')",
+      "original_snippets": "'It's worth noting that...' 'Interestingly enough...' 'To be fair...' ... These are throat-clearing. They signal the writer isn't confident enough to just make the point.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use emojis, not even in the TLDR, not even ironically",
+      "original_snippets": "Never. Zero. Not even in the TLDR. Not even ironically.",
+      "relevant_when": "Writing or reviewing any blog post",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Never use AI vocabulary contamination words: delve, tapestry, leverage, pivotal, nuanced, robust, seamless, etc.",
+      "original_snippets": "Verbs: 'delve', 'underscore', 'highlight' (as verb), 'foster', 'leverage', 'harness', 'showcase', 'streamline' ... Adjectives: 'pivotal', 'crucial', 'vital', 'nuanced', 'multifaceted', 'robust', 'seamless'",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use copula avoidance ('serves as' instead of 'is', 'boasts' instead of 'has')",
+      "original_snippets": "'serves as' / 'stands as' / 'acts as' instead of 'is' ... 'boasts' / 'features' / 'offers' instead of 'has' ... Use 'is', 'are', 'has.' They're not boring -- they're precise.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Vary sentence length (high burstiness): roughly 20% short (<10 words), 50% medium (10-20), 30% long (20+)",
+      "original_snippets": "Every sentence is roughly the same length and structure. No rhythm variation ... Human writers naturally vary sentence length ... Good target distribution: roughly 20% short (under 10 words), 50% medium (10-20 words), 30% long (20+ words).",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never fabricate experience; personal moments must come from the source material",
+      "original_snippets": "The AI simulates personal encounters, emotional reactions, or sensory moments that never happened. ... Personal moments must come from the source material -- the transcript, the author's notes, the actual events.",
+      "relevant_when": "Writing any blog post draft from a transcript",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use false ranges ('from beginners to experts', 'from startups to enterprises')",
+      "original_snippets": "'From beginners to experts' 'From startups to enterprises' ... Real tools have a sweet spot. Real blog posts are honest about who they're for.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use synonym cycling; use the same word consistently for the same concept",
+      "original_snippets": "The same thing is called by a different name every time it appears. 'The CLI' becomes 'the tool' becomes 'the interface' ... Use the same word. 'The CLI' is 'the CLI' every time.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use Unicode giveaways: curly quotes, horizontal ellipsis character, bullet character, en dashes",
+      "original_snippets": "Curly double quotes: \\u201C and \\u201D ... Curly single quotes: \\u2018 and \\u2019 ... Horizontal ellipsis: \\u2026 ... En dash: \\u2013 ... Use plain ASCII in the draft.",
+      "relevant_when": "Writing or reviewing any blog post draft",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Blog tone needs more self-deprecation and 'we' language than stage talk; every provocation needs a wink built into the prose",
+      "original_snippets": "Blog posts need the same confrontational energy but with more self-deprecation and more 'we' language. On stage you can say 'this is broken.' In a blog, say 'we broke it, here's how, here's the screenshot.'",
+      "relevant_when": "Calibrating tone in any blog post",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Onboarding: ask for 2-5 writing samples, analyze across 6 dimensions (voice, rhetorical devices, cultural references, humor, technical depth, recurring elements)",
+      "original_snippets": "I need 2-5 samples of your writing. ... Analyze the collected samples to identify patterns across these dimensions: 4a: Overall voice and personality ... 4b: Rhetorical devices ... 4c: Cultural reference style ... 4d: Humor type and calibration ... 4e: Technical depth tendencies ... 4f: Recurring elements",
+      "relevant_when": "First-time persona setup",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Generate voice.md with specific sections: voice paragraph, rhetorical devices with quotes, cultural references, recurring characters, voice consistency notes",
+      "original_snippets": "## The Voice in One Paragraph ... ## Rhetorical Devices That Work [Each device as a subsection with description and quoted examples from their writing] ## Cultural Reference Style ... ## Recurring Characters ... ## Voice Consistency Notes",
+      "relevant_when": "Generating persona/voice.md during onboarding",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Generate bio.md with bio schema, examples, and kicker notes",
+      "original_snippets": "## Bio Schema [The template with variable parts marked] ## Examples [1-2 example bios] ## Kicker Notes [How the kicker should work -- rotating or fixed, tone guidance]",
+      "relevant_when": "Generating persona/bio.md during onboarding",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Generate examples.md with post URLs, each annotated with key voice patterns it demonstrates",
+      "original_snippets": "## [Post title or description] URL: [url] Key patterns: [1-line note about what this sample demonstrates about the voice]",
+      "relevant_when": "Generating persona/examples.md during onboarding",
+      "why_given": "particular preference"
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent follows the editorial planning workflow from the skill, including research bank structure, main idea template format, clarification question formatting, placeholder planning, and series continuity handling.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Research bank file naming",
+      "description": "A file named blog-research-migration-diaries-ep2.md exists (using the slug provided)",
+      "max_score": 8
+    },
+    {
+      "name": "Research bank sections",
+      "description": "The research bank contains sections for Source Material Summary and Editorial Plan (and optionally Clarification Log and Draft Notes)",
+      "max_score": 8
+    },
+    {
+      "name": "Main idea template format",
+      "description": "The editorial plan contains a main idea statement that follows the structure 'This post shows that [specific claim], demonstrated by [specific evidence]' or a close equivalent with a specific claim and specific evidence",
+      "max_score": 12
+    },
+    {
+      "name": "CTA is practical and specific",
+      "description": "The editorial plan includes a proposed CTA that suggests a concrete action (not vague like 'think about microservices'), such as trying a tool, reading something, or following a specific step",
+      "max_score": 8
+    },
+    {
+      "name": "Section outline with descriptions",
+      "description": "The editorial plan includes section headers with 1-2 sentence descriptions of each section's purpose",
+      "max_score": 8
+    },
+    {
+      "name": "Placeholder locations in outline",
+      "description": "The section outline includes proposed placeholder locations (Screenshot, Code, or similar) with each type numbered independently starting at 01",
+      "max_score": 10
+    },
+    {
+      "name": "Questions are numbered",
+      "description": "The clarification questions file contains numbered questions (1, 2, 3, etc.) so the author could reply with '1: yes, 2: no, 3: ...'",
+      "max_score": 10
+    },
+    {
+      "name": "Questions include guesses",
+      "description": "At least half of the clarification questions include the agent's best guess from context so the author can just confirm (e.g., 'Was the tool X? I'm guessing based on...')",
+      "max_score": 10
+    },
+    {
+      "name": "Questions grouped by type",
+      "description": "The clarification questions are organized into categories (e.g., narrative gaps, technical gaps, visual gaps, context gaps -- or similar groupings)",
+      "max_score": 8
+    },
+    {
+      "name": "Series callbacks referenced",
+      "description": "The editorial plan references at least one callback from the series tracker (e.g., 'the simple refactor', the shared database, the Miro board, or Dana's role)",
+      "max_score": 10
+    },
+    {
+      "name": "No prose draft written",
+      "description": "No actual blog post draft or prose body content was produced -- only planning artifacts (research bank, editorial plan, clarification questions)",
+      "max_score": 8
+    }
+  ]
+}

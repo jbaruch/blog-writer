@@ -1,0 +1,71 @@
+{
+  "context": "Tests whether the agent follows the blog-writer skill's structural, formatting, and voice rules when producing a complete blog post draft from a video transcript with persona and series context provided.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Research bank created",
+      "description": "A file named blog-research-agent-disasters-ep3.md exists in the working directory",
+      "max_score": 7
+    },
+    {
+      "name": "Research bank structure",
+      "description": "The research bank file contains sections for Source Material Summary, Clarification Log (or equivalent gap identification), and Editorial Plan",
+      "max_score": 7
+    },
+    {
+      "name": "Draft file naming",
+      "description": "A file named blog-draft-agent-disasters-ep3.md exists in the working directory",
+      "max_score": 7
+    },
+    {
+      "name": "TLDR is bullets not prose",
+      "description": "The draft contains a TLDR section that uses bullet points (lines starting with - or *), NOT prose paragraphs",
+      "max_score": 10
+    },
+    {
+      "name": "TLDR bullet count",
+      "description": "The TLDR contains exactly 2, 3, or 4 bullet items (not 1, not 5+)",
+      "max_score": 7
+    },
+    {
+      "name": "TLDR placed before body",
+      "description": "The TLDR section appears before the opening hook/story, not at the end of the post",
+      "max_score": 7
+    },
+    {
+      "name": "Opening is narrative",
+      "description": "The first section after TLDR opens with a story, anecdote, or confession -- NOT a thesis statement and NOT a preamble like 'In this post we will explore'",
+      "max_score": 10
+    },
+    {
+      "name": "Placeholder independent numbering",
+      "description": "Screenshot placeholders and Code placeholders each start their own numbering at 01 independently (e.g., Screenshot 01 and Code 01 can both exist, NOT Screenshot 01 then Code 02)",
+      "max_score": 10
+    },
+    {
+      "name": "Placeholder zero-padding",
+      "description": "All placeholders use zero-padded numbers (01, 02, etc.) not bare single digits (1, 2, etc.)",
+      "max_score": 7
+    },
+    {
+      "name": "Author bio present",
+      "description": "The draft ends with an author bio section for Marcus Chen that follows the schema from persona/bio.md",
+      "max_score": 7
+    },
+    {
+      "name": "Bio kicker is post-specific",
+      "description": "The author bio includes a rotating kicker (final sentence) that references something specific from THIS post (recipes, the agent calling OpenAI, chocolate spaghetti, etc.)",
+      "max_score": 7
+    },
+    {
+      "name": "Series callback present",
+      "description": "The draft references at least one element from previous episodes (e.g., 'it's probably a quick fix' from Episode 2, or 'the authentication incident' from Episode 1)",
+      "max_score": 7
+    },
+    {
+      "name": "No preamble announcement",
+      "description": "The draft does NOT contain phrases like 'In this post, we'll explore', 'Let's take a look at', or 'What follows is'",
+      "max_score": 7
+    }
+  ]
+}

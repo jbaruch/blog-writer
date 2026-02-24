@@ -1,0 +1,41 @@
+name: Review & Publish Tile
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Tessl CLI
+        run: curl -fsSL https://tessl.io/install.sh | bash
+      - name: Lint tile structure
+        run: tessl tile lint .
+      - name: Review skill quality
+        run: |
+          RESULT=$(tessl skill review --json .)
+          SCORE=$(echo "$RESULT" | jq -r '.score // 0')
+          echo "Skill review score: ${SCORE}%"
+          if [ "$SCORE" -lt 90 ]; then
+            echo "::error::Skill review score ${SCORE}% is below the 90% threshold"
+            echo "$RESULT" | jq .
+            exit 1
+          fi
+        env:
+          TESSL_API_TOKEN: ${{ secrets.TESSL_API_TOKEN }}
+
+  publish:
+    needs: review
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: tesslio/publish@main
+        with:
+          token: ${{ secrets.TESSL_API_TOKEN }}
