@@ -32,7 +32,7 @@ Read these reference files in order:
    tone, rhetorical devices, and voice-specific examples.
 2. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-3. `references/ai-anti-patterns.md` — 11 named AI writing patterns to never use. Each has
+3. `references/ai-anti-patterns.md` — 18 named AI writing patterns to never use. Each has
    symptoms, examples, and alternatives. The anti-pattern check in Phase 3 and 4 scans
    the draft against this file.
 4. `references/process.md` — The workflow from transcript to published draft.
