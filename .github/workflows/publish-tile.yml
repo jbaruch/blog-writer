@@ -24,11 +24,12 @@ jobs:
       - name: Review skill quality
         run: |
           RESULT=$(tessl skill review --json .)
-          SCORE=$(echo "$RESULT" | jq -r '.score // 0')
-          echo "Skill review score: ${SCORE}%"
-          if [ "$SCORE" -lt 90 ]; then
-            echo "::error::Skill review score ${SCORE}% is below the 90% threshold"
-            echo "$RESULT" | jq .
+          echo "$RESULT" | jq .
+          SCORE=$(echo "$RESULT" | jq -r '.normalizedScore // 0')
+          PERCENT=$(echo "$SCORE * 100" | bc | cut -d. -f1)
+          echo "Skill review score: ${PERCENT}%"
+          if [ "$PERCENT" -lt 90 ]; then
+            echo "::error::Skill review score ${PERCENT}% is below the 90% threshold"
             exit 1
           fi
         env:
