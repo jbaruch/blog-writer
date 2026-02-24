@@ -25,7 +25,7 @@ jobs:
         run: |
           RESULT=$(tessl skill review --json .)
           echo "$RESULT" | jq .
-          SCORE=$(echo "$RESULT" | jq -r '.normalizedScore // 0')
+          SCORE=$(echo "$RESULT" | jq -r '.contentJudge.normalizedScore // 0')
           PERCENT=$(echo "$SCORE * 100" | bc | cut -d. -f1)
           echo "Skill review score: ${PERCENT}%"
           if [ "$PERCENT" -lt 90 ]; then
