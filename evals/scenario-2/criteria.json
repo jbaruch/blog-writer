@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent follows the persona onboarding structure from the skill's setup flow, producing voice.md, bio.md, and examples.md with the correct sections, analysis depth, and format requirements.",
+  "context": "Tests whether the agent follows the persona onboarding structure from the skill's setup flow, producing voice.md, bio.md, and examples.md with the correct sections, analysis depth across all six dimensions, and format requirements.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -14,27 +14,32 @@
     },
     {
       "name": "Cultural reference analysis",
-      "description": "persona/voice.md contains a section analyzing the cultural reference style (domains, frequency, whether explained or left for reader)",
+      "description": "persona/voice.md contains a section analyzing the cultural reference style (what domains, how often, whether explained or left for the reader)",
       "max_score": 8
     },
     {
       "name": "Recurring characters identified",
-      "description": "persona/voice.md contains a section on recurring characters that identifies Prashant as a recurring figure and describes his role/dynamic",
+      "description": "persona/voice.md contains a section on recurring characters that identifies Dex as a recurring figure and describes their role/dynamic with the author",
       "max_score": 10
     },
     {
       "name": "Voice consistency notes",
-      "description": "persona/voice.md contains a section on voice consistency (how the voice behaves in technical sections)",
+      "description": "persona/voice.md contains a section on voice consistency (how the voice behaves in technical sections, whether it changes register)",
+      "max_score": 8
+    },
+    {
+      "name": "Humor analysis present",
+      "description": "persona/voice.md analyzes the author's humor style (type, frequency, calibration) -- either as a standalone section or clearly integrated into the rhetorical devices section",
       "max_score": 8
     },
     {
       "name": "Bio schema present",
-      "description": "persona/bio.md contains a bio template/schema with variable parts marked, incorporating the provided info (name, role at Meridian Health, gaming company background)",
+      "description": "persona/bio.md contains a bio template/schema with variable parts marked, incorporating the provided info (name, role at Lattice Systems, embedded systems background)",
       "max_score": 10
     },
     {
       "name": "Bio kicker notes",
-      "description": "persona/bio.md contains a section on kicker notes specifying that the kicker should be rotating and describing the expected tone",
+      "description": "persona/bio.md contains a section on kicker notes specifying that the kicker should be rotating and describing the expected tone (matching the author's style)",
       "max_score": 8
     },
     {
@@ -46,11 +51,6 @@
       "name": "Examples have pattern annotations",
       "description": "Each entry in persona/examples.md includes a note about what voice patterns that sample demonstrates (not just the title/URL)",
       "max_score": 10
-    },
-    {
-      "name": "Humor analysis present",
-      "description": "persona/voice.md analyzes the author's humor style (type, frequency, calibration) -- either as a standalone section or integrated into the rhetorical devices section",
-      "max_score": 8
     },
     {
       "name": "Product context skipped",

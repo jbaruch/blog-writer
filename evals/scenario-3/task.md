@@ -2,107 +2,128 @@
 
 ## Problem/Feature Description
 
-A developer advocate named Sam Reeves has rough meeting notes from a team retro where they discussed their experience migrating from a monolith to microservices using AI-assisted code splitting. The meeting was chaotic and wide-ranging, but there's a good blog post in there. Sam needs the source material analyzed and an editorial plan created -- not the draft itself, just the plan.
+Elena Vasquez is a site reliability engineer who writes a blog about operational lessons and infrastructure war stories. She has rough notes from an on-call incident where her team discovered that their logging pipeline was silently dropping 30% of logs during peak traffic, masking a cascading failure in their payment service. The incident is resolved and she wants to turn it into a blog post.
 
-This is part 2 of Sam's "Migration Diaries" series. The slug for this post is `migration-diaries-ep2`.
+Elena needs the source material analyzed and an editorial plan created -- not the draft itself, just the plan. This is part 3 of her "Ops War Stories" series. The slug for this post is `ops-war-stories-ep3`.
 
-Sam's persona files and series context are provided below. Analyze the source material, create a structured research bank, identify gaps in the material, and produce an editorial plan with a focused main idea, CTA, and section outline. Do NOT write the actual blog post -- just the plan.
+Analyze the source material, create a structured research bank, identify gaps where you'd need more information, and produce an editorial plan with a focused main idea, call to action, and section outline. Do NOT write the actual blog post -- just the plan and the questions you'd ask before drafting.
 
 ## Output Specification
 
 Produce the following files:
-- `blog-research-migration-diaries-ep2.md` -- structured research notes from the source material
-- `editorial-plan.md` -- the editorial plan containing: main idea statement, proposed CTA, section outline with descriptions, and proposed placeholder locations
-- `clarification-questions.md` -- questions you'd need answered before writing the draft, organized by category
+- `blog-research-ops-war-stories-ep3.md` -- structured research notes from the source material
+- `editorial-plan.md` -- the editorial plan for the blog post
+- `clarification-questions.md` -- questions you'd need answered before writing the draft
 
 ## Input Files
 
 The following files are provided as inputs. Extract them before beginning.
 
 =============== FILE: persona/voice.md ===============
-# Voice Profile: Sam Reeves
+# Voice Profile: Elena Vasquez
 
 ## The Voice in One Paragraph
-You're a developer advocate who spent years as a platform engineer before switching to the dark side of developer relations. You write like you're explaining something to a smart friend over coffee -- technical depth without condescension. You find humor in the gap between how things should work and how they actually work. You're honest about failures because you've seen too many "we migrated perfectly" blog posts that you know are lies.
+
+You're an SRE who has been on enough 2 AM pages to know that the incident report never captures the real story. You write with dark humor about operational failures because laughing about them is healthier than crying. You name your incidents like hurricanes -- it helps the team remember them and it makes the postmortems more readable. You believe that every system is one bad deploy away from a very interesting night.
 
 ## Rhetorical Devices That Work
 
-### The honest admission
-Starting a section by admitting something most people wouldn't.
-> "We had no idea what we were doing. We had a Miro board and strong opinions."
+### The incident name
+Giving colorful names to incidents that the team actually uses.
 
-### The callback
-Referencing earlier parts of the post or previous posts for continuity.
-> "Remember the 'simple refactor' from Episode 1? Yeah, me neither."
+> "We call it 'The Great Log Famine of March' internally. It's easier than saying 'that time we lost thirty percent of our logs and didn't notice for nine hours.'"
 
-### Real numbers
-Using specific numbers instead of vague claims.
-> "14 services. 3 teams. 1 shared database that nobody wanted to own."
+### The 2 AM detail
+Including the specific unglamorous details of on-call work.
+
+> "I was debugging in my kitchen at 2:14 AM, wearing one sock because I'd gotten the page mid-getting-dressed, with a cat on my keyboard contributing error messages of her own."
+
+### The comparison to a worse thing
+Making a point by comparing the current failure to something more dramatic.
+
+> "Our log pipeline had the reliability of a WiFi connection at a stadium concert."
+
+## Cultural Reference Style
+References to ops culture, on-call life, and the eternal gap between architecture diagrams and 3 AM reality. Occasional references to disaster movies and survival shows.
 
 ## Recurring Characters
-- **Dana** -- tech lead, makes pragmatic decisions that annoy Sam but are usually right
-- **The Miro Board** -- treated as a character; the team's planning artifact that keeps growing
+
+- **Mika** -- junior SRE on the team, asks questions that sound naive but turn out to be exactly right. The one who noticed the log gap during an unrelated investigation.
+- **The on-call phone** -- treated as a character, usually delivering bad news at inconvenient times.
 
 ## Voice Consistency Notes
-Sam's voice stays conversational even in architectural discussions. Diagrams and code are introduced with context about why the reader is seeing them, never just dropped in.
+Elena's dark humor continues into technical sections. Diagrams and architecture are presented as "what we thought was happening" vs "what was actually happening." Config files are described with personality.
 
 =============== FILE: persona/bio.md ===============
-# Author Bio: Sam Reeves
+# Author Bio: Elena Vasquez
 
 ## Bio Schema
-Sam Reeves is a developer advocate at SplitStack, where he helps teams migrate monoliths without losing their minds. Previously spent six years as a platform engineer, mostly apologizing for breaking the build. [Rotating kicker.]
+Elena Vasquez is a site reliability engineer at PageCo, where she keeps distributed systems from paging her at 2 AM. (They page her anyway.) Previously spent five years running infrastructure for a gaming company where "five nines" was aspirational and "three nines" was optimistic. [Rotating kicker.]
 
 ## Kicker Notes
-Rotating. Dry humor. Should reference something specific from the post.
+Rotating. Should reference something specific from the post. Dark humor preferred.
 
 =============== FILE: series-tracker.md ===============
 # Series Tracker
 
-## Migration Diaries
-- Episode 1: "The Miro Board of Doom" -- published
-  - Established: Dana as pragmatic foil, the Miro board as running character
-  - Callbacks: "the simple refactor" (ironic reference to a 3-month project)
-  - Running joke: the team's shared database that nobody wants to own
-  - Teaser at end: "Next time: we actually start splitting services. The database problem gets worse before it gets better."
-- Episode 2: IN PROGRESS
-  - Should callback to: "the simple refactor", the shared database, the Miro board
-  - Should address the teaser about database splitting getting worse
+## Ops War Stories
+- Episode 1: "The Kafka Incident" -- published
+  - Callbacks: "the Kafka incident" as shorthand for cascading failures
+  - Elena's naming convention established: giving incidents colorful names
+  - Running joke: debugging at 2 AM as a recurring life event
+  - Mika's first appearance: asked "wait, are we sure Kafka is even running?"
+- Episode 2: "The Config That Wasn't" -- published
+  - Callbacks: referenced the Kafka incident
+  - New running element: Elena's cat appearing during late-night debugging
+  - Teaser at end: "Next time: the one where the logs disappeared and we didn't notice for nine hours."
+- Episode 3: IN PROGRESS
+  - Should callback to: the Kafka incident, Elena's naming convention, the 2 AM debugging lifestyle
+  - Should address the teaser about disappearing logs
 
-=============== FILE: inputs/meeting-notes.txt ===============
-RETRO NOTES: Microservices Migration - Week 8 Check-in
-Date: Tuesday
+=============== FILE: inputs/incident-notes.txt ===============
+INCIDENT NOTES: The Great Log Famine
+Resolved: last Thursday
+Severity: Sev-2 (upgraded from Sev-3 during investigation)
 
-Attendees: Sam, Dana, Raj, Keiko
+TIMELINE:
+- Three weeks ago: logs started dropping during peak traffic (5-7 PM UTC)
+- Nobody noticed because the logging pipeline doesn't have its own monitoring (ironic)
+- Last Monday: Mika was investigating a latency spike in the payment service
+- Mika noticed log gaps -- searched for payment service logs from 5:30 PM and found nothing
+- Mika asked: "Should there be logs here?" (yes, there should be thousands)
+- Investigation revealed: Fluentd was dropping ~30% of logs during peak hours
+- Root cause: Fluentd buffer was sized for our traffic from 18 months ago, before the payment service was added
+- The buffer fills up during peak, Fluentd silently drops overflow records
+- This had been happening for at least three weeks, possibly longer
 
-WHAT WENT WELL:
-- Finally extracted the user service. It has its own database now.
-- Raj figured out the event bus pattern for keeping user data in sync across services.
-- Keiko's integration tests caught a race condition in the order service that would have been invisible in the monolith.
-- Dana's decision to start with the user service (instead of orders like Sam wanted) turned out to be right. User data had fewer foreign key dependencies.
+THE PAYMENT SERVICE PROBLEM:
+- The payment service had been throwing intermittent 503 errors for two weeks
+- We couldn't find the errors in our logs because those were exactly the logs being dropped
+- The dropped logs were disproportionately from high-traffic services (payment, search)
+- Low-traffic services (admin panel, internal tools) logged fine -- their volume fit in the buffer
+- So our log search made it look like the payment service was healthy when it wasn't
+- Customers were reporting failed payments but our dashboards showed no errors
 
-WHAT WENT WRONG:
-- The shared database is now THREE databases. We went from "one database nobody owns" to "three databases that all need the same user data." The sync is fragile.
-- Sam spent two days trying to get the AI code-splitting tool to understand our domain boundaries. It kept wanting to split along technical layers (controllers/services/repos) instead of business domains (users/orders/inventory).
-- The AI tool generated migration scripts that would have dropped a column still used by the order service. Dana caught it in code review.
-- We're now running the monolith AND two microservices simultaneously. Deploys take 3x longer.
-- Raj's event bus pattern works but the error handling is "optimistic" (his word). Failed events just disappear.
+THE FIX:
+- Immediate: tripled the Fluentd buffer size (stopgap)
+- Short-term: added monitoring for Fluentd's own drop rate (should have had this from day one)
+- Medium-term: moving to a backpressure-based system so Fluentd slows down the source instead of dropping
+- Also: Mika wrote a script to estimate how many logs we'd lost, based on expected vs actual log volume per service
 
-WHAT WE LEARNED:
-- AI code-splitting tools think in technical layers, not business domains. You have to be extremely explicit about domain boundaries or it defaults to splitting controllers from services from repositories.
-- The hardest part isn't splitting the code. It's splitting the data. We underestimated this by about 300%.
-- Running monolith + microservices simultaneously is operationally miserable. We need a timeline for killing the monolith.
-- Dana: "The AI is great at the mechanical work -- extracting interfaces, generating service stubs, writing migration scripts. It's terrible at deciding WHAT to extract. That's still a human judgment call."
-- Integration tests between services need to exist BEFORE you split, not after. Keiko had to backfill tests for behaviors that were implicit in the monolith.
+NOTABLE QUOTES FROM THE INCIDENT:
+- Elena: "We were monitoring everything except the monitoring."
+- Mika: "Is it normal for there to be no logs? Because this seems like a thing."
+- Elena to her manager: "The good news is we found the payment bug. The bad news is we found it by discovering a different, worse bug."
+- Team joke during postmortem: "The logs were there the whole time. They just chose not to be recorded."
 
-ACTION ITEMS:
-- Raj: add dead letter queue for failed events (2 days)
-- Sam: write blog post about the migration so far
-- Keiko: set up contract tests between user service and order service
-- Dana: create timeline for monolith sunset
+UNRESOLVED QUESTIONS:
+- How long had this actually been happening? Mika's script estimates 3-5 weeks but we're not sure
+- Were there other incidents masked by the log gap that we haven't found yet?
+- Should we implement log sampling instead of dropping during overflow?
 
-RANDOM QUOTES:
-- Sam: "I told the AI to split by domain and it split by file extension."
-- Dana: "If we'd started with the order service we'd still be untangling foreign keys."
-- Raj: "The event bus works perfectly. As long as nothing fails. Which it does."
-- Keiko: "I found a race condition that's been there for two years. The monolith just hid it."
+PEOPLE INVOLVED:
+- Elena (led the investigation after Mika flagged it)
+- Mika (discovered the gap)
+- Carlos (platform team, helped with the Fluentd config)
+- Payment team (provided context on the 503 errors)
 =============== END INPUT ===============

@@ -2,9 +2,9 @@
 
 ## Problem/Feature Description
 
-A new contributor (Alex Torres) submitted his first blog post draft. The technical content and narrative are solid, but Alex hasn't written for this blog before and isn't familiar with our formatting conventions. Before publication, the draft needs a formatting review to bring it in line with how the blog handles summaries, visual asset references, and overall structure.
+A new contributor (Mateo Silva) submitted his first blog post draft. The technical content and narrative are solid -- it's about building a rate limiter that accidentally took down their own health check endpoint. Mateo hasn't written for this blog before and isn't familiar with the formatting conventions for summaries, visual asset references, and overall structure.
 
-Review the draft against the blog's formatting standards and fix any issues you find. Preserve the actual content -- this is a formatting pass, not a rewrite. Document what you changed so Alex can learn the conventions for his next post.
+Before publication, the draft needs a formatting review to bring it in line with how the blog handles things. Preserve the actual content -- this is a formatting and tightening pass, not a rewrite. Document what you changed so Mateo can learn the conventions for his next post.
 
 ## Output Specification
 
@@ -17,85 +17,101 @@ Produce the following files:
 The following files are provided as inputs. Extract them before beginning.
 
 =============== FILE: inputs/draft-to-fix.md ===============
-# The Cache Invalidation Episode
+# The Rate Limiter That Rate Limited Us
 
 ## TLDR
 
-We spent a week building a caching layer for our product catalog API, and it turned out the hardest part wasn't the caching itself but knowing when to throw the cache away. Our first approach used time-based expiration, which meant customers saw stale prices for up to five minutes after a price change. We switched to event-driven invalidation using webhooks from the catalog service, which reduced stale reads to under 200 milliseconds. Tomoko, our frontend lead, pointed out that we'd essentially rebuilt the Observer pattern from the Gang of Four book, except with more YAML and less dignity.
+We built a rate limiter for our public API to stop abuse from scrapers, but we made the mistake of applying it globally without excluding internal services. Our health check endpoint started getting rate limited during traffic spikes, which caused the load balancer to think our servers were down, which triggered a rolling restart across the fleet. The rate limiter designed to protect us from external abuse essentially became a self-inflicted denial of service. We fixed it by adding an allowlist for internal service IPs and moving the health check to a separate port that bypasses the middleware stack. Yuki, our on-call engineer, described the incident as "the system attacking itself like an autoimmune disease" which is basically the most accurate metaphor anyone has ever used for this class of bug.
 
 ## The Setup
 
-Last month, our product catalog API started buckling under load. Response times crept from 80ms to 400ms during peak hours, and our CDN was no help because the catalog data changes too frequently for edge caching.
+Last month, our API started getting hammered by scrapers. Hundreds of requests per second from a rotating pool of IPs, all hitting our product catalog endpoint. Response times for legitimate users crept from 50ms to 800ms during peak scraping hours.
 
-I told the team it was probably a quick fix. Add Redis, cache the responses, done by lunch.
+I told the team we needed a rate limiter. In order to protect our users, we'd throttle requests per IP to 100 per minute. Standard stuff.
 
-[Placeholder 1: Terminal showing the API response times during peak load]
+[Placeholder 1: Terminal showing the scraper traffic pattern in our access logs]
 
-It was not done by lunch.
+Yuki -- our on-call engineer who has essentially survived every major incident in the last two years -- asked if we'd thought about which endpoints to exclude. I said "no, we'll apply it globally, it's simpler that way."
 
-## The First Attempt
+Famous last words.
 
-We added a Redis cache with a 5-minute TTL. Standard stuff. The response times dropped to 12ms for cached requests.
+## The Implementation
 
-[Placeholder 2: The Redis config file showing the TTL settings]
+We dropped in a Redis-backed sliding window rate limiter as Express middleware. Basically, every request increments a counter in Redis keyed by IP, and if you exceed 100 requests per minute, you get a 429 Too Many Requests response.
 
-```python
-# Cache decorator for catalog endpoints
-@cache(ttl=300)  # 5 minutes
-def get_product(product_id: str):
-    return catalog_service.fetch(product_id)
+[Placeholder 2: The rate limiter middleware code]
+
+```javascript
+// Rate limiter configuration
+const limiter = rateLimit({
+  store: new RedisStore({ client: redisClient }),
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { error: "Rate limit exceeded" }
+});
+
+app.use(limiter); // Applied to ALL routes
 ```
 
-[Placeholder 3: Screenshot of the Grafana dashboard showing the latency drop after adding the cache]
+[Placeholder 3: Redis dashboard showing the rate limit counter keys]
 
-Victory! For about two hours.
+The scraper traffic dropped immediately. Response times went back to normal. Victory.
 
-Then the pricing team updated a product price and three customers were charged the old price. One of them was a VIP account.
+For about four hours.
 
-[Placeholder 4: Slack message from the pricing team reporting the stale price issue]
+## The Incident
 
-Tomoko came over to my desk with the expression she reserves for when I've created more work for her team. "The frontend is showing $49.99 and the backend is charging $59.99. Pick one."
+At 3:47 PM, our monitoring fired. Half our fleet was showing as unhealthy. The load balancer was pulling servers out of rotation.
+
+[Placeholder 4: PagerDuty alert showing the fleet health dropping]
+
+[Placeholder 5: Grafana dashboard showing the cascading server restarts]
+
+I pulled up the health check logs and found... nothing. No logs. The health check endpoint was returning 429. Our load balancer hits the health check endpoint from the same internal IP range, and during the traffic spike, the combined load of health checks plus legitimate traffic was exceeding the rate limit for those IPs.
+
+[Placeholder 6: The load balancer config showing the health check endpoint]
+
+Yuki was already on it. She'd basically figured out the problem before I finished reading the alerts. "The rate limiter is rate limiting the health checks. The load balancer thinks we're dead. It's restarting us in order to fix a problem that only exists because it's restarting us."
 
 ## The Fix
 
-We needed the cache to invalidate the moment a price changed, not five minutes later. The catalog service already had a webhook system for inventory updates, so we extended it to fire on price changes too.
+Two changes:
 
-[Placeholder 5: The webhook configuration for cache invalidation events]
+First, we added an allowlist for internal CIDR ranges. Health checks, service-to-service calls, and monitoring probes now bypass the rate limiter entirely.
 
-```python
-# Event-driven cache invalidation
-@webhook_handler("catalog.product.updated")
-def invalidate_product_cache(event):
-    product_id = event["product_id"]
-    cache.delete(f"product:{product_id}")
-    logger.info(f"Cache invalidated for product {product_id}")
+[Placeholder 7: The updated middleware with the allowlist]
+
+```javascript
+// Fixed: internal services bypass rate limiting
+const isInternal = (ip) => internalCIDRs.some(cidr => cidr.contains(ip));
+
+app.use((req, res, next) => {
+  if (isInternal(req.ip)) return next();
+  return limiter(req, res, next);
+});
 ```
 
-[Placeholder 6: Code showing the webhook handler registration]
+Second, we moved the health check to a dedicated port that doesn't go through the middleware stack at all. In order to ensure the health check is always reachable, it runs on port 8081 with essentially zero middleware.
 
-The result was elegant: cache hits stayed fast, but the moment a product changed, the next request would fetch fresh data. Stale window went from 5 minutes to ~200ms (the time between the webhook firing and the cache entry being deleted).
+[Placeholder 8: The separate health check server configuration]
 
-[Placeholder 7: Grafana dashboard showing the before/after stale read duration]
-
-[Placeholder 8: Architecture diagram of the event-driven invalidation flow]
+[Placeholder 9: Updated Grafana dashboard showing stable fleet health after the fix]
 
 ## The Broader Point
 
-Tomoko nailed it when she said we'd rebuilt the Observer pattern. Caching isn't a storage problem -- it's a consistency problem. The question isn't "how do I cache this?" It's "how do I know when this isn't true anymore?"
+Rate limiters are essentially a form of access control, and access control that doesn't distinguish between friends and enemies is just a wall. We were so focused on stopping the scrapers that we forgot our own infrastructure is also a client of our API.
 
-[Placeholder 9: Link to the Gang of Four Observer pattern for reference]
+[Placeholder 10: Link to the OWASP rate limiting best practices]
 
-Every caching bug I've seen in production comes down to the same thing: someone optimized for reads without thinking about writes. We were so excited about 12ms response times that we forgot prices change.
+Yuki suggested we basically add the allowlist pattern to our service template so new services get it by default. We did. It took twenty minutes. The incident took four hours.
 
-## Try It Yourself
+## Try It
 
-If your API responses are slow and you're reaching for a cache, start with the invalidation strategy, not the cache layer. Figure out how you'll know when data is stale BEFORE you cache it.
+If you're adding rate limiting to an existing service, check your internal callers first. Grep your load balancer config for health check endpoints and make sure they're excluded before you deploy.
 
-[Placeholder 10: Link to the Redis documentation on cache invalidation patterns]
-
-Our implementation is open-source if you want to see the full webhook-based approach.
+[Placeholder 11: Link to our internal rate limiter template on GitHub]
 
 ---
 
-*Alex Torres is a backend engineer at ShopGrid, where he builds systems that serve the right price most of the time. Previously spent five years at a fintech startup where "eventual consistency" was a lifestyle, not an architecture choice. He now has strong opinions about TTLs and a healthy fear of VIP accounts.*
+*Mateo Silva is a backend engineer at CartStack, where he builds systems that occasionally protect themselves from their own infrastructure. Previously spent four years at a payments company where "rate limiting" meant the database was too slow to process requests at any rate. He now has strong opinions about allowlists and a healthy distrust of global middleware.*
 =============== END INPUT ===============

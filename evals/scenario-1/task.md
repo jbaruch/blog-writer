@@ -2,9 +2,9 @@
 
 ## Problem/Feature Description
 
-A developer blog editor received a draft from a writer who used AI assistance heavily during the writing process. The draft has good technical content and a solid narrative arc, but the prose has quality issues that make it read like AI-generated text rather than authentic developer writing. The editor needs the draft cleaned up so it reads like it was written by a human developer with real opinions.
+A developer blog editor received a draft from a writer who used AI assistance heavily during the writing process. The draft covers a real technical topic -- migrating to trunk-based development -- and the narrative arc is solid, but the prose has quality issues throughout that make it read like AI-generated text rather than authentic developer writing.
 
-Review the draft below for writing quality problems. Produce a cleaned-up version that preserves the technical content and narrative structure but fixes the prose quality issues. Also produce a report documenting every issue you found, with the original text and your replacement.
+Review the draft below for writing quality problems. Produce a cleaned-up version that preserves the technical content and narrative structure but fixes the prose quality issues. Also produce a detailed report documenting every issue you found, with the original text and your replacement.
 
 ## Output Specification
 
@@ -17,71 +17,55 @@ Produce the following files:
 The following files are provided as inputs. Extract them before beginning.
 
 =============== FILE: inputs/draft-to-clean.md ===============
-# How We Rebuilt Our Deploy Pipeline With AI Agents
+# How Our Team Adopted Trunk-Based Development
 
-In this post, we'll explore how our team leveraged AI agents to transform our deployment pipeline from a manual nightmare into a streamlined, robust system. What follows is a deep dive into the lessons we learned along the way.
-
-## TLDR
-
-Our deployment pipeline was broken. We spent three months rebuilding it with AI-assisted tooling, and the results were transformative. The new system handles everything from code review to staging deployment automatically, reducing our deploy time from 45 minutes to under 8 minutes. It's worth noting that this approach works for teams of all sizes, from two-person startups to hundred-engineer organizations.
+In this post, we\u2019ll explore how our team navigated the transition to trunk-based development. What follows is a deep dive into the lessons we learned, the tools we leveraged, and the streamlined workflow we built along the way.
 
 ## The Problem
 
-Not a broken pipeline. A broken process.
+Not a branching strategy. A survival mechanism.
 
-Every Friday at 4 PM, someone had to babysit the deploy. Click buttons. Watch logs. Pray. It was, to put it mildly, suboptimal.
+Our team of eight engineers had been running GitFlow for three years. Release branches, hotfix branches, feature branches that lived for weeks. Merge conflicts were a daily ritual. It\u2019s worth noting that we spent more time resolving conflicts than writing code some weeks. Interestingly enough, nobody questioned the process until our deploy frequency dropped to once every two weeks.
 
-The deploy script -- which had been written by an intern three years ago -- served as the backbone of our entire release process. It boasted a grand total of zero tests and featured hardcoded paths that only worked on Jake's laptop.
+The CI pipeline \u2013 which had been configured by a contractor two years ago \u2013 served as the backbone of our entire release process. It boasted a grand total of 340 test cases and stood as a testament to our commitment to quality. The integration system showcased automated linting and type checking across all branches.
 
-It's worth noting that we'd tried to fix it before. Interestingly enough, every previous attempt had failed because nobody wanted to touch the script. To be fair, the script was genuinely terrifying.
+To be fair, GitFlow had worked when we were four people. But at eight engineers with three active feature branches, the build infrastructure was buckling. It bears mentioning that the merge queue alone added two hours to every release.
 
-## The Pivot
+## The Decision
 
-Where manual deploys give you control, automated pipelines give you speed. Where human oversight catches edge cases, AI agents catch patterns. One approach trusts the operator. The other trusts the system.
+Where feature branches give you isolation, trunk-based gives you speed. Where long-lived branches give you safety, short-lived ones give you momentum. One approach trusts the branch. The other trusts the team.
 
-We decided to let an AI agent analyze our deploy script and suggest improvements. The result? A complete rewrite. The best part? It actually worked. And the tests? All passing.
+We decided to adopt trunk-based development with feature flags. The result? Zero rollbacks in the first month. The best part? Everyone could deploy independently. And the tests? All green, all the time.
 
-Fast. Reliable. Tested. And deployed to production on a Tuesday.
+Fast. Reliable. Tested. And shipped on a Monday.
 
-The agent -- which had access to our entire codebase -- rewrote the script in stages. The pipeline -- our most critical piece of infrastructure -- was rebuilt from scratch. The config files -- previously scattered across three repos -- were consolidated into one.
+Feature flags. Dark launches. Percentage rollouts. Pure control.
 
-I keep coming back to this idea that the real value of AI agents isn't generating code --- it's analyzing existing systems. Something feels off about how we've been thinking about this --- like we've been using a telescope as a hammer --- and the agent proved it by finding patterns in our deploy logs that no human had noticed.
+The code doesn\u2019t define the process; the process defines the code.
 
-## The Technical Meat
+## The Migration
 
-The new pipeline orchestrates the entire deploy process through a series of stages. Each stage serves as a checkpoint that validates the previous step's output. The monitoring dashboard stands as a single source of truth for deploy health. The alert system showcases real-time notifications.
+The pipeline \u2013 which we had built over three sprints \u2013 handled the transition gracefully. The config \u2013 our most critical file \u2013 was updated to support the new workflow. The tests \u2013 all 200 of them \u2013 passed on the first run. The monitoring \u2013 our Datadog setup \u2013 confirmed zero regressions.
 
-The linter handles the style. The formatter provides the structure. The type checker handles the safety. And the AI agent? It handles everything else.
+We reviewed the pipeline configuration. We updated the branch protection rules. We enabled the feature flag service. We migrated the first three services. We monitored for regressions closely. We documented the new workflow thoroughly. We trained the team on the process.
 
-Developers can configure the pipeline through a YAML file. Engineers who need more control can use the CLI directly. Practitioners working in larger teams should leverage the dashboard for visibility. Builders who want custom stages can extend the base configuration.
+What I find genuinely interesting about this transition is that it fundamentally transforms how you think about the development landscape. I keep coming back to the idea that trunk-based development isn\u2019t just a technical choice\u2026 it\u2019s a cultural one. The team delved into the codebase with renewed energy, navigating the complexity of the migration and fostering a more robust and seamless development experience. This pivotal shift was nothing short of transformative.
 
-Process without knowledge yields organized failures. Knowledge without process yields correctly understood chaos.
+## The Results
 
-The model is smart, but the context is limited. The pipeline is fast, but the feedback is slow.
+We shipped the new pipeline on a Thursday \ud83d\ude80 and by Monday our deploy frequency had tripled \ud83d\udd25. The team was finally able to ship features daily instead of biweekly \ud83c\udf89.
 
-From junior developers just learning CI/CD to seasoned platform engineers running multi-region deployments, everyone benefits from this approach. Whether you're deploying a side project or scaling to millions of users, the same principles apply.
+Not just a workflow. A philosophy.
 
-Here's what I find genuinely interesting about this approach --- it fundamentally transforms how we think about the deployment landscape. The agent delves into the codebase, navigates the complexity, and illuminates patterns that would otherwise remain hidden. This pivotal shift in our workflow has been nothing short of transformative, fostering a more robust and seamless development experience.
+From solo developers just learning version control to hundred-person engineering orgs running multi-region deployments, this approach works. Whether you\u2019re running a side project or a Fortune 500 deployment pipeline, the same principles apply. The automation layer handles everything regardless of scale.
 
-Purple gradients. Chat interface. Zero tests. Pure vibes.
+\u2022 Deploy frequency went from biweekly to daily
+\u2022 Merge conflicts dropped by 90%
+\u2022 Mean time to recovery fell from 4 hours to 20 minutes
 
-That's what the agent's first attempt looked like. It generated a beautiful monitoring dashboard that monitored absolutely nothing.
-
-## What We Learned
-
-The agent wrote better tests than we usually do. The tool caught edge cases we'd missed. The system flagged configuration drift automatically. The interface surfaced deploy bottlenecks we didn't know existed.
-
-We shipped the new pipeline on a Thursday 🚀 and by Monday our deploy frequency had doubled 💪. The team was finally able to focus on features instead of fighting the deploy process 🎉.
-
-It bears mentioning that the journey wasn't without setbacks. We hit three major blockers during the migration, but each one taught us something valuable about how AI agents interact with legacy systems.
-
-## Wrapping Up
-
-Not just a tool. A methodology.
-
-The pipeline rebuild proved that AI agents aren't just code generators --- they're system analysts. From beginners to experts, from startups to enterprises, this approach works because it lets the agent do what it does best: find patterns humans miss.
+The build infrastructure proved that small, frequent commits beat large, infrequent merges every time.
 
 ---
 
-*Jake is a platform engineer at CloudScale, where he builds deploy pipelines that occasionally deploy. Previously spent five years watching Jenkins builds at a bank. He once mass-deployed to production on a Friday and lived to mass-deploy another day.*
+*Jordan Kim is a senior engineer at ShipFast, where they build deploy pipelines that occasionally deploy on time. Previously spent five years at a consulting firm where \u201ctrunk-based development\u201d meant everyone committed to main and hoped for the best. Once mass-deployed to production during a company all-hands and discovered that \u201cfeature complete\u201d and \u201cworking\u201d are different concepts.*
 =============== END INPUT ===============

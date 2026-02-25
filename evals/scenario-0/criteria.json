@@ -1,71 +1,91 @@
 {
-  "context": "Tests whether the agent follows the blog-writer skill's structural, formatting, and voice rules when producing a complete blog post draft from a video transcript with persona and series context provided.",
+  "context": "Tests whether the agent follows the blog-writer skill's complete pipeline when producing a blog post from a transcript: correct file naming, TLDR format and placement, opening hook, placeholder conventions, author bio, series continuity, word count target, and voice maintenance in technical sections.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Research bank created",
-      "description": "A file named blog-research-agent-disasters-ep3.md exists in the working directory",
-      "max_score": 7
+      "name": "Research bank naming",
+      "description": "A file named blog-research-production-confessions-ep2.md exists in the working directory (uses the slug provided in the task)",
+      "max_score": 5
     },
     {
       "name": "Research bank structure",
-      "description": "The research bank file contains sections for Source Material Summary, Clarification Log (or equivalent gap identification), and Editorial Plan",
-      "max_score": 7
+      "description": "The research bank file contains at least sections for Source Material Summary and Editorial Plan (may also include Product Context, Clarification Log, Draft Notes)",
+      "max_score": 5
     },
     {
       "name": "Draft file naming",
-      "description": "A file named blog-draft-agent-disasters-ep3.md exists in the working directory",
-      "max_score": 7
+      "description": "A file named blog-draft-production-confessions-ep2.md exists in the working directory",
+      "max_score": 5
     },
     {
-      "name": "TLDR is bullets not prose",
+      "name": "TLDR is bullets",
       "description": "The draft contains a TLDR section that uses bullet points (lines starting with - or *), NOT prose paragraphs",
-      "max_score": 10
+      "max_score": 8
     },
     {
       "name": "TLDR bullet count",
       "description": "The TLDR contains exactly 2, 3, or 4 bullet items (not 1, not 5+)",
-      "max_score": 7
+      "max_score": 5
     },
     {
       "name": "TLDR placed before body",
-      "description": "The TLDR section appears before the opening hook/story, not at the end of the post",
+      "description": "The TLDR section appears before the opening hook/story, not after the body or at the end of the post",
+      "max_score": 5
+    },
+    {
+      "name": "TLDR recurring character last",
+      "description": "One TLDR bullet mentions or quotes Lin (the recurring character), and that bullet is the last one in the TLDR list",
       "max_score": 7
     },
     {
       "name": "Opening is narrative",
       "description": "The first section after TLDR opens with a story, anecdote, or confession -- NOT a thesis statement and NOT a preamble like 'In this post we will explore'",
-      "max_score": 10
+      "max_score": 8
     },
     {
       "name": "Placeholder independent numbering",
       "description": "Screenshot placeholders and Code placeholders each start their own numbering at 01 independently (e.g., Screenshot 01 and Code 01 can both exist, NOT Screenshot 01 then Code 02)",
-      "max_score": 10
+      "max_score": 8
     },
     {
       "name": "Placeholder zero-padding",
       "description": "All placeholders use zero-padded numbers (01, 02, etc.) not bare single digits (1, 2, etc.)",
+      "max_score": 5
+    },
+    {
+      "name": "Code VERIFY comment",
+      "description": "At least one code placeholder or inline code block includes a VERIFY comment (e.g., <!-- VERIFY: ... -->) indicating the code was reconstructed from the transcript",
       "max_score": 7
     },
     {
-      "name": "Author bio present",
-      "description": "The draft ends with an author bio section for Marcus Chen that follows the schema from persona/bio.md",
-      "max_score": 7
-    },
-    {
-      "name": "Bio kicker is post-specific",
-      "description": "The author bio includes a rotating kicker (final sentence) that references something specific from THIS post (recipes, the agent calling OpenAI, chocolate spaghetti, etc.)",
+      "name": "Bio post-specific kicker",
+      "description": "The draft ends with an author bio for Ravi Patel that includes a rotating kicker (final sentence) referencing something specific from THIS post (e.g., silent failures, CSV exports, cgroup v2, green dashboards)",
       "max_score": 7
     },
     {
       "name": "Series callback present",
-      "description": "The draft references at least one element from previous episodes (e.g., 'it's probably a quick fix' from Episode 2, or 'the authentication incident' from Episode 1)",
-      "max_score": 7
+      "description": "The draft references at least one element from the series tracker's Episode 1 (e.g., 'the autoscaler incident', 'let me check the dashboard', or Lin's 'we tried that in 2019' catchphrase)",
+      "max_score": 5
+    },
+    {
+      "name": "Word count range",
+      "description": "The blog post body (excluding the author bio section) contains between 1,500 and 2,200 words",
+      "max_score": 5
     },
     {
       "name": "No preamble announcement",
-      "description": "The draft does NOT contain phrases like 'In this post, we'll explore', 'Let's take a look at', or 'What follows is'",
-      "max_score": 7
+      "description": "The draft does NOT contain phrases like 'In this post, we will', 'Let's explore', 'What follows is', or 'Let's take a look at'",
+      "max_score": 5
+    },
+    {
+      "name": "Voice in technical sections",
+      "description": "At least one code block, configuration example, or technical explanation is introduced with personality (humor, opinion, or a device from the voice profile) rather than a clinical description like 'The following code shows' or 'Here is the configuration'",
+      "max_score": 5
+    },
+    {
+      "name": "Narrative density maintained",
+      "description": "At least one section in the technical middle of the post (not the opening hook, not the closing) contains a specific moment with dialogue, a reaction, or a concrete detail -- not just abstract technical summary",
+      "max_score": 5
     }
   ]
 }

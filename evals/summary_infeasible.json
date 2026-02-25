@@ -1,17 +1,21 @@
 {
-  "total_infeasible": 3,
+  "total_infeasible": 4,
   "infeasible_scenarios": [
     {
-      "scenarios": "Interactive clarification round",
-      "reasoning": "Phase 1 of the blog-writer workflow requires back-and-forth with the author to resolve narrative, technical, visual, and context gaps. The eval sandbox is one-shot with no user interaction, so the iterative clarification loop cannot be tested as a live interaction. Scenario 3 tests the clarification question format as a static artifact instead."
+      "scenario": "Read reference files in specific order",
+      "reasoning": "Instruction #3 requires reading files in a particular order (voice.md -> tone-guide.md -> ai-anti-patterns.md -> process.md -> product.md). This is a process observation that cannot be verified from file outputs alone. The eval sandbox only grades final files, not agent execution logs or tool call order."
     },
     {
-      "scenarios": "Interactive revision loop",
-      "reasoning": "Phase 4 requires the author to provide feedback, the agent to edit the draft file surgically, and then re-run anti-pattern/accuracy/tightening checks. This iterative loop requires multiple rounds of human-in-the-loop interaction that cannot be simulated in a one-shot eval."
+      "scenario": "Don't read product.md upfront",
+      "reasoning": "Instruction #4 requires scanning product.md without reading it fully, then fetching specific pages during Phase 0. This is a behavioral constraint on how the agent processes files internally, which cannot be observed from output artifacts."
     },
     {
-      "scenarios": "WebFetch of product documentation and published posts",
-      "reasoning": "The skill instructs the agent to use WebFetch to pull product documentation pages from persona/product.md URLs and to fetch previously published series posts. These require real, accessible URLs to specific documentation sites. The eval sandbox has network access but cannot guarantee that arbitrary external URLs will be available or return meaningful content for grading."
+      "scenario": "Ask for slug before starting Phase 0",
+      "reasoning": "Instruction #20 requires the agent to interactively ask the author for a slug before proceeding. The eval sandbox does not support interactive back-and-forth with a user. All scenarios provide the slug upfront in the task description instead."
+    },
+    {
+      "scenario": "Phase 4 surgical file editing",
+      "reasoning": "Instruction #31 requires the agent to edit the draft file surgically using the Edit tool during revision based on author feedback. Phase 4 is inherently interactive (author gives feedback, agent revises), which cannot be simulated in a one-shot eval. The revision loop requires multiple turns of human-agent interaction."
     }
   ]
 }

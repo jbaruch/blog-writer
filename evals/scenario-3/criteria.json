@@ -1,35 +1,35 @@
 {
-  "context": "Tests whether the agent follows the editorial planning workflow from the skill, including research bank structure, main idea template format, clarification question formatting, placeholder planning, and series continuity handling.",
+  "context": "Tests whether the agent follows the editorial planning workflow from the skill, including research bank structure, main idea template format, clarification question formatting, placeholder planning, and series continuity handling -- without jumping ahead to write the actual draft.",
   "type": "weighted_checklist",
   "checklist": [
     {
       "name": "Research bank file naming",
-      "description": "A file named blog-research-migration-diaries-ep2.md exists (using the slug provided)",
+      "description": "A file named blog-research-ops-war-stories-ep3.md exists (using the slug provided in the task)",
       "max_score": 8
     },
     {
       "name": "Research bank sections",
-      "description": "The research bank contains sections for Source Material Summary and Editorial Plan (and optionally Clarification Log and Draft Notes)",
+      "description": "The research bank contains sections for Source Material Summary and Editorial Plan (and optionally Clarification Log, Product Context, Draft Notes)",
       "max_score": 8
     },
     {
       "name": "Main idea template format",
-      "description": "The editorial plan contains a main idea statement that follows the structure 'This post shows that [specific claim], demonstrated by [specific evidence]' or a close equivalent with a specific claim and specific evidence",
+      "description": "The editorial plan contains a main idea statement that follows the structure 'This post shows that [specific claim], demonstrated by [specific evidence]' or a close equivalent with both a specific claim and specific evidence",
       "max_score": 12
     },
     {
       "name": "CTA is practical and specific",
-      "description": "The editorial plan includes a proposed CTA that suggests a concrete action (not vague like 'think about microservices'), such as trying a tool, reading something, or following a specific step",
+      "description": "The editorial plan includes a proposed CTA that suggests a concrete action (not vague like 'think about observability'), such as trying a tool, implementing a specific practice, or reading something specific",
       "max_score": 8
     },
     {
       "name": "Section outline with descriptions",
-      "description": "The editorial plan includes section headers with 1-2 sentence descriptions of each section's purpose",
+      "description": "The editorial plan includes section headers with 1-2 sentence descriptions explaining each section's purpose and what narrative it carries",
       "max_score": 8
     },
     {
       "name": "Placeholder locations in outline",
-      "description": "The section outline includes proposed placeholder locations (Screenshot, Code, or similar) with each type numbered independently starting at 01",
+      "description": "The section outline includes proposed placeholder locations (Screenshot, Code, Link, or similar) with each type numbered independently starting at 01",
       "max_score": 10
     },
     {
@@ -39,22 +39,22 @@
     },
     {
       "name": "Questions include guesses",
-      "description": "At least half of the clarification questions include the agent's best guess from context so the author can just confirm (e.g., 'Was the tool X? I'm guessing based on...')",
+      "description": "At least half of the clarification questions include the agent's best guess from context so the author can confirm or correct (e.g., 'Was the monitoring tool Datadog? I'm guessing based on...')",
       "max_score": 10
     },
     {
       "name": "Questions grouped by type",
-      "description": "The clarification questions are organized into categories (e.g., narrative gaps, technical gaps, visual gaps, context gaps -- or similar groupings)",
+      "description": "The clarification questions are organized into categories such as narrative gaps, technical gaps, visual gaps, and context gaps (or similar meaningful groupings)",
       "max_score": 8
     },
     {
       "name": "Series callbacks referenced",
-      "description": "The editorial plan references at least one callback from the series tracker (e.g., 'the simple refactor', the shared database, the Miro board, or Dana's role)",
+      "description": "The editorial plan references at least one callback from the series tracker (e.g., Elena's naming convention, 'the Kafka incident', the 2 AM debugging running joke, or Mika's role)",
       "max_score": 10
     },
     {
       "name": "No prose draft written",
-      "description": "No actual blog post draft or prose body content was produced -- only planning artifacts (research bank, editorial plan, clarification questions)",
+      "description": "No actual blog post draft, blog body prose, or blog-draft-*.md file was produced -- only planning artifacts (research bank, editorial plan, clarification questions)",
       "max_score": 8
     }
   ]

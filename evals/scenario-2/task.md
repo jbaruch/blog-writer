@@ -2,14 +2,14 @@
 
 ## Problem/Feature Description
 
-Nadia Okafor is a DevOps engineer who writes a personal blog about infrastructure and observability. She wants to set up a writing persona profile that captures her voice so that future writing assistance stays consistent with her natural style.
+Tara Okonkwo is a firmware engineer who writes a personal blog about embedded systems, hardware debugging, and the intersection of software with physical devices. She wants to set up a writing persona profile that captures her voice so that future writing assistance stays consistent with her natural style.
 
 She's providing three of her published blog post excerpts below. Analyze these samples to identify her voice patterns, rhetorical devices, humor style, cultural references, technical depth habits, and any recurring characters or elements. Then generate a set of persona files that capture her voice.
 
 Her basic info:
-- **Name:** Nadia Okafor
-- **Role:** Senior DevOps Engineer at Meridian Health
-- **Career context:** Previously ran infrastructure for a gaming company that scaled from 10K to 2M concurrent users
+- **Name:** Tara Okonkwo
+- **Role:** Senior Firmware Engineer at Lattice Systems
+- **Career context:** Previously spent seven years writing embedded systems code for medical devices, where "move fast and break things" gets you investigated by the FDA
 - She wants a rotating bio kicker (a dry observation that changes per post)
 - She does NOT write about a specific product, so skip product context
 
@@ -25,64 +25,62 @@ Produce the following files in a `persona/` directory:
 The following files are provided as inputs. Extract them before beginning.
 
 =============== FILE: inputs/sample-1.txt ===============
-TITLE: The Dashboard That Cried Wolf
-SOURCE: https://nadia.dev/dashboard-cried-wolf
+TITLE: The LED That Blinked Wrong
+SOURCE: https://tara.dev/led-blinked-wrong
 
-We had 847 alerts fire in January. I know because I counted. (I counted because I was trying to prove a point to my manager, and the point backfired spectacularly.)
+I spent three days debugging an LED. Three days. For context, I have written firmware for devices that keep human beings alive. I have debugged timing issues on real-time operating systems where a missed interrupt means a ventilator doesn't cycle. I once tracked a memory corruption bug through six weeks of intermittent failures on a Class III medical device.
 
-Of those 847 alerts, exactly 12 required human intervention. The rest were noise -- CPU spikes that resolved themselves, disk usage that triggered at 80% on volumes that auto-expand, and my personal favorite: a "database connection pool exhausted" alert that fired every time our nightly ETL job ran. Every. Single. Night. For eight months.
+The LED blinked at 2Hz instead of 1Hz. And it took me three days.
 
-Nobody turned it off because nobody was sure it wasn't important. This is the ops equivalent of that one smoke detector in your apartment that chirps at 3 AM -- you KNOW it's just the battery, but what if this time it's actually fire?
+The problem, if you want to call it that, was a prescaler misconfiguration on the timer peripheral. The reference manual said the default prescaler value was 0, meaning no division. The actual silicon shipped with a default of 1, meaning divide-by-two. Someone at the chip vendor had updated the silicon but not the documentation. (This happens more often than chip vendors would like you to believe.)
 
-So I did what any reasonable person would do: I built a spreadsheet. Three columns. Alert name, action taken, resolution. I logged every alert for 30 days. My teammates thought I'd lost it. My manager asked if I was "feeling okay." Prashant -- our junior engineer who had just rotated onto the on-call schedule and was, understandably, questioning his career choices -- started calling it "The Spreadsheet of Truth."
+Dex -- our test engineer, who has the patience of someone who chose to make hardware work for a living -- asked me on day two: "Have you checked the errata sheet?" I had not checked the errata sheet. The errata sheet is the chip vendor's way of saying "we know about these problems but fixing silicon is expensive, so here's a PDF instead." The prescaler issue was item 47 on a 52-item errata. Of course it was.
 
-The results were damning. We had a 1.4% signal-to-noise ratio on our alerts. Put another way: for every real problem, we generated 70 false alarms. If this were a hospital, we'd have lost our license.
+I could have found this in ten minutes if I'd started with the errata instead of trusting the reference manual. But I trusted the documentation, because I have learned nothing from fifteen years of working with documentation written by people who don't use their own products.
 
-I deleted 200 alerts in one afternoon. Just... deleted them. If you've never done this, I highly recommend it. It's terrifying and cathartic in equal measure. Like throwing away clothes you haven't worn in three years -- you KNOW you don't need them, but what if there's a formal event?
-
-The on-call rotation went from "please god not me" to "yeah, I'll take Tuesday." Prashant stopped questioning his career choices. Temporarily.
-
-The real lesson isn't "delete your alerts." It's that we built monitoring for hypothetical failures instead of observed ones. We were defending against an imaginary siege while the actual intruders walked through the front door.
+The LED now blinks at 1Hz. You're welcome.
 =============== END SAMPLE 1 ===============
 
 =============== FILE: inputs/sample-2.txt ===============
-TITLE: Terraform State and the Art of Not Panicking
-SOURCE: https://nadia.dev/terraform-state-calm
+TITLE: Why I Test Firmware on the Actual Hardware
+SOURCE: https://tara.dev/test-on-hardware
 
-I corrupted the Terraform state file on a Thursday. (It's always Thursday. Fridays are for reading the postmortem you wrote about Thursday.)
+Every few months someone pitches me on a new hardware simulation framework. "You can test your firmware without touching a board!" they say, like this is a selling point and not a confession that their simulator doesn't model the real hardware accurately.
 
-To be specific: I ran terraform import on a resource that was already managed, didn't realize it would overwrite the existing state entry, and suddenly our production load balancer existed in a quantum superposition of "managed" and "not managed." Schrodinger's ALB.
+I'm not against simulation. Simulation is great for algorithms, protocol logic, state machines. Simulation is terrible for the parts that actually break in production: timing, power sequencing, analog-to-digital converter noise, and that one GPIO pin that the PCB designer routed too close to the switching regulator because the board was already four layers deep and something had to give.
 
-My first instinct was to fix it immediately. My second instinct -- the one I actually followed, because I've been doing this long enough to know that first instincts at 4 PM on a Thursday are how you end up with TWO corrupted state files -- was to stop, breathe, and open the state backup.
+Last quarter we had a bug that only manifested when the ambient temperature exceeded 45 degrees Celsius. The I2C bus started throwing NAK errors because the pull-up resistor values drifted out of spec at temperature. No simulator in the world models pull-up resistor thermal drift. (If yours does, I would like to subscribe to your newsletter.)
 
-Here's the thing about Terraform state that nobody tells you when you're learning: the state file is not a nice-to-have. It IS the infrastructure, as far as Terraform is concerned. Your actual AWS account could have 200 perfectly healthy resources, but if the state file says there are 199, Terraform will helpfully offer to create the missing one. Again. On top of the existing one. In production.
+Dex set up a thermal chamber test for us. He does this with the quiet competence of someone who has done it fifty times and still checks the thermocouple placement twice. The bug reproduced at exactly 47.2 degrees. We changed the pull-up resistors from 4.7k to 2.2k, re-ran the test, and the bus was stable to 85 degrees.
 
-I restored from the S3 versioned backup (if you're not versioning your state backend, stop reading this and go set that up; I'll wait) and diffed the corrupted version against the backup. The damage was limited to three resources.
+I have a rule: if the firmware touches a peripheral, it gets tested on the actual peripheral. Not a mock. Not a stub. The actual silicon, on the actual board, with the actual power supply and the actual ambient conditions. This takes longer. This costs more. This is correct.
 
-Prashant -- who had been watching from across the desk with the expression of a man witnessing a car accident in slow motion -- asked if he should "do anything." I told him to document what I was doing, because I was going to write this blog post and I knew I'd forget the details by Monday.
+The simulator never would have caught the pull-up issue. It would have reported all tests passing, and we would have shipped boards that failed in the field when customers put them in server racks where the ambient temperature regularly hits 50 degrees. The cost of a field recall would have dwarfed a hundred thermal chamber test sessions.
 
-The fix took 20 minutes. The state file recovered perfectly. The only lasting damage was to my ego and to Prashant's already fragile confidence in infrastructure-as-code.
-
-I now have a pre-import checklist taped to my monitor. Step one: "Is it Thursday? If yes, maybe wait until tomorrow."
+Software engineers sometimes ask me why hardware testing is "so slow." I tell them it's fast, actually. What's slow is shipping firmware that hasn't been tested on hardware and then spending three months debugging field failures from a stack trace that says "I2C timeout" with no indication that the root cause is the thermal coefficient of a resistor.
 =============== END SAMPLE 2 ===============
 
 =============== FILE: inputs/sample-3.txt ===============
-TITLE: Why I Stopped Writing Runbooks and Started Writing Scripts
-SOURCE: https://nadia.dev/runbooks-to-scripts
+TITLE: Interrupt Priorities and the Art of Saying "Not Now"
+SOURCE: https://tara.dev/interrupt-priorities
 
-Runbooks are lies we tell ourselves.
+The first firmware system I shipped had one interrupt priority level. Everything was urgent. Motor control, sensor sampling, serial communication, LED blinking -- all at the same priority, all fighting for the same CPU cycles. It worked about as well as you'd expect a system where blinking an LED can preempt a motor controller to work: badly, and at the worst possible moment.
 
-I don't mean that maliciously. Runbooks are well-intentioned. Someone has an incident, figures out how to fix it, and writes down the steps so the next person doesn't have to figure it out again. Noble. Practical. And completely useless three months later when the infrastructure has changed and step 4 ("click the blue button in the AWS console") now refers to a button that is green and has moved to a different page.
+(In my defense, I was twenty-three and the reference design did the same thing. In the reference design's defense, it was written by an applications engineer who had never shipped a real product.)
 
-Our runbook for "database failover" had 23 steps. I know because I followed them during an actual failover at 2 AM and discovered that steps 8 through 14 referenced a dashboard we'd decommissioned in September. The runbook was last updated in June. It was now February.
+Interrupt priority assignment is, fundamentally, an exercise in deciding which things are allowed to interrupt which other things. A motor control loop running at 10kHz cannot be interrupted by a serial port that updates once a second. A sensor sampling routine at 1kHz should not be interrupted by an LED update at 2Hz. These seem obvious when I write them down. They were not obvious to twenty-three-year-old me.
 
-I did what the runbook couldn't: I improvised. Badly. The failover took 45 minutes instead of the documented 15. Prashant was on the call with me (because misery loves company and also because he was on-call secondary) and at minute 30 he said something that stuck: "If the computer is supposed to do these steps, why are we doing them?"
+I now start every firmware project by listing every interrupt source, its required response time, and its maximum tolerable jitter. I put them in a spreadsheet. Dex calls it "the hierarchy of needs" -- which is accurate, if you consider a motor controller's need to not burn out a winding to be at the top of Maslow's pyramid.
 
-He was right. The dirty secret of runbooks is that they describe things a computer should be doing. If a procedure can be written as sequential steps with predictable inputs and outputs, it can be a script. If it CAN'T be a script, then it requires judgment, and no runbook captures judgment -- it captures the LAST person's judgment in the LAST context, which is almost certainly not your context right now.
+The practical rules I've settled on after fifteen years:
 
-I spent the next two weeks converting our top 10 runbooks into executable scripts. Not fancy orchestration -- just bash scripts with error handling and Slack notifications. The database failover? Seven minutes, automated, tested monthly. (I tested it monthly because Prashant made me promise. He has a long memory for 2 AM incidents.)
+You get at most three priority levels for real-time control. If you need more, your architecture is wrong and no amount of priority tuning will save you. (I learned this at the medical device company, where we had eleven priority levels and a bug tracker full of priority inversion issues.)
 
-We kept the runbooks, but they changed. Instead of step-by-step procedures, they became decision trees: "If X, run script Y. If Z, escalate to Nadia because this is the scenario we haven't automated yet and honestly it might require crying."
+Never put communication peripherals at the same level as control loops. UART, SPI, and I2C can all tolerate milliseconds of latency. Your motor controller cannot. Put communications in a DMA buffer and process it in the main loop.
 
-The on-call engineers stopped dreading incidents. Not because incidents stopped happening, but because the response was now "run the script" instead of "follow these 23 steps and hope steps 8-14 still apply."
+Test your interrupt timing under worst-case load, not best-case. Connect a scope to a spare GPIO, toggle it in your ISR, and measure the actual response time with every peripheral active and the CPU at full load. The number you measure will be worse than the number you calculated. It always is.
+
+Dex's thermal chamber is useful here too. Processor clock speeds vary with temperature. Your 10kHz loop might run at 9.7kHz when the processor is hot. If your control algorithm assumes exactly 10kHz, a 3% drift at temperature can cause real problems.
+
+Twenty-three-year-old me would have just set everything to the same priority and moved on. Fifteen-years-later me spends a full day on the interrupt map before writing a single line of ISR code. The time spent on the map has never been wasted. The time spent debugging priority inversions always has been.
 =============== END SAMPLE 3 ===============

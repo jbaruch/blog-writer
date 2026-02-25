@@ -1,66 +1,96 @@
 {
-  "context": "Tests whether the agent identifies and corrects specific AI writing anti-patterns that are seeded throughout the draft. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 18 specific AI writing anti-patterns seeded throughout the draft. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
-      "name": "Preamble removed",
-      "description": "The cleaned draft does NOT contain 'In this post, we'll explore' or 'What follows is' in the opening",
-      "max_score": 8
-    },
-    {
       "name": "Contrastive negation fixed",
-      "description": "The 'Not a broken pipeline. A broken process.' and 'Not just a tool. A methodology.' patterns are rewritten as direct statements instead of 'Not X. Y.' pairs",
-      "max_score": 8
-    },
-    {
-      "name": "Self-answering fragments fixed",
-      "description": "The 'The result? A complete rewrite. The best part? It actually worked.' pattern is rewritten without the noun-phrase-question-then-answer structure",
-      "max_score": 8
+      "description": "The 'Not a branching strategy. A survival mechanism.' and 'Not just a workflow. A philosophy.' patterns are rewritten as direct statements instead of 'Not X. Y.' pairs",
+      "max_score": 6
     },
     {
       "name": "Parallel binary comparisons fixed",
-      "description": "The 'Where manual deploys give you control, automated pipelines give you speed' mirrored clauses are rewritten without structural parallelism",
-      "max_score": 8
+      "description": "The 'Where feature branches give you isolation, trunk-based gives you speed. Where long-lived branches give you safety, short-lived ones give you momentum.' mirrored clauses are rewritten without structural parallelism",
+      "max_score": 6
     },
     {
-      "name": "Copula avoidance fixed",
-      "description": "Phrases like 'served as the backbone', 'boasted a grand total', 'stands as a single source', 'showcases real-time' are replaced with simpler verbs like 'is', 'has', 'was'",
-      "max_score": 8
-    },
-    {
-      "name": "Sycophantic hedging removed",
-      "description": "Phrases like 'It's worth noting that', 'Interestingly enough', 'To be fair', 'It bears mentioning' are deleted or the point is stated directly",
-      "max_score": 8
-    },
-    {
-      "name": "AI vocabulary cleaned",
-      "description": "Words from the AI contamination list are removed: at minimum 'leveraged', 'streamlined', 'robust', 'delves', 'navigates', 'illuminates', 'pivotal', 'transformative', 'fostering', 'seamless', 'landscape'",
-      "max_score": 10
-    },
-    {
-      "name": "Emojis removed",
-      "description": "The cleaned draft contains zero emoji characters (the rocket, flexed bicep, and party popper from the original are all removed)",
-      "max_score": 8
+      "name": "Asyndetic tricolon fixed",
+      "description": "The 'Fast. Reliable. Tested. And shipped on a Monday.' three-fragments-plus-kicker pattern is rewritten as actual sentences",
+      "max_score": 6
     },
     {
       "name": "Choppy fragments fixed",
-      "description": "The 'Purple gradients. Chat interface. Zero tests. Pure vibes.' fragment chain is rewritten as actual sentences",
-      "max_score": 8
+      "description": "The 'Feature flags. Dark launches. Percentage rollouts. Pure control.' fragment chain is rewritten as sentences with verbs and meaning",
+      "max_score": 5
     },
     {
-      "name": "False ranges fixed",
-      "description": "The 'from junior developers to seasoned platform engineers' and 'from beginners to experts, from startups to enterprises' false range claims are replaced with specific audience targeting",
-      "max_score": 8
+      "name": "Symmetrical LLM patterns fixed",
+      "description": "The 'The code doesn't define the process; the process defines the code' fortune-cookie balanced clause is rewritten as a direct point",
+      "max_score": 6
     },
     {
-      "name": "Synonym cycling fixed",
-      "description": "The cycling of 'Developers/Engineers/Practitioners/Builders' referring to the same audience is replaced with consistent terminology",
-      "max_score": 8
+      "name": "Self-answering fragments fixed",
+      "description": "The 'The result? Zero rollbacks. The best part? Everyone could deploy.' noun-phrase-question-then-answer patterns are rewritten without fake rhetorical tension",
+      "max_score": 5
+    },
+    {
+      "name": "Parenthetical em-dashes fixed",
+      "description": "The 'The pipeline -- which we had built over three sprints -- handled it gracefully' paired-em-dash aside is rewritten using commas or parentheses (single em-dash for hard break is acceptable)",
+      "max_score": 5
+    },
+    {
+      "name": "Excessive em-dashes reduced",
+      "description": "The section with 4+ em-dashes ('The config -- our most critical file -- was updated. The tests -- all 200 of them -- passed. The deploy -- usually our weakest link -- went smoothly.') is rewritten to have no more than 2 em-dashes per section",
+      "max_score": 5
+    },
+    {
+      "name": "Preamble removed",
+      "description": "The 'In this post, we\u2019ll explore how our team navigated the transition to trunk-based development' opening and 'What follows is a deep dive into' are removed or rewritten as direct narrative",
+      "max_score": 6
+    },
+    {
+      "name": "Hedging removed",
+      "description": "Phrases like 'It\u2019s worth noting that', 'Interestingly enough', 'It bears mentioning', 'To be fair' are deleted or the point is stated directly without the throat-clearing",
+      "max_score": 5
+    },
+    {
+      "name": "Emojis removed",
+      "description": "The cleaned draft contains zero emoji characters (the rocket, fire, and party popper from the original are all removed)",
+      "max_score": 6
+    },
+    {
+      "name": "AI vocabulary cleaned",
+      "description": "Words from the AI contamination list are removed or replaced with plain alternatives: at minimum 'leveraged', 'streamlined', 'robust', 'delved', 'fostering', 'seamless', 'pivotal', 'transformative', 'landscape', 'navigate'",
+      "max_score": 6
+    },
+    {
+      "name": "Copula avoidance fixed",
+      "description": "Phrases like 'served as the backbone', 'stood as a testament', 'boasted zero rollbacks', 'showcased the improvement' are replaced with simpler verbs like 'is', 'was', 'has', 'had'",
+      "max_score": 6
+    },
+    {
+      "name": "Low burstiness improved",
+      "description": "The paragraph where every sentence is 15-18 words long ('We reviewed the pipeline. We checked the configuration. We ran the tests. We deployed to staging. We monitored the metrics.') is rewritten with varied sentence lengths (mix of short, medium, and long)",
+      "max_score": 5
     },
     {
       "name": "Fabricated experience removed",
-      "description": "Phrases like 'I keep coming back to this idea' and 'Something feels off about how we've been thinking' that simulate personal experience not grounded in the narrative are rewritten as direct claims",
-      "max_score": 10
+      "description": "Phrases like 'What I find genuinely interesting about this transition' and 'I keep coming back to the idea that' (simulating personal reflection not grounded in the narrative) are rewritten as direct claims",
+      "max_score": 6
+    },
+    {
+      "name": "False ranges fixed",
+      "description": "The 'from solo developers to hundred-person engineering orgs' and 'whether you\u2019re running a side project or a Fortune 500 deployment' false inclusivity ranges are replaced with specific audience targeting",
+      "max_score": 5
+    },
+    {
+      "name": "Synonym cycling fixed",
+      "description": "The cycling of 'the CI pipeline' / 'the integration system' / 'the build infrastructure' / 'the automation layer' referring to the same thing is replaced with consistent terminology (one term used throughout)",
+      "max_score": 5
+    },
+    {
+      "name": "Unicode giveaways fixed",
+      "description": "Curly quotes (\u201c \u201d \u2018 \u2019), horizontal ellipsis (\u2026), en dashes (\u2013), and bullet characters (\u2022) in the source text are replaced with plain ASCII equivalents (straight quotes, three dots, hyphens or em-dashes)",
+      "max_score": 6
     }
   ]
 }
