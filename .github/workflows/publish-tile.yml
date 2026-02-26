@@ -10,36 +10,12 @@ on:
       - main
 
 jobs:
-  review:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Install Tessl CLI
-        run: npm install -g @tessl/cli
-      - name: Lint tile structure
-        run: tessl tile lint .
-      - name: Review skill quality
-        run: |
-          RESULT=$(tessl skill review --json .)
-          echo "$RESULT" | jq .
-          SCORE=$(echo "$RESULT" | jq -r '.contentJudge.normalizedScore // 0')
-          PERCENT=$(echo "$SCORE * 100" | bc | cut -d. -f1)
-          echo "Skill review score: ${PERCENT}%"
-          if [ "$PERCENT" -lt 90 ]; then
-            echo "::error::Skill review score ${PERCENT}% is below the 90% threshold"
-            exit 1
-          fi
-        env:
-          TESSL_API_TOKEN: ${{ secrets.TESSL_API_TOKEN }}
-
   publish:
-    needs: review
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: tesslio/publish@main
         with:
           token: ${{ secrets.TESSL_API_TOKEN }}
+          review: 'true'
+          review-threshold: '90'
