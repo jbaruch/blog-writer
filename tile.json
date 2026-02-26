@@ -1,6 +1,6 @@
 {
   "name": "jbaruch/blog-writer",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "summary": "Write developer blog posts from video transcripts, meeting notes, or rough ideas. Extracts narrative from source material, structures content with hooks and technical sections, formats code examples with placeholders, and checks drafts against 18 AI anti-patterns. Includes interactive onboarding to learn the author's voice from writing samples. Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript into a blog, work on blog content, or mentions \"blog\" in the context of content creation. Also trigger when the user provides a video transcript and wants written content derived from it, or when continuing work on a blog series.\n",
   "skills": {
     "blog-writer": {
