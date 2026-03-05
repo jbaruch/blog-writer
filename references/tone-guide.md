@@ -61,7 +61,7 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**Read `references/ai-anti-patterns.md` for the full list.** It contains 18 named patterns
+**Read `references/ai-anti-patterns.md` for the full list.** It contains 22 named patterns
 with symptoms, examples, and alternatives. Scan the draft against every one of them during
 Phase 3 and Phase 4. Zero tolerance.
 
@@ -84,6 +84,10 @@ Quick index for scanning:
 16. False ranges — "from beginners to experts"
 17. Synonym cycling — "the CLI" → "the tool" → "the interface"
 18. Unicode giveaways — curly quotes, ellipsis character, en dashes in source
+19. Participle-phrase filler — "-ing" clauses tacked on as fake analysis
+20. Significance inflation — mundane facts framed as pivotal moments
+21. Challenge-optimism sandwich — "Despite X, challenges... Despite these, thriving"
+22. Inline-header lists — bold term + colon + description bullet points
 
 ---
 
@@ -110,7 +114,9 @@ Before submitting a draft, check:
 - [ ] Does the CTA feel like advice from a friend, not a sales pitch?
 - [ ] Would you be embarrassed to read any sentence out loud at a conference?
 - [ ] Is the bio kicker actually funny AND connected to the post's content?
-- [ ] Run a final pass: search for every anti-pattern listed above. Rewrite any hits.
+- [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
+  then skeleton scan (compare grammatical structure of adjacent sentences). Rewrite any hits,
+  then re-check each rewrite against all 22 patterns before considering it fixed.
 
 ---
 

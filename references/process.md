@@ -249,6 +249,20 @@ Read `persona/voice.md` to stay in the author's voice throughout.
    must connect to something specific in THIS post. Propose a kicker and confirm with the
    author — don't reuse the same one across posts unless nothing better fits.
 
+10. **The Comparison Trap.** Posts that involve before/after demos, A/B tests, or tool
+    comparisons are magnets for patterns #1, #2, and #5. The content naturally involves
+    contrasts (old vs. new, broken vs. fixed, input vs. output), and every sentence about
+    those contrasts will default to mirrored grammatical structure unless you actively fight
+    it. When writing a comparison post:
+    - Write the "before" story and the "after" story as separate narratives with different
+      sentence structures, not as matched pairs
+    - If you catch yourself writing "[thing A] does X, [thing B] does Y" in any form,
+      rewrite so only one of them gets a full sentence and the other is folded into a
+      different construction
+    - The anti-pattern check for comparison posts should include an extra pass specifically
+      looking for mirrored clause pairs, even if they don't match the exact examples in the
+      anti-pattern file
+
 ### Placeholder conventions:
 
 Each placeholder type has its own **independent** numbering sequence, zero-padded.
@@ -269,8 +283,33 @@ Link 01, Screenshot 02.
 
 ### After writing:
 
-Run the anti-pattern check. Open `references/ai-anti-patterns.md` and scan the draft for
-all 18 patterns. Rewrite any hits. This is not optional.
+Run the anti-pattern check (two passes). Open `references/ai-anti-patterns.md` and scan
+the draft:
+
+**Pass 1 — Surface scan:** Read the draft against each of the 22 patterns, looking for
+the forms described in the examples and structural variants.
+
+**Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
+look at the grammatical skeleton only. Ask: "Do these two sentences have the same shape?"
+Subject-verb-object mirroring, parallel prepositional phrases, matching parenthetical
+structures — any of these in adjacent sentences is a flag, regardless of whether it matches
+a named pattern. Vary the structure of one sentence in the pair. Pass 2 catches patterns
+that Pass 1 misses because the vocabulary is different but the grammar is identical.
+
+Rewrite any hits. This is not optional.
+
+**Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
+in isolation and check it against ALL 22 patterns. Rewrites frequently introduce the same
+pattern in a different surface form. This is especially true for:
+- #2 (Parallel Binary) — the most likely pattern to survive a rewrite, because describing
+  a comparison naturally produces mirrored clauses. If you rewrote a parallel binary and the
+  new version still has two clauses about two different things, check the grammatical
+  skeleton. If both clauses have the same shape, you just wrote another parallel binary.
+- #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
+  question with a longer answer, but the structure is identical.
+
+Do not consider an anti-pattern fixed until the replacement passes a full 22-pattern scan
+on its own.
 
 Run the product accuracy check (if configured). If `persona/product.md` exists and contains
 content, verify every claim the draft makes about the product — feature names, CLI commands,
@@ -315,8 +354,10 @@ conversation — edit the file surgically.
 
 **How to handle feedback:**
 - Apply changes to the draft file using Edit
-- Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes (new
-  writing can introduce new patterns)
+- Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — both
+  passes (surface scan + skeleton scan) for new or rewritten sections. Apply the rewrite
+  audit rule: every rewrite must pass a full 22-pattern scan on its own before it's
+  considered fixed. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or
   terminology were added or changed (only if `persona/product.md` is configured) — use
   WebFetch against docs pages as needed

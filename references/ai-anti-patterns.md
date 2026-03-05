@@ -21,6 +21,15 @@ A negation followed by an affirmation, framed as revelation.
 - ❌ "It's not about the code. It's about the process."
 - ❌ "Not hype. Results."
 
+**Structural variants:**
+The negation doesn't have to lead the sentence or use the word "Not."
+- "I went from 65 to zero by fixing the input, not the output." — Contrastive negation
+  embedded at the end of a sentence.
+- "The only thing I changed was the prompt, not the code." — Same structure, different
+  position.
+- Any "[positive claim], not [contrasting thing]" at the end of a sentence is this pattern
+  in a less obvious position.
+
 **Why it's a tell:** This is the single most common LLM writing pattern. It sounds
 confident and pithy to a machine. To a human reader it sounds like a LinkedIn post.
 
@@ -44,6 +53,16 @@ the other does Y, and the two clauses are suspiciously symmetrical.
 - ❌ "Where vibecoding gives you speed, spec-driven development gives you correctness."
 - ❌ "One approach trusts the model. The other trusts the process."
 
+**Structural variants:**
+Watch for identical grammatical skeletons even when the vocabulary differs.
+- "Tessl gates what goes into the agent. SonarQube validates what comes out." — Different
+  verbs, different subjects, but the skeleton is identical: [Tool] [verb] what [preposition]
+  the agent.
+- "'Build queries dynamically' meant X. 'Graceful error recovery' meant Y." — Two quoted
+  phrases followed by the same verb. The parallel is in the structure, not the words.
+- "skills (how to build things), rules (what to always do), and documentation (accurate API
+  knowledge)" — Triple parallel with identical parenthetical structure.
+
 **Why it's a tell:** Real comparisons are messy. Things don't map 1:1 onto neat
 structural parallels. When they do in prose, it's because the writer manufactured
 the symmetry.
@@ -66,6 +85,13 @@ then tell the story of B succeeding. Let the reader draw the conclusion.
 **Examples:**
 - ❌ "Fast. Cheap. Wrong. And deployed to production."
 - ❌ "No tests. No specs. No way to verify. And 25% of Y Combinator is built this way."
+
+**Structural variants:**
+The three items don't have to be single words or short fragments.
+- "We wrote the spec. We tested the agent. We validated the output. And then we realized
+  the spec was wrong." — Full sentences, but the same rhythm: three setup beats + punchline.
+- Any list of three that exists only to build momentum toward a fourth item is this pattern,
+  regardless of item length.
 
 **Why it's a tell:** The published posts DO use lists of three sometimes. The difference:
 they occur inside natural paragraphs, not as standalone staccato fragments designed to
@@ -92,6 +118,13 @@ fragment is 1-5 words, usually noun phrases.
 - ❌ "Purple gradients. Chat interface. Zero tests. Pure vibes."
 - ❌ "Same model. Same prompt. Different result."
 
+**Structural variants:**
+Fragments don't have to be noun phrases.
+- "Tested it. Broke it. Fixed it. Shipped it." — Verb-phrase fragments, same pattern.
+- "New model. Retrained from scratch. Still hallucinating." — Mixed lengths, but still a
+  chain of fragments substituting rhythm for meaning.
+- Any sequence of three or more sentences under six words where none carries a full thought.
+
 **Why it's a tell:** It substitutes rhythm for meaning. Every fragment carries equal
 weight, which means none of them carry any weight.
 
@@ -116,6 +149,15 @@ The clauses are balanced like a seesaw.
 - ❌ "Process without knowledge yields organized hallucinations. Knowledge without
   process yields correctly spelled chaos."
 - ❌ "The linter handles the style. The formatter provides the structure."
+
+**Structural variants:**
+The symmetry can span separate sentences and use different vocabulary.
+- "The old pipeline caught errors at deployment. The new pipeline catches them at design
+  time." — Two sentences, structurally mirrored, different words.
+- "Without guardrails, the agent hallucinates. With guardrails, the agent delivers." — The
+  only difference is one word; the grammatical skeleton is identical.
+- Three parallel clauses are a tricolon wearing a fortune-cookie costume and should be caught
+  as both this pattern and #3.
 
 **Why it's a tell:** These read like fortune cookies. The structural balance makes
 the writer feel clever, but the reader feels lectured.
@@ -142,6 +184,15 @@ own punchy fragment. The "question" never actually asks anything.
 - ❌ "The best part? It just works."
 - ❌ "The takeaway? Context is everything."
 - ❌ "And the error message? Also hallucinated."
+
+**Structural variants:**
+The question can be any length. The tell is the structure, not the word count.
+- "Every single one of those 65 SonarQube findings from earlier? Now a prevention rule." —
+  Same move as "The result? Great." The question exists only to set up its own answer.
+- "That prompt I thought matched my design philosophy? It was basically an OWASP tutorial."
+  — Full-clause question, still only exists to deliver the punchline.
+- Any sentence you could restructure as "[statement]. [period]" without losing information
+  is this pattern wearing a question mark as a costume.
 
 **Why it's a tell:** It creates fake dramatic tension where none exists. It's a
 formatting trick pretending to be rhetoric — a setup/punchline couplet disguised
@@ -209,12 +260,15 @@ not a staple.
 - "In this post, we'll explore..."
 - "Let's take a look at..."
 - "What follows is..."
+- Closing variants: "In summary," "In conclusion," "Overall," "To sum up"
 
 **Why it's a tell:** The TLDR handles the preview. The reader clicked the title. They
-know what the post is about. Announcing it again is filler.
+know what the post is about. Announcing it again is filler. The closing variant is the
+same move in reverse — restating the point the reader just read.
 
-**Instead:** Just start. Open with the hook, the story, the confession. The reader
-doesn't need a table of contents narrated to them.
+**Instead:** Just start. Open with the hook, the story, the confession. End with the CTA
+or the kicker, not a restatement. The reader doesn't need a table of contents narrated to
+them, and they don't need the post summarized back at them.
 
 ---
 
@@ -227,11 +281,16 @@ doesn't need a table of contents narrated to them.
 - "Interestingly enough..."
 - "To be fair..."
 - "It bears mentioning that..."
+- Didactic variants: "It's important to note/remember...", "It's crucial to consider...",
+  "It's essential to understand...", "may vary"
 
 **Why it's a tell:** These are throat-clearing. They signal the writer isn't confident
-enough to just make the point. LLMs insert them as politeness padding.
+enough to just make the point. LLMs insert them as politeness padding. The didactic
+variants are worse — they talk down to the reader, implying they need to be told what's
+important.
 
-**Instead:** Delete the hedge and start with the actual point.
+**Instead:** Delete the hedge and start with the actual point. If it's important, the
+reader will know because you showed them why, not because you announced it.
 
 ---
 
@@ -251,16 +310,23 @@ a model but scream machine to a reader.
 
 Verbs: "delve", "underscore", "highlight" (as verb), "foster", "leverage", "harness",
 "showcase", "streamline", "navigate" (abstract), "cultivate", "illuminate", "orchestrate",
-"spearhead"
+"spearhead", "bolster", "enhance" (when inflating mundane improvements), "garner",
+"align with", "resonate with", "exemplify", "encompass"
 
 Nouns: "tapestry", "landscape" (abstract), "realm", "journey" (abstract), "ecosystem",
-"paradigm", "trajectory", "blueprint", "interplay", "intricacies"
+"paradigm", "trajectory", "blueprint", "interplay", "intricacies", "testament", "focal
+point", "commitment" (abstract), "diverse array"
 
 Adjectives: "pivotal", "crucial", "vital", "nuanced", "multifaceted", "robust", "seamless",
-"comprehensive", "cutting-edge", "groundbreaking", "transformative"
+"comprehensive", "cutting-edge", "groundbreaking", "transformative", "enduring", "vibrant",
+"meticulous/meticulously", "renowned", "nestled", "profound", "rich" (figurative: "rich
+history", "rich cultural heritage"), "key" (as adjective: "key role", "key turning point"),
+"valuable" ("valuable insights")
 
 Inflation phrases: "plays a significant role in shaping", "serves as a testament to",
-"it is important to note", "a vibrant tapestry of"
+"it is important to note", "a vibrant tapestry of", "in the heart of", "setting the stage
+for", "reflects broader", "deeply rooted", "marks/represents a significant shift",
+"evolving landscape", "Additionally," (as sentence opener — research-backed strong tell)
 
 **Why it's a tell:** Research tracking word frequency before and after ChatGPT shows
 "delve" spiked 10-50x, "tapestry" and "landscape" (abstract) 5-20x, and "plays a
@@ -292,6 +358,13 @@ elaborate verbs that inflate the significance of mundane statements.
 - ❌ "This feature serves as a bridge between the developer and the runtime."
 - ❌ "The config file stands as the single source of truth."
 - ❌ "The dashboard boasts a real-time monitoring panel."
+
+**Structural variants:**
+The inflated verb doesn't always replace "is" — it can replace any simple verb.
+- "provides" / "delivers" / "enables" instead of "has" or "lets you"
+- "This approach empowers developers to..." instead of "This lets developers..."
+- "The framework facilitates seamless integration" instead of "The framework connects to..."
+- Any verb that makes a mundane statement sound like a press release.
 
 **Why it's a tell:** These substitutions make everything sound ceremonial. A config
 file doesn't "stand as" anything. It IS the source of truth. The inflated verb implies
@@ -406,6 +479,15 @@ across consecutive paragraphs — all referring to the exact same thing.
 - ❌ "Developers can install the tile. Engineers who need customization can fork it.
   Practitioners in larger teams should use the workspace feature."
 
+**Structural variants:**
+Cycling can happen within a single sentence or across sections, not just adjacent paragraphs.
+- "managing your dependencies, tracking your packages, and updating your libraries" — all
+  three noun phrases describe the same concept within one sentence.
+- The intro calls it "the CLI" and the conclusion calls it "the command-line experience" —
+  cycling across sections is harder to spot but equally confusing.
+- Pronoun avoidance is a subtle form: using "the tool" or "the solution" instead of "it"
+  when the referent is obvious from context.
+
 **Why it's a tell:** LLMs are trained with repetition penalties that discourage reusing
 tokens. So the model reaches for synonyms even when the original word was the right one.
 In technical writing, this creates confusion — the reader wonders whether "the tool" and
@@ -441,3 +523,126 @@ generated by an LLM (ChatGPT in particular outputs curly quotes by default).
 **Instead:** Use plain ASCII in the draft. Straight quotes, three dots, hyphens. Let the
 publishing system handle typography. During the anti-pattern scan, search the draft file
 for these Unicode characters and replace any that appear.
+
+---
+
+## 19. Participle-Phrase Filler
+
+**The tell:** A sentence ends with a present-participle ("-ing") clause tacked on as
+fake analysis. The clause sounds like it's adding insight but says nothing the main
+clause didn't already say.
+
+**Symptoms:**
+- "..., significantly enhancing developer productivity."
+- "..., highlighting the importance of testing."
+- "..., demonstrating the ongoing relevance of this approach."
+- "..., ensuring consistent behavior across environments."
+- "..., contributing to the overall reliability of the system."
+- The "-ing" clause could be deleted without losing any information
+
+**Examples:**
+- ❌ "The new feature reduces build times by 40%, significantly enhancing developer
+  productivity."
+- ❌ "The team adopted trunk-based development, reflecting a broader industry shift toward
+  continuous integration."
+- ❌ "We added input validation to every endpoint, ensuring robust error handling across
+  the application."
+
+**Why it's a tell:** LLMs append these clauses to make simple statements sound analytical.
+The participle phrase restates the main clause's implication as if it's a separate insight.
+"Reduces build times by 40%" already means "enhances developer productivity" — saying both
+is redundant inflation.
+
+**Instead:** End the sentence at the real point. If the implication is worth stating, give
+it its own sentence with specific evidence.
+- ✅ "The new feature reduces build times by 40%."
+- ✅ "We added input validation to every endpoint. The 500-error rate dropped from twelve
+  per hour to zero."
+
+---
+
+## 20. Significance Inflation
+
+**The tell:** Mundane facts are framed as historically important moments, broader shifts,
+or lasting legacies. The sentence asserts significance instead of showing it.
+
+**Symptoms:**
+- "This marks a pivotal moment in..."
+- "...represented a significant shift toward..."
+- "...solidifying its role as..."
+- "This highlights the enduring legacy of..."
+- "...the transformative power of..."
+- "...plays a crucial role in the ecosystem"
+
+**Examples:**
+- ❌ "The v2.0 release marks a pivotal moment in the evolution of developer tooling."
+- ❌ "This migration represented a significant shift toward cloud-native architecture."
+- ❌ "The framework's adoption highlights the transformative power of open source."
+
+**Why it's a tell:** LLMs inflate significance because they pattern-match on authoritative
+encyclopedia prose. A version bump is not a pivotal moment. A migration is not a
+significant shift. These phrases are significance-assertions without evidence — the
+written equivalent of an applause sign.
+
+**Instead:** Show the impact with specifics. Let the reader decide if it's significant.
+- ✅ "The v2.0 release cut the config file from 200 lines to 12."
+- ✅ "After the migration, deploys went from 45 minutes to 90 seconds."
+
+---
+
+## 21. Challenge-Optimism Sandwich
+
+**The tell:** A formulaic structure: acknowledge positives, pivot to challenges with
+"Despite," then resolve with vague optimism about the future.
+
+**Symptoms:**
+- "Despite its [positive words], [subject] faces several challenges..."
+- "Despite these challenges, [subject] continues to thrive/gain traction/evolve"
+- "Future investments/developments could further enhance..."
+- The "challenges" are vague and the "optimism" is unsupported
+
+**Examples:**
+- ❌ "Despite its growing adoption, the framework faces challenges in enterprise
+  environments. Despite these challenges, the community continues to thrive, and future
+  developments could further enhance its capabilities."
+- ❌ "Despite its promise, the tool faces challenges around documentation and onboarding.
+  Nevertheless, it continues to gain traction among developers."
+
+**Why it's a tell:** This is a structural formula, not analysis. The "despite" pivot is
+a template the LLM fills in for any subject. Real analysis of challenges names specific
+problems and proposes specific solutions. The sandwich structure exists to sound balanced
+without committing to an actual opinion.
+
+**Instead:** If there are real challenges, name them specifically and say what you'd do
+about them. If there aren't, don't manufacture them for "balance."
+- ✅ "The docs assume you already know Kubernetes. If you don't, you'll spend your first
+  hour on Stack Overflow, not on the tool."
+
+---
+
+## 22. Inline-Header Lists
+
+**The tell:** Bullet points where each item starts with a boldfaced term followed by a
+colon and then a description. The format is inherited from READMEs, sales pages, and
+how-to guides.
+
+**Symptoms:**
+- "**Term:** Description of what it does..."
+- "**Feature Name:** Why this matters..."
+- Every bullet follows the identical bold-colon-description structure
+- Often used for "Key Takeaways" or "What We Learned" sections
+
+**Examples:**
+- ❌ "**Spec-driven development:** Define what you're building before the agent starts."
+- ❌ "**Context management:** Keep the agent focused by limiting what it can see."
+- ❌ "**Guardrails:** Prevent the agent from making unauthorized changes."
+
+**Why it's a tell:** This format is a glossary pretending to be prose. It signals that the
+content was generated as a list of definitions rather than written as part of a narrative.
+Blog posts should flow, not read like a feature matrix.
+
+**Instead:** Integrate the points into the narrative. If a list is genuinely the right
+format, use plain bullets without the bold-colon template.
+- ✅ "We defined what we were building before the agent started (the spec). We limited
+  what it could see (context). We told it what it couldn't do (guardrails). Three files.
+  That's it."

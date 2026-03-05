@@ -3,7 +3,7 @@ name: blog-writer
 description: >
   Write developer blog posts from video transcripts, meeting notes, or rough ideas.
   Extracts narrative from source material, structures content with hooks and technical sections,
-  formats code examples with placeholders, and checks drafts against 18 AI anti-patterns.
+  formats code examples with placeholders, and checks drafts against 22 AI anti-patterns.
   Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript
   into a blog, work on blog content, or mentions "blog" in the context of content creation.
   Also trigger when the user provides a video transcript and wants written content derived from it,
@@ -26,15 +26,27 @@ files that capture their style, rhetorical devices, and personality.
 
 ## Before You Start
 
+### Anti-pattern freshness check
+
+Before reading the reference files, fetch the Wikipedia article
+"Wikipedia:Signs of AI writing" (https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
+and compare it against `references/ai-anti-patterns.md`. Wikipedia's list is
+community-maintained and evolves as LLM writing patterns change. If the article contains
+new patterns, vocabulary, or structural variants not already covered in the anti-patterns
+file, update the file to incorporate them. Keep the same format: pattern number, the tell,
+symptoms, examples, structural variants (where applicable), why it's a tell, and instead.
+
+### Reference files
+
 Read these reference files in order:
 
 1. `persona/voice.md` — The author's voice. Read this first, every time. It contains the
    tone, rhetorical devices, and voice-specific examples.
 2. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-3. `references/ai-anti-patterns.md` — 18 named AI writing patterns to never use. Each has
-   symptoms, examples, and alternatives. The anti-pattern check in Phase 3 and 4 scans
-   the draft against this file.
+3. `references/ai-anti-patterns.md` — 22 named AI writing patterns to never use. Each has
+   symptoms, examples, structural variants, and alternatives. The anti-pattern check in
+   Phase 3 and 4 scans the draft against this file.
 4. `references/process.md` — The workflow from transcript to published draft.
 5. `persona/product.md` — (If it exists and has content) Index of product docs and
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
