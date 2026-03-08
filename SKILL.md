@@ -29,14 +29,23 @@ files that capture their style, rhetorical devices, and personality.
 ### Anti-pattern freshness check
 
 Before reading the reference files, fetch the Wikipedia article
-"Wikipedia:Signs of AI writing" (https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
-and compare it against `references/ai-anti-patterns.md`. Wikipedia's list is
-community-maintained and evolves as LLM writing patterns change. If the article contains
-new patterns, vocabulary, or structural variants not already covered in the anti-patterns
-file, update the file to incorporate them. Keep the same format: pattern number, the tell,
-symptoms, examples, structural variants (where applicable), why it's a tell, and instead.
-If the fetch fails (network error, page unavailable), proceed with the current anti-pattern
-file as-is — it is self-contained and does not depend on the Wikipedia check.
+"Wikipedia:Signs of AI writing" and compare it against `references/ai-anti-patterns.md`.
+Wikipedia's list is community-maintained and evolves as LLM writing patterns change.
+
+To fetch: Wikipedia blocks standard WebFetch requests. Use Bash instead:
+```
+curl -s -L -H "User-Agent: Mozilla/5.0" "https://en.wikipedia.org/w/index.php?title=Wikipedia:Signs_of_AI_writing&action=raw"
+```
+This returns the raw wikitext. If the output is too large to process inline, pipe it to
+a temp file and read it.
+
+If the article contains new patterns, vocabulary, or structural variants not already
+covered in the anti-patterns file, update the file to incorporate them. Keep the same
+format: pattern number, the tell, symptoms, examples, structural variants (where
+applicable), why it's a tell, and instead.
+
+If the fetch fails (network error, page unavailable), proceed with the current
+anti-pattern file as-is — it is self-contained and does not depend on the Wikipedia check.
 
 ### Reference files
 
