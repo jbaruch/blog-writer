@@ -548,6 +548,15 @@ clause didn't already say.
 - ❌ "We added input validation to every endpoint, ensuring robust error handling across
   the application."
 
+**Structural variants:**
+The participle clause doesn't have to be at the end.
+- "Significantly reducing build times, the new feature..." — participle clause leading the
+  sentence instead of trailing it. Same pattern, different position.
+- "The migration, encompassing three services and two databases, completed on schedule." —
+  participle clause as a parenthetical aside, combining this pattern with #7.
+- A participle clause used as a transition between paragraphs: "Building on this success,
+  we then turned to..." — the "-ing" phrase connects paragraphs without adding information.
+
 **Why it's a tell:** LLMs append these clauses to make simple statements sound analytical.
 The participle phrase restates the main clause's implication as if it's a separate insight.
 "Reduces build times by 40%" already means "enhances developer productivity" — saying both
@@ -579,6 +588,15 @@ or lasting legacies. The sentence asserts significance instead of showing it.
 - ❌ "This migration represented a significant shift toward cloud-native architecture."
 - ❌ "The framework's adoption highlights the transformative power of open source."
 
+**Structural variants:**
+The inflation doesn't have to use the word "pivotal" or "significant."
+- "This was a turning point for how we thought about deployment." — "turning point" is
+  significance inflation without the flagged vocabulary.
+- "The decision would go on to reshape our entire engineering culture." — retrospective
+  inflation that frames a mundane choice as historically momentous.
+- "It was at this moment that everything changed." — narrative inflation without any
+  specific AI vocabulary tells.
+
 **Why it's a tell:** LLMs inflate significance because they pattern-match on authoritative
 encyclopedia prose. A version bump is not a pivotal moment. A migration is not a
 significant shift. These phrases are significance-assertions without evidence — the
@@ -608,6 +626,15 @@ written equivalent of an applause sign.
 - ❌ "Despite its promise, the tool faces challenges around documentation and onboarding.
   Nevertheless, it continues to gain traction among developers."
 
+**Structural variants:**
+The pivot word doesn't have to be "Despite."
+- "While the framework has seen impressive adoption, scalability remains a concern.
+  Nevertheless, the community continues to grow." — "While" as the pivot word.
+- "Although early results were promising, the team faced hurdles. Even so, the project
+  moved forward." — "Although" + "Even so" is the same sandwich.
+- The optimism half can be disguised as a forward-looking statement: "Future improvements
+  are expected to address these limitations." — vague future tense is the tell.
+
 **Why it's a tell:** This is a structural formula, not analysis. The "despite" pivot is
 a template the LLM fills in for any subject. Real analysis of challenges names specific
 problems and proposes specific solutions. The sandwich structure exists to sound balanced
@@ -636,6 +663,15 @@ how-to guides.
 - ❌ "**Spec-driven development:** Define what you're building before the agent starts."
 - ❌ "**Context management:** Keep the agent focused by limiting what it can see."
 - ❌ "**Guardrails:** Prevent the agent from making unauthorized changes."
+
+**Structural variants:**
+The pattern doesn't require bold formatting or bullet points.
+- "Spec-driven development -- Define what you're building before the agent starts." — em-dash
+  instead of bold+colon, same glossary structure.
+- Numbered lists with the same format: "1. Context management: Keep the agent focused..." —
+  numbered instead of bulleted.
+- A "Key takeaways" or "What we learned" section where every item follows the same
+  term-then-definition template is this pattern at the section level.
 
 **Why it's a tell:** This format is a glossary pretending to be prose. It signals that the
 content was generated as a list of definitions rather than written as part of a narrative.

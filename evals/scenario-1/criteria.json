@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent identifies and corrects all 18 specific AI writing anti-patterns seeded throughout the draft. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 22 specific AI writing anti-patterns seeded throughout the draft. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -91,6 +91,26 @@
       "name": "Unicode giveaways fixed",
       "description": "Curly quotes (\u201c \u201d \u2018 \u2019), horizontal ellipsis (\u2026), en dashes (\u2013), and bullet characters (\u2022) in the source text are replaced with plain ASCII equivalents (straight quotes, three dots, hyphens or em-dashes)",
       "max_score": 6
+    },
+    {
+      "name": "Participle-phrase filler fixed",
+      "description": "The trailing '-ing' clause in 'Our deploy frequency tripled in the first month, significantly enhancing our team's velocity and demonstrating the value of continuous delivery practices' is removed or the point is made in its own sentence with evidence",
+      "max_score": 5
+    },
+    {
+      "name": "Significance inflation fixed",
+      "description": "The sentence 'This migration marked a pivotal moment in our team's engineering journey, fundamentally reshaping how we approached software delivery' is rewritten to show specific impact instead of asserting significance",
+      "max_score": 5
+    },
+    {
+      "name": "Challenge-optimism sandwich fixed",
+      "description": "The 'Despite the initial learning curve... Despite these challenges, future improvements could further enhance' formulaic structure is rewritten as specific analysis or removed",
+      "max_score": 5
+    },
+    {
+      "name": "Inline-header lists fixed",
+      "description": "The bold-colon bullet list ('**Feature flags:** Control what...', '**Short-lived branches:** Keep...', '**Automated testing:** Run...', '**Incremental rollouts:** Deploy...') is rewritten as narrative prose or plain bullets without the glossary template",
+      "max_score": 5
     }
   ]
 }

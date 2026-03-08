@@ -134,7 +134,7 @@
     },
     {
       "instruction": "Include your best guess in clarification questions so the author can just confirm",
-      "original_snippets": "When you have a reasonable guess from context, **include it in the question** so the author can just confirm instead of typing out an explanation.",
+      "original_snippets": "**EVERY question MUST include your best guess.** Do not ask open-ended questions like 'what happened here?' or 'what was on screen?' Instead, reconstruct what you think happened from context and ask the author to confirm or correct.",
       "relevant_when": "Phase 1 clarification round",
       "why_given": "particular preference"
     },
@@ -163,8 +163,8 @@
       "why_given": "particular preference"
     },
     {
-      "instruction": "Run the anti-pattern check against all 18 patterns after writing and after every revision",
-      "original_snippets": "Run the anti-pattern check. Open `references/ai-anti-patterns.md` and scan the draft for all 18 patterns. Rewrite any hits. This is not optional. ... Re-run the anti-pattern check after changes (new writing can introduce new patterns)",
+      "instruction": "Run the two-pass anti-pattern check against all 22 patterns after writing and after every revision, with rewrite audit",
+      "original_snippets": "Run the anti-pattern check (two passes). Open `references/ai-anti-patterns.md` and scan the draft: Pass 1 -- Surface scan ... Pass 2 -- Skeleton scan ... Rewrite audit: After rewriting any anti-pattern hit, re-read the replacement sentence in isolation and check it against ALL 22 patterns.",
       "relevant_when": "After completing Phase 3 first draft or any Phase 4 revision",
       "why_given": "particular preference"
     },
@@ -310,6 +310,54 @@
       "instruction": "Never use Unicode giveaways: curly quotes, horizontal ellipsis character, bullet character, en dashes",
       "original_snippets": "Curly double quotes: \\u201C and \\u201D ... Curly single quotes: \\u2018 and \\u2019 ... Horizontal ellipsis: \\u2026 ... En dash: \\u2013 ... Use plain ASCII in the draft.",
       "relevant_when": "Writing or reviewing any blog post draft",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use participle-phrase filler ('-ing' clauses tacked on as fake analysis)",
+      "original_snippets": "A sentence ends with a present-participle ('-ing') clause tacked on as fake analysis. The clause sounds like it's adding insight but says nothing the main clause didn't already say.",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use significance inflation (framing mundane facts as pivotal moments or broader shifts)",
+      "original_snippets": "Mundane facts are framed as historically important moments, broader shifts, or lasting legacies. The sentence asserts significance instead of showing it. ... 'This marks a pivotal moment in...'",
+      "relevant_when": "Writing or reviewing any blog post prose",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use challenge-optimism sandwich ('Despite X, challenges... Despite these, thriving')",
+      "original_snippets": "A formulaic structure: acknowledge positives, pivot to challenges with 'Despite,' then resolve with vague optimism about the future.",
+      "relevant_when": "Writing or reviewing any blog post prose, especially conclusions",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Never use inline-header lists (bold term + colon + description bullet points)",
+      "original_snippets": "Bullet points where each item starts with a boldfaced term followed by a colon and then a description. The format is inherited from READMEs, sales pages, and how-to guides.",
+      "relevant_when": "Writing or reviewing any blog post lists or takeaway sections",
+      "why_given": "new knowledge"
+    },
+    {
+      "instruction": "Fetch Wikipedia 'Signs of AI writing' article before each session and update anti-patterns if new patterns found",
+      "original_snippets": "Before reading the reference files, fetch the Wikipedia article 'Wikipedia:Signs of AI writing' ... If the article contains new patterns, vocabulary, or structural variants not already covered in the anti-patterns file, update the file to incorporate them. ... If the fetch fails ... proceed with the current anti-pattern file as-is.",
+      "relevant_when": "Starting any blog writing session",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Anti-pattern check uses two passes: surface scan (examples + variants) then skeleton scan (grammatical structure of adjacent sentences)",
+      "original_snippets": "Pass 1 -- Surface scan: Read the draft against each of the 22 patterns, looking for the forms described in the examples and structural variants. Pass 2 -- Skeleton scan: For each pair of adjacent sentences, strip the content and look at the grammatical skeleton only.",
+      "relevant_when": "Running the anti-pattern check in Phase 3 or Phase 4",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Rewrite audit: after fixing an anti-pattern, re-check the replacement against all 22 patterns before considering it fixed",
+      "original_snippets": "After rewriting any anti-pattern hit, re-read the replacement sentence in isolation and check it against ALL 22 patterns. Rewrites frequently introduce the same pattern in a different surface form. ... Do not consider an anti-pattern fixed until the replacement passes a full 22-pattern scan on its own.",
+      "relevant_when": "Rewriting anti-pattern hits during Phase 3 or Phase 4",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "Comparison posts need extra anti-pattern vigilance for patterns #1, #2, #5, and #6",
+      "original_snippets": "Posts that involve before/after demos, A/B tests, or tool comparisons are magnets for patterns #1, #2, #5, and #6. ... The anti-pattern check for comparison posts should include an extra pass specifically looking for mirrored clause pairs.",
+      "relevant_when": "Writing a blog post that involves comparisons, before/after, or A/B tests",
       "why_given": "new knowledge"
     },
     {

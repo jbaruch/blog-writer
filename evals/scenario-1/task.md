@@ -65,6 +65,19 @@ From solo developers just learning version control to hundred-person engineering
 
 The build infrastructure proved that small, frequent commits beat large, infrequent merges every time.
 
+This migration marked a pivotal moment in our team's engineering journey, fundamentally reshaping how we approached software delivery.
+
+Despite the initial learning curve, trunk-based development continued to thrive in our organization. Despite these challenges, future improvements to our CI pipeline could further enhance our deployment capabilities.
+
+Here's what we learned:
+
+- **Feature flags:** Control what users see without deploying new code
+- **Short-lived branches:** Keep branches under 24 hours to avoid merge conflicts
+- **Automated testing:** Run the full suite on every commit to catch issues early
+- **Incremental rollouts:** Deploy to 1% of users first, then scale up gradually
+
+Our deploy frequency tripled in the first month, significantly enhancing our team's velocity and demonstrating the value of continuous delivery practices.
+
 ---
 
 *Jordan Kim is a senior engineer at ShipFast, where they build deploy pipelines that occasionally deploy on time. Previously spent five years at a consulting firm where \u201ctrunk-based development\u201d meant everyone committed to main and hoped for the best. Once mass-deployed to production during a company all-hands and discovered that \u201cfeature complete\u201d and \u201cworking\u201d are different concepts.*

@@ -12,7 +12,8 @@ gates at each step.
 ## Anti-pattern detection
 
 Drafts are checked against 22 named AI writing anti-patterns, each with symptoms,
-examples, structural variants, and alternatives. The check runs in two passes:
+examples, and alternatives (plus structural variants where applicable). The check runs
+in two passes:
 
 - **Surface scan** — matches known pattern forms and their structural variants
 - **Skeleton scan** — compares grammatical structure of adjacent sentences to catch

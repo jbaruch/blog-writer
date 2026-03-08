@@ -250,7 +250,7 @@ Read `persona/voice.md` to stay in the author's voice throughout.
    author — don't reuse the same one across posts unless nothing better fits.
 
 10. **The Comparison Trap.** Posts that involve before/after demos, A/B tests, or tool
-    comparisons are magnets for patterns #1, #2, and #5. The content naturally involves
+    comparisons are magnets for patterns #1, #2, #5, and #6. The content naturally involves
     contrasts (old vs. new, broken vs. fixed, input vs. output), and every sentence about
     those contrasts will default to mirrored grammatical structure unless you actively fight
     it. When writing a comparison post:
