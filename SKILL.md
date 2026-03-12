@@ -3,7 +3,7 @@ name: blog-writer
 description: >
   Write developer blog posts from video transcripts, meeting notes, or rough ideas.
   Extracts narrative from source material, structures content with hooks and technical sections,
-  formats code examples with placeholders, and checks drafts against 22 AI anti-patterns.
+  formats code examples with placeholders, and checks drafts against 24 AI anti-patterns.
   Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript
   into a blog, work on blog content, or mentions "blog" in the context of content creation.
   Also trigger when the user provides a video transcript and wants written content derived from it,
@@ -55,7 +55,7 @@ Read these reference files in order:
    tone, rhetorical devices, and voice-specific examples.
 2. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-3. `references/ai-anti-patterns.md` — 22 named AI writing patterns to never use. Each has
+3. `references/ai-anti-patterns.md` — 24 named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
 4. `references/process.md` — The workflow from transcript to published draft.
