@@ -311,6 +311,11 @@ pattern in a different surface form. This is especially true for:
 Do not consider an anti-pattern fixed until the replacement passes a full 24-pattern scan
 on its own.
 
+**Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against
+`persona/voice.md`. Does it still sound like the author? If the rewrite is correct but
+flat, redo it using the author's rhetorical devices. A mechanically clean sentence that
+sounds like a different person is not a fix.
+
 Run the product accuracy check (if configured). If `persona/product.md` exists and contains
 content, verify every claim the draft makes about the product — feature names, CLI commands,
 behavior, terminology — against the docs pages fetched in Phase 0. If the draft references
@@ -357,7 +362,8 @@ conversation — edit the file surgically.
 - Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — both
   passes (surface scan + skeleton scan) for new or rewritten sections. Apply the rewrite
   audit rule: every rewrite must pass a full 24-pattern scan on its own before it's
-  considered fixed. New writing can introduce new patterns
+  considered fixed. Then run the voice check: re-read against `persona/voice.md` and
+  redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or
   terminology were added or changed (only if `persona/product.md` is configured) — use
   WebFetch against docs pages as needed
