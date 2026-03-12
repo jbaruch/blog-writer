@@ -29,6 +29,11 @@ The negation doesn't have to lead the sentence or use the word "Not."
   position.
 - Any "[positive claim], not [contrasting thing]" at the end of a sentence is this pattern
   in a less obvious position.
+- "No tests, no guardrails." / "No spec, no safety net." — Negative parallelism. Two
+  "no [noun]" phrases mirrored for dramatic effect. Same mechanism as "Not X. Y." but
+  using symmetrical negation instead of negation-then-affirmation.
+- "No monitoring, no alerting, no idea what's happening in production." — Extended
+  negative parallelism building to a kicker. Overlaps with pattern #3 (tricolon).
 
 **Why it's a tell:** This is the single most common LLM writing pattern. It sounds
 confident and pithy to a machine. To a human reader it sounds like a LinkedIn post.
@@ -682,3 +687,88 @@ format, use plain bullets without the bold-colon template.
 - ✅ "We defined what we were building before the agent started (the spec). We limited
   what it could see (context). We told it what it couldn't do (guardrails). Three files.
   That's it."
+
+---
+
+## 23. Performed Credentialism
+
+**The tell:** Inserting unnecessary technical specificity to sound authoritative. The
+jargon depth exceeds what the surrounding context requires — the writer is performing
+expertise rather than communicating.
+
+**Symptoms:**
+- Naming protocols, algorithms, or internal engine components that are irrelevant to
+  the point being made
+- Qualifying simple concepts with their formal computer-science terminology
+- Dropping implementation details from a layer below the one the post operates at
+- Technical precision that impresses but doesn't inform
+
+**Examples:**
+- ❌ "Utilizing the WebSocket protocol's full-duplex communication channel" when the
+  post is about a chat feature (just say "using WebSockets")
+- ❌ "Leveraging V8's TurboFan JIT compilation pipeline" in a post about Node.js
+  deployment workflows
+- ❌ "The garbage collector's concurrent mark-sweep phase" in a post about reducing
+  memory usage (just say "the GC")
+- ❌ "Employing a declarative, idempotent infrastructure-as-code paradigm" instead of
+  "using Terraform"
+
+**Structural variants:**
+The credentialism doesn't have to be jargon — it can be unnecessary precision in any form.
+- "The 200 OK HTTP response status code indicates..." — specifying the status code number
+  AND its name AND that it's HTTP, when context makes all three obvious.
+- "We observed a 47.3% reduction in p99 latency" in a post where the actual number doesn't
+  matter and "latency dropped by half" would serve the story better.
+- Parenthetical specifications that nobody asked for: "the container orchestrator
+  (Kubernetes, specifically the kube-scheduler component)" — each layer of specificity
+  adds precision that the reader doesn't need and didn't request.
+
+**Why it's a tell:** LLMs over-specify because their training data rewards technical
+precision. A human writer matches depth to context — you say "WebSockets" in a blog post
+about chat features and "the WebSocket protocol's frame-masking mechanism" in a post about
+WebSocket security. The LLM doesn't adjust; it defaults to maximum specificity because
+that's what gets rewarded in training data (Stack Overflow answers, documentation,
+textbooks). The result reads like someone trying to pass a job interview, not someone
+explaining something to a peer.
+
+**Instead:** Match precision to purpose. Name the technology at the level your reader
+needs. If the post is about deployment, "WebSockets" is enough. If the post is about
+WebSocket internals, then name the internals.
+- ✅ "We switched to WebSockets and the UI stopped polling every 500ms."
+- ✅ "Latency dropped by half."
+- ✅ "We use Terraform."
+
+---
+
+## 24. "Did Nothing" Constructions
+
+**The tell:** Using "did nothing" or "did little" as a formal negation where a native
+speaker would use idiomatic alternatives. The phrasing is grammatically correct but
+stilted.
+
+**Symptoms:**
+- "X did nothing to address Y"
+- "X did nothing to resolve the issue"
+- "The change did little to improve performance"
+- "This approach did nothing for reliability"
+
+**Examples:**
+- ❌ "The migration did nothing to resolve the latency issues."
+- ❌ "Adding more replicas did nothing to improve throughput."
+- ❌ "The refactor did little to address the underlying problem."
+
+**Structural variants:**
+The stilted negation extends beyond "did nothing."
+- "failed to yield any improvement" — formal negation of a formal positive
+- "proved insufficient to address" — bureaucratic hedging
+- "did not succeed in resolving" — passive circumlocution around "didn't fix"
+
+**Why it's a tell:** Native speakers in casual technical writing say "didn't help,"
+"didn't fix it," "made no difference," or just "still broken." The "did nothing to
+[verb]" construction reads like a formal report or a translated text. It's not wrong —
+it's just not how practitioners talk about things that didn't work.
+
+**Instead:** Use idiomatic negation.
+- ✅ "The migration didn't fix the latency."
+- ✅ "More replicas didn't help."
+- ✅ "Still broken after the refactor."

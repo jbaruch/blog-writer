@@ -61,7 +61,7 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**Read `references/ai-anti-patterns.md` for the full list.** It contains 22 named patterns
+**Read `references/ai-anti-patterns.md` for the full list.** It contains 24 named patterns
 with symptoms, examples, and alternatives. Scan the draft against every one of them during
 Phase 3 and Phase 4. Zero tolerance.
 
@@ -88,6 +88,8 @@ Quick index for scanning:
 20. Significance inflation — mundane facts framed as pivotal moments
 21. Challenge-optimism sandwich — "Despite X, challenges... Despite these, thriving"
 22. Inline-header lists — bold term + colon + description bullet points
+23. Performed credentialism — unnecessary technical specificity to sound authoritative
+24. "Did nothing" constructions — stilted formal negation instead of idiomatic phrasing
 
 ---
 
@@ -116,7 +118,7 @@ Before submitting a draft, check:
 - [ ] Is the bio kicker actually funny AND connected to the post's content?
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences). Rewrite any hits,
-  then re-check each rewrite against all 22 patterns before considering it fixed.
+  then re-check each rewrite against all 24 patterns before considering it fixed.
 
 ---
 

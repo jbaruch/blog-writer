@@ -286,7 +286,7 @@ Link 01, Screenshot 02.
 Run the anti-pattern check (two passes). Open `references/ai-anti-patterns.md` and scan
 the draft:
 
-**Pass 1 — Surface scan:** Read the draft against each of the 22 patterns, looking for
+**Pass 1 — Surface scan:** Read the draft against each of the 24 patterns, looking for
 the forms described in the examples and structural variants.
 
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
@@ -299,7 +299,7 @@ that Pass 1 misses because the vocabulary is different but the grammar is identi
 Rewrite any hits. This is not optional.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
-in isolation and check it against ALL 22 patterns. Rewrites frequently introduce the same
+in isolation and check it against ALL 24 patterns. Rewrites frequently introduce the same
 pattern in a different surface form. This is especially true for:
 - #2 (Parallel Binary) — the most likely pattern to survive a rewrite, because describing
   a comparison naturally produces mirrored clauses. If you rewrote a parallel binary and the
@@ -308,7 +308,7 @@ pattern in a different surface form. This is especially true for:
 - #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
   question with a longer answer, but the structure is identical.
 
-Do not consider an anti-pattern fixed until the replacement passes a full 22-pattern scan
+Do not consider an anti-pattern fixed until the replacement passes a full 24-pattern scan
 on its own.
 
 Run the product accuracy check (if configured). If `persona/product.md` exists and contains
@@ -356,7 +356,7 @@ conversation — edit the file surgically.
 - Apply changes to the draft file using Edit
 - Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — both
   passes (surface scan + skeleton scan) for new or rewritten sections. Apply the rewrite
-  audit rule: every rewrite must pass a full 22-pattern scan on its own before it's
+  audit rule: every rewrite must pass a full 24-pattern scan on its own before it's
   considered fixed. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or
   terminology were added or changed (only if `persona/product.md` is configured) — use
