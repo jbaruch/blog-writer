@@ -275,10 +275,11 @@ after new blog posts are added to `persona/examples.md`.
 > 2. No — only use it for blog writing
 > 3. Not sure — remind me next time
 
-**If yes:** Write a summary of the voice profile to `~/.claude/user-memory/voice.md`
-(or update if it already exists). Include the key voice characteristics, rhetorical
-devices, and tone notes from `persona/voice.md` — enough for any Claude Code session
-to adopt the voice without access to the persona files.
+**If yes:** Write a voice summary to the `# Voice` section of `~/.claude/CLAUDE.md`
+(create the file or update the section if it already exists). Include the key voice
+characteristics, rhetorical devices, and tone notes from `persona/voice.md` — enough
+for any Claude Code session to adopt the voice without access to the persona files.
+`~/.claude/CLAUDE.md` is read by every Claude Code conversation globally.
 
 **If no:** Do nothing. The voice stays local to the blog-writer skill.
 
