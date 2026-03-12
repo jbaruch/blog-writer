@@ -16,9 +16,24 @@ Write developer blog posts for practitioners who build things, break things, and
 opinions about their tools. The voice is the author's own — configured through persona
 files that capture their style, rhetorical devices, and personality.
 
+## Bootstrap: Persona Location
+
+**Before anything else**, check if the persona folder path is known. If this is the first
+session or the persona folder hasn't been located yet, ask:
+
+> Where is your persona folder? This is where your voice profile, bio, and examples live.
+>
+> 1. `persona/` (in this project directory) ← **my guess**
+> 2. A different path in this project
+> 3. A path outside this project
+> 4. I don't have one yet — let's create it
+
+Wait for the answer before proceeding. If the author picks option 4, create `persona/` in
+the project root and continue to the setup flow.
+
 ## Persona Check
 
-**Before anything else**, check if `persona/voice.md` exists and contains content.
+Check if `persona/voice.md` exists and contains content (using the located persona path).
 
 - **If `persona/voice.md` is empty or missing:** Read `references/setup.md` and run the
   interactive onboarding flow. Do not proceed with blog writing until the persona is set up.
@@ -70,7 +85,7 @@ The full process is in `references/process.md`. Here are the phases and their ga
 | Phase | What happens | Gate |
 |-------|-------------|------|
 | 0: Intake | Read source material, WebFetch relevant product docs (if configured), read series tracker | Gaps identified |
-| 1: Clarification | Numbered questions with your best guess included in each one — author confirms or corrects | Author confirms reconstruction |
+| 1: Clarification | One question at a time with 1-4 options (including open answer), your best guess marked — author picks or corrects | Author confirms reconstruction |
 | 2: Planning | Lock main idea, CTA, and section outline | Author approves |
 | 3: First Draft | Write to `blog-draft-[slug].md`, run anti-pattern + accuracy + tightening checks | Draft delivered |
 | 4: Revision | Edit file based on feedback, re-run checks after changes | Author declares done |

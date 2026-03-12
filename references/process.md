@@ -113,37 +113,37 @@ casually might be technically important.
 
 **How to do it:**
 
-Ask clarification questions. Ask as many as you need. **Always number them** so the author
-can reply efficiently with "1: yes, 2: it was actually React, 3: yes" etc.
+Ask **one question at a time**. Each question presents 1-4 concrete options plus an open
+answer escape hatch. Mark your best guess with an arrow or "← my guess". The author should
+be able to answer with a single number in most cases.
 
-**EVERY question MUST include your best guess.** Do not ask open-ended questions like "what
-happened here?" or "what was on screen?" Instead, reconstruct what you think happened from
-context and ask the author to confirm or correct. The author should be able to answer most
-questions with "yes", a short correction, or a one-liner. You do the heavy lifting.
+**EVERY question MUST include your best guess as one of the options.** Do not ask open-ended
+questions like "what happened here?" or "what was on screen?" Instead, reconstruct what you
+think happened from context and present it as the likely option. The author should be able
+to answer most questions with a single number. You do the heavy lifting.
 
 **Example format:**
 
 ```
-1. At ~12:30 you said "and then this happened." I'm guessing the screen showed the agent's
-   terminal output with an error — is that right? If so, what was the error?
-2. The transcript mentions installing a package. Was the command `npm install example-lib`?
-3. You referenced "the last time we tried this." Is that from a previous post in the series?
-4. It sounds like your collaborator pushed back here about the time spent. Was this the
-   "we spent an hour and still haven't implemented anything" moment, or a different objection?
+At ~12:30 you said "and then this happened." What was on screen at that point?
+
+1. The agent's terminal output showing an error ← my guess
+2. The IDE with the config file open
+3. The browser showing the dashboard
+4. Something else (describe briefly)
 ```
 
-If you catch yourself writing a question without a guess, stop and add one. Even a wrong
-guess is better than an open-ended question — it gives the author something to react to.
+Wait for the answer, then proceed to the next question. Do not batch questions.
 
-Group questions by type for easier scanning:
+**Question ordering:** Work through gaps in this priority order:
+1. **Narrative gaps** (what happened when) — needed to structure the post
+2. **Technical gaps** (exact commands, outputs, configurations) — needed for accuracy
+3. **Visual gaps** (what was on screen) — needed for placeholders
+4. **Context gaps** (references to other work, people, previous posts) — needed for callbacks
 
-- **Narrative gaps** (what happened when)
-- **Technical gaps** (exact commands, outputs, configurations)
-- **Visual gaps** (what was on screen)
-- **Context gaps** (references to other work, people, previous posts)
-
-Keep asking rounds until you can reconstruct the entire narrative without uncertainty.
-Multiple rounds are fine — just keep numbering sequentially across rounds.
+Keep asking questions one at a time until you can reconstruct the entire narrative without
+uncertainty. Tell the author roughly how many questions you expect ("I have about 6 questions
+to fill in the gaps") so they know what to expect, and update if the count changes.
 
 **Checkpoint:** The author confirms the narrative reconstruction is accurate. No ambiguity
 remains.
@@ -368,6 +368,9 @@ conversation — edit the file surgically.
   introduce redundancy with existing content
 
 **The post is done when the author says it's done. Not before.**
+
+**When a post is finished and added to `persona/examples.md`:** The persona has been updated
+with new writing. Ask the global voice preference question from `references/setup.md` Step 10.
 
 ---
 
