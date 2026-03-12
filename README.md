@@ -11,7 +11,7 @@ gates at each step.
 
 ## Anti-pattern detection
 
-Drafts are checked against 22 named AI writing anti-patterns, each with symptoms,
+Drafts are checked against 24 named AI writing anti-patterns, each with symptoms,
 examples, and alternatives (plus structural variants where applicable). The check runs
 in two passes:
 
@@ -19,7 +19,7 @@ in two passes:
 - **Skeleton scan** — compares grammatical structure of adjacent sentences to catch
   patterns where the vocabulary differs but the grammar is identical
 
-Every rewrite is re-audited against all 22 patterns before it's considered fixed.
+Every rewrite is re-audited against all 24 patterns before it's considered fixed.
 
 The anti-pattern list auto-updates from
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
@@ -29,7 +29,9 @@ at the start of each session to stay current as LLM writing patterns evolve.
 
 The skill learns the author's voice through an interactive onboarding flow that analyzes
 2-5 writing samples. Voice profile, bio template, product context, and example posts are
-stored in `persona/` and read fresh each session.
+stored in `persona/` and read fresh each session. A bootstrap step locates the persona
+folder on first run. After setup (or when new posts are added), you can optionally save
+the voice profile to your global Claude Code user memory so it applies across all projects.
 
 ## Series support
 
@@ -44,5 +46,6 @@ Install via [Tessl](https://tessl.io):
 tessl install jbaruch/blog-writer
 ```
 
-On first use, the skill runs the persona setup flow. After that, just tell it what you
-want to write about.
+On first use, the skill asks where your persona folder is and runs the setup flow.
+Clarification questions are asked one at a time with numbered options — no question dumps.
+After that, just tell it what you want to write about.
