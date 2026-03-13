@@ -117,6 +117,29 @@ of the output. To prevent drift:
    3 rhetorical devices from the profile. If you can't, you haven't internalized it — read
    it again.
 
+## Anti-Pattern Check Adherence
+
+The anti-pattern check is a **defined procedure**, not a vibe check. Do not improvise it.
+
+1. **Always re-read `references/ai-anti-patterns.md` before running the check.** Do not
+   rely on your general knowledge of AI writing patterns. The file contains 24 specific
+   patterns with specific symptoms, examples, structural variants, and alternatives. Use
+   THOSE definitions, not your own.
+
+2. **Follow the two-pass procedure exactly as written in `references/process.md`.** Pass 1
+   is the surface scan against all 24 patterns. Pass 2 is the skeleton scan on adjacent
+   sentence pairs. Then the rewrite audit. Then the voice check. In that order. Do not
+   skip passes, do not merge them, do not substitute your own method.
+
+3. **Do not invent patterns that aren't in the file.** If something feels "AI-ish" but
+   doesn't match any of the 24 defined patterns or their structural variants, leave it
+   alone. The pattern list is curated and maintained — false positives from improvised
+   rules damage the author's voice more than the pattern they're trying to fix.
+
+4. **If you can't find or read the anti-pattern file — ASK.** Same rule as the persona:
+   never wing it from memory, never claim the file doesn't exist. Ask the author where it
+   is.
+
 ## Quick Reference: Blog Anatomy
 
 Posts are stories about real problems that happen to involve a technology (and optionally a
