@@ -97,6 +97,15 @@ The three items don't have to be single words or short fragments.
   the spec was wrong." — Full sentences, but the same rhythm: three setup beats + punchline.
 - Any list of three that exists only to build momentum toward a fourth item is this pattern,
   regardless of item length.
+- **Dense-paragraph tricolon:** Three examples buried in a long paragraph, each following
+  the same grammatical skeleton (e.g., "[problem] — fix went into [location]"). The length
+  and density of the paragraph disguises the repetition, but the skeleton is identical across
+  all three items. Especially suspect when followed by a neat summary like "Three bugs, three
+  different parts" that announces the manufactured symmetry.
+- **Thematic number echo:** When the post's topic already involves a specific number (e.g.,
+  three tiers, three layers), the LLM will manufacture tricolons to echo it. The content
+  showing three examples is fine; a sentence announcing "Three X, three Y" on top of that
+  is the pattern.
 
 **Why it's a tell:** The published posts DO use lists of three sometimes. The difference:
 they occur inside natural paragraphs, not as standalone staccato fragments designed to

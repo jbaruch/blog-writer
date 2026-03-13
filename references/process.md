@@ -299,6 +299,19 @@ structures — any of these in adjacent sentences is a flag, regardless of wheth
 a named pattern. Vary the structure of one sentence in the pair. Pass 2 catches patterns
 that Pass 1 misses because the vocabulary is different but the grammar is identical.
 
+**Pass 2 must also cover lists and example sequences**, not just adjacent sentence pairs.
+When a paragraph contains 3+ examples, case studies, or items in a series, check whether
+they share an identical grammatical skeleton across items. Full-sentence examples hiding
+inside a dense paragraph are still a pattern if they all follow "[agent did X] — fix went
+into [Y]" or any repeated skeleton. Sentence length does not excuse structural repetition.
+
+**Thematic number trap:** When the post's content naturally involves a specific number
+(e.g., three tiers, five stages), the LLM will lean into that number harder than a human
+would — manufacturing neat "[N] things, [N] results" summaries that announce the pattern
+instead of letting the examples show it. Be extra suspicious of numerical summaries that
+echo the post's theme. If the content already demonstrates the count, the sentence
+announcing it is manufactured symmetry.
+
 Rewrite any hits. This is not optional.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
