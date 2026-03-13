@@ -92,6 +92,31 @@ The full process is in `references/process.md`. Here are the phases and their ga
 
 Do not skip phases. Do not write prose before Phase 3.
 
+## Persona Adherence (Periodic Re-anchor)
+
+Long conversations lose context. The persona is not optional — it defines the entire voice
+of the output. To prevent drift:
+
+1. **Re-read `persona/voice.md` before every writing action** — before Phase 3 first draft,
+   before every revision in Phase 4, and before the anti-pattern rewrite voice check. Not
+   "remember what it said" — actually re-read the file.
+
+2. **If you think the persona is empty, missing, or unfamiliar — ASK, don't assume.** The
+   persona was set up earlier in the session or in a previous session. If you can't find it,
+   ask the author:
+   > I can't locate the persona files. Where is the persona folder?
+   >
+   > 1. `persona/` (in this project directory)
+   > 2. A different path (tell me)
+   >
+   Never claim the persona doesn't exist or that you don't know what it is. It exists. You
+   may have lost track of the path — ask.
+
+3. **Voice spot-check at phase transitions.** At the start of Phase 3 and Phase 4, re-read
+   `persona/voice.md` and confirm to yourself (not to the author) that you can name at least
+   3 rhetorical devices from the profile. If you can't, you haven't internalized it — read
+   it again.
+
 ## Quick Reference: Blog Anatomy
 
 Posts are stories about real problems that happen to involve a technology (and optionally a

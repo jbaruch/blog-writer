@@ -198,7 +198,10 @@ Include proposed placeholder locations in the outline — each type numbered ind
 ## Phase 3: First Draft
 
 **Purpose:** Write the post. Use the approved structure. Follow the tone guide religiously.
-Read `persona/voice.md` to stay in the author's voice throughout.
+
+**Re-read `persona/voice.md` now.** Actually re-read the file — do not rely on memory from
+earlier in the conversation. Confirm you can name at least 3 rhetorical devices from the
+profile before writing a single sentence.
 
 ### Writing rules:
 
@@ -343,6 +346,9 @@ count, placeholder counts by type, and any open questions or flags.
 
 **Purpose:** Iterate based on author feedback. This phase loops until the author declares
 the post done.
+
+**Re-read `persona/voice.md` now.** Every time you enter Phase 4 or return to it after
+author feedback, re-read the file. Long revision cycles are where voice drift happens.
 
 **Draft is a file.** All revisions happen in `blog-draft-[slug].md` using the Edit tool.
 This gives the author a persistent artifact they can review in their editor, diff against
