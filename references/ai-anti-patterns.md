@@ -298,13 +298,27 @@ them, and they don't need the post summarized back at them.
 - Didactic variants: "It's important to note/remember...", "It's crucial to consider...",
   "It's essential to understand...", "may vary"
 
+**Structural variants — casual filler hedges:**
+- "basically" — adds nothing, signals the writer is about to oversimplify
+- "essentially" — same as "basically" in a blazer
+- "in order to" — always replaceable with "to"
+- "it turns out" / "it turns out that" — false surprise, especially when the thing that
+  "turned out" was the whole point of the investigation
+- "just" (as minimizer) — "we just added an allowlist" downplays what might be the key fix
+
+These are subtler than the formal hedges above but equally empty. They pad sentences
+without adding meaning.
+
 **Why it's a tell:** These are throat-clearing. They signal the writer isn't confident
 enough to just make the point. LLMs insert them as politeness padding. The didactic
 variants are worse — they talk down to the reader, implying they need to be told what's
-important.
+important. The casual filler hedges are sneakier — they sound conversational but still
+add zero information.
 
 **Instead:** Delete the hedge and start with the actual point. If it's important, the
-reader will know because you showed them why, not because you announced it.
+reader will know because you showed them why, not because you announced it. For casual
+fillers: delete the word and re-read the sentence. If it still works (it will), leave it
+out.
 
 ---
 
@@ -513,6 +527,11 @@ often in a passage, restructure the sentences or use a pronoun — don't swap in
 synonym.
 - ✅ "The CLI scaffolds the project. Once it finishes, review the output. It will
   prompt you for confirmation."
+
+**How to check:** After writing, grep the draft for the main technical nouns (the tool,
+the system, the pipeline, the service). If the same thing has two or more names anywhere
+in the draft — even across different sections — pick the most precise term and use it
+everywhere. Cross-section synonym cycling is the hardest to spot and the most common miss.
 
 ---
 

@@ -135,11 +135,14 @@ At ~12:30 you said "and then this happened." What was on screen at that point?
 
 Wait for the answer, then proceed to the next question. Do not batch questions.
 
-**Question ordering:** Work through gaps in this priority order:
+**Question grouping:** Group questions by type under section headers, in this order:
 1. **Narrative gaps** (what happened when) — needed to structure the post
 2. **Technical gaps** (exact commands, outputs, configurations) — needed for accuracy
 3. **Visual gaps** (what was on screen) — needed for placeholders
 4. **Context gaps** (references to other work, people, previous posts) — needed for callbacks
+
+Present each group as a headed section (e.g., "### Narrative gaps") with its questions
+underneath. This lets the author scan by category instead of reading a flat numbered list.
 
 Keep asking questions one at a time until you can reconstruct the entire narrative without
 uncertainty. Tell the author roughly how many questions you expect ("I have about 6 questions
