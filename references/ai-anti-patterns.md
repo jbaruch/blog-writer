@@ -528,10 +528,15 @@ synonym.
 - ✅ "The CLI scaffolds the project. Once it finishes, review the output. It will
   prompt you for confirmation."
 
-**How to check:** After writing, grep the draft for the main technical nouns (the tool,
-the system, the pipeline, the service). If the same thing has two or more names anywhere
-in the draft — even across different sections — pick the most precise term and use it
-everywhere. Cross-section synonym cycling is the hardest to spot and the most common miss.
+**How to check:** After writing, build a term inventory: list every noun phrase used for
+each core concept in the post. Example inventory:
+- The export job: "the pipeline", "the export job", "the batch process" ← PICK ONE
+- The database: "Postgres", "the database", "the data store" ← PICK ONE
+
+If any concept has more than one name, replace all variants with the most precise term.
+Do this as an explicit pass — read the draft looking ONLY for this. Cross-section synonym
+cycling (one term in the Problem section, a different one in the Fix section) is the most
+common miss because each section reads fine in isolation.
 
 ---
 

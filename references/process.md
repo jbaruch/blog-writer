@@ -191,8 +191,15 @@ open threads, and teasers. Then confirm with the author:
 Propose section headers and a 1-2 sentence description of each section's purpose. Confirm
 with the author before proceeding.
 
-Include proposed placeholder locations in the outline — each type numbered independently:
-"[Screenshot 01: ...]", "[Screenshot 02: ...]", "[Code 01: ...]", "[Link 01: ...]", etc.
+**Placeholders go in the outline, not just the draft.** For each section, include the
+specific placeholders that will appear there, using the standard format with independent
+numbering per type:
+- `[Screenshot 01: the Grafana panel showing memory usage]`
+- `[Code 01: the rate limiter middleware config]`
+- `[Link 01: OWASP rate limiting guide]`
+
+Screenshot, Code, Link, and Fact each have their own counter starting at 01. The outline
+is where placeholder planning happens — don't defer it to the draft.
 
 **Checkpoint:** Author approves the main idea, CTA, and structure outline.
 
