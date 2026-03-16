@@ -19,7 +19,7 @@ Produce the following files in the working directory:
 
 The following files are provided as inputs. Extract them before beginning.
 
-=============== FILE: persona/voice.md ===============
+=============== FILE: ~/.claude/blog-writer-persona/voice.md ===============
 # Voice Profile: Ravi Patel
 
 ## The Voice in One Paragraph
@@ -62,7 +62,7 @@ References to systems thinking, monitoring culture, and the gap between observab
 ## Voice Consistency Notes
 The voice stays data-driven even in narrative sections. Numbers appear in stories, not just technical explanations. The dry humor continues into config files and log output -- Ravi treats infrastructure artifacts as characters in the story.
 
-=============== FILE: persona/bio.md ===============
+=============== FILE: ~/.claude/blog-writer-persona/bio.md ===============
 # Author Bio: Ravi Patel
 
 ## Bio Schema
@@ -71,7 +71,7 @@ Ravi Patel is a platform engineer at StreamKit, where he keeps distributed syste
 ## Kicker Notes
 Rotating. Should be a dry, matter-of-fact observation about something specific in the post. Self-deprecating or wryly observational preferred.
 
-=============== FILE: persona/examples.md ===============
+=============== FILE: ~/.claude/blog-writer-persona/examples.md ===============
 # Example Posts: Ravi Patel
 
 ## Production Confessions, Episode 1: "The Autoscaler That Didn't"

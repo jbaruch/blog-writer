@@ -19,7 +19,7 @@ Produce the following files:
 
 The following files are provided as inputs. Extract them before beginning.
 
-=============== FILE: persona/voice.md ===============
+=============== FILE: ~/.claude/blog-writer-persona/voice.md ===============
 # Voice Profile: Elena Vasquez
 
 ## The Voice in One Paragraph
@@ -54,7 +54,7 @@ References to ops culture, on-call life, and the eternal gap between architectur
 ## Voice Consistency Notes
 Elena's dark humor continues into technical sections. Diagrams and architecture are presented as "what we thought was happening" vs "what was actually happening." Config files are described with personality.
 
-=============== FILE: persona/bio.md ===============
+=============== FILE: ~/.claude/blog-writer-persona/bio.md ===============
 # Author Bio: Elena Vasquez
 
 ## Bio Schema

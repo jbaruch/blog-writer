@@ -4,6 +4,9 @@ This file defines the interactive onboarding that runs when `persona/voice.md` i
 or missing. Follow these steps in order. The goal: generate persona files that let the
 blog-writer skill match the author's actual voice.
 
+**Path note:** `persona/` means `~/.claude/blog-writer-persona/` (see SKILL.md "Persona
+Directory"). All file reads and writes in this flow use that absolute path.
+
 ---
 
 ## Step 1: Welcome
@@ -243,14 +246,18 @@ Key patterns: [1-line note about what this sample demonstrates about the voice]
 
 Tell the author:
 
-> **Setup complete!** Your persona files are ready:
-> - `persona/voice.md` — Your voice profile
-> - `persona/bio.md` — Your bio template
-> - `persona/product.md` — [Product context / Skipped]
-> - `persona/examples.md` — Your reference posts
+> **Setup complete!** Your persona files are ready in `~/.claude/blog-writer-persona/`:
+> - `voice.md` — Your voice profile
+> - `bio.md` — Your bio template
+> - `product.md` — [Product context / Skipped]
+> - `examples.md` — Your reference posts
 >
 > You can edit any of these files directly at any time. The skill reads them fresh
-> each session.
+> each session. If you ever want to move them (e.g., to Google Drive for backup),
+> move the directory and create a symlink:
+> ```
+> ln -s /your/new/path ~/.claude/blog-writer-persona
+> ```
 
 Then ask the global voice question (see Step 10).
 

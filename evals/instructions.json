@@ -1,14 +1,14 @@
 {
   "instructions": [
     {
-      "instruction": "Check if persona/voice.md exists and has content before doing anything else",
-      "original_snippets": "**Before anything else**, check if `persona/voice.md` exists and contains content. ... If `persona/voice.md` is empty or missing: Read `references/setup.md` and run the interactive onboarding flow.",
+      "instruction": "Check if ~/.claude/blog-writer-persona/ exists and persona/voice.md has content before doing anything else",
+      "original_snippets": "**Before anything else**, check if `~/.claude/blog-writer-persona/` exists (as a real directory or a symlink). ... **If it exists and `persona/voice.md` has content:** Persona is ready. ... **If it exists but `persona/voice.md` is empty or missing:** Read `references/setup.md` and run the interactive onboarding flow.",
       "relevant_when": "Starting any blog writing session",
       "why_given": "particular preference"
     },
     {
       "instruction": "Run the interactive onboarding flow from setup.md if persona/voice.md is empty or missing",
-      "original_snippets": "If `persona/voice.md` is empty or missing: Read `references/setup.md` and run the interactive onboarding flow. Do not proceed with blog writing until the persona is set up.",
+      "original_snippets": "If it exists but `persona/voice.md` is empty or missing: Read `references/setup.md` and run the interactive onboarding flow. Do not proceed with blog writing until the persona is set up.",
       "relevant_when": "First-time setup when no persona exists yet",
       "why_given": "particular preference"
     },
@@ -375,19 +375,19 @@
     {
       "instruction": "Generate voice.md with specific sections: voice paragraph, rhetorical devices with quotes, cultural references, recurring characters, voice consistency notes",
       "original_snippets": "## The Voice in One Paragraph ... ## Rhetorical Devices That Work [Each device as a subsection with description and quoted examples from their writing] ## Cultural Reference Style ... ## Recurring Characters ... ## Voice Consistency Notes",
-      "relevant_when": "Generating persona/voice.md during onboarding",
+      "relevant_when": "Generating ~/.claude/blog-writer-persona/voice.md during onboarding",
       "why_given": "particular preference"
     },
     {
       "instruction": "Generate bio.md with bio schema, examples, and kicker notes",
       "original_snippets": "## Bio Schema [The template with variable parts marked] ## Examples [1-2 example bios] ## Kicker Notes [How the kicker should work -- rotating or fixed, tone guidance]",
-      "relevant_when": "Generating persona/bio.md during onboarding",
+      "relevant_when": "Generating ~/.claude/blog-writer-persona/bio.md during onboarding",
       "why_given": "particular preference"
     },
     {
       "instruction": "Generate examples.md with post URLs, each annotated with key voice patterns it demonstrates",
       "original_snippets": "## [Post title or description] URL: [url] Key patterns: [1-line note about what this sample demonstrates about the voice]",
-      "relevant_when": "Generating persona/examples.md during onboarding",
+      "relevant_when": "Generating ~/.claude/blog-writer-persona/examples.md during onboarding",
       "why_given": "particular preference"
     }
   ]

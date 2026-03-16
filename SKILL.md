@@ -16,28 +16,45 @@ Write developer blog posts for practitioners who build things, break things, and
 opinions about their tools. The voice is the author's own — configured through persona
 files that capture their style, rhetorical devices, and personality.
 
-## Bootstrap: Persona Location
+## Persona Directory
 
-**Before anything else**, check if the persona folder path is known. If this is the first
-session or the persona folder hasn't been located yet, ask:
+**Persona path:** `~/.claude/blog-writer-persona/`
 
-> Where is your persona folder? This is where your voice profile, bio, and examples live.
+Throughout this document and all reference files, **`persona/`** is shorthand for this
+absolute path. When you see "read `persona/voice.md`", that means read
+`~/.claude/blog-writer-persona/voice.md`. Always resolve `persona/` to this absolute path
+when reading or writing files.
+
+## Bootstrap
+
+**Before anything else**, check if `~/.claude/blog-writer-persona/` exists (as a real
+directory or a symlink).
+
+**If it exists and `persona/voice.md` has content:** Persona is ready. Skip to
+"Before You Start."
+
+**If it exists but `persona/voice.md` is empty or missing:** Read `references/setup.md`
+and run the interactive onboarding flow. Do not proceed with blog writing until the
+persona is set up.
+
+**If the directory doesn't exist:** First-time setup. Ask:
+
+> Where should I store your persona files (voice profile, bio, examples)?
 >
-> 1. `persona/` (in this project directory) ← **my guess**
-> 2. A different path in this project
-> 3. A path outside this project
-> 4. I don't have one yet — let's create it
+> 1. `~/.claude/blog-writer-persona/` ← **default** (recommended)
+> 2. A custom path (e.g., Google Drive for backup) — I'll create a symlink so the
+>    skill always finds them
 
-Wait for the answer before proceeding. If the author picks option 4, create `persona/` in
-the project root and continue to the setup flow.
+If the author picks **option 1**: create `~/.claude/blog-writer-persona/`.
 
-## Persona Check
+If the author picks **option 2**: ask for the full path, create the directory there, then
+create a symlink:
+```bash
+ln -s /their/chosen/path ~/.claude/blog-writer-persona
+```
+This way the skill always reads from the same path regardless of where the data lives.
 
-Check if `persona/voice.md` exists and contains content (using the located persona path).
-
-- **If `persona/voice.md` is empty or missing:** Read `references/setup.md` and run the
-  interactive onboarding flow. Do not proceed with blog writing until the persona is set up.
-- **If `persona/voice.md` has content:** Proceed with the normal blog writing flow below.
+Then read `references/setup.md` and run the interactive onboarding flow.
 
 ## Before You Start
 
@@ -102,15 +119,9 @@ of the output. To prevent drift:
    "remember what it said" — actually re-read the file.
 
 2. **If you think the persona is empty, missing, or unfamiliar — ASK, don't assume.** The
-   persona was set up earlier in the session or in a previous session. If you can't find it,
-   ask the author:
-   > I can't locate the persona files. Where is the persona folder?
-   >
-   > 1. `persona/` (in this project directory)
-   > 2. A different path (tell me)
-   >
-   Never claim the persona doesn't exist or that you don't know what it is. It exists. You
-   may have lost track of the path — ask.
+   persona was set up earlier in the session or in a previous session. If you can't find it
+   at `~/.claude/blog-writer-persona/`, ask the author — don't claim it doesn't exist.
+   It exists. You may have lost track of the path.
 
 3. **Voice spot-check at phase transitions.** At the start of Phase 3 and Phase 4, re-read
    `persona/voice.md` and confirm to yourself (not to the author) that you can name at least

@@ -15,10 +15,10 @@ Her basic info:
 
 ## Output Specification
 
-Produce the following files in a `persona/` directory:
-- `persona/voice.md` -- voice profile with analysis of her writing patterns
-- `persona/bio.md` -- author bio template with schema, examples, and kicker notes
-- `persona/examples.md` -- catalog of the writing samples with notes on what each demonstrates about her voice
+Produce the following files in `~/.claude/blog-writer-persona/`:
+- `~/.claude/blog-writer-persona/voice.md` -- voice profile with analysis of her writing patterns
+- `~/.claude/blog-writer-persona/bio.md` -- author bio template with schema, examples, and kicker notes
+- `~/.claude/blog-writer-persona/examples.md` -- catalog of the writing samples with notes on what each demonstrates about her voice
 
 ## Input Files
 

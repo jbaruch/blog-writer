@@ -29,9 +29,10 @@ at the start of each session to stay current as LLM writing patterns evolve.
 
 The skill learns the author's voice through an interactive onboarding flow that analyzes
 2-5 writing samples. Voice profile, bio template, product context, and example posts are
-stored in `persona/` and read fresh each session. A bootstrap step locates the persona
-folder on first run. After setup (or when new posts are added), you can optionally save
-the voice profile to your global Claude Code user memory so it applies across all projects.
+stored in `~/.claude/blog-writer-persona/` and read fresh each session. On first run, the
+skill creates this directory (or lets you point it at a custom location like Google Drive
+via symlink). After setup (or when new posts are added), you can optionally save the voice
+profile to your global Claude Code user memory so it applies across all projects.
 
 ## Series support
 
@@ -46,6 +47,7 @@ Install via [Tessl](https://tessl.io):
 tessl install jbaruch/blog-writer
 ```
 
-On first use, the skill asks where your persona folder is and runs the setup flow.
-Clarification questions are asked one at a time with numbered options — no question dumps.
-After that, just tell it what you want to write about.
+On first use, the skill creates `~/.claude/blog-writer-persona/` and runs the setup flow
+(or lets you symlink it to a custom location for backup). Clarification questions are asked
+one at a time with numbered options — no question dumps. After that, just tell it what you
+want to write about.
