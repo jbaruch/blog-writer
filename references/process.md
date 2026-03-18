@@ -299,7 +299,7 @@ Link 01, Screenshot 02.
 Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md` and scan
 the draft:
 
-**Pass 1 — Surface scan:** Read the draft against each of the 27 patterns, looking for
+**Pass 1 — Surface scan:** Read the draft against each of the 31 patterns, looking for
 the forms described in the examples and structural variants.
 
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
@@ -332,7 +332,7 @@ not checking against specific patterns but reacting to the overall feel. Look fo
 - Uniform energy — every paragraph has the same emotional temperature
 - Press-release tone — sounds like it was written to impress rather than to communicate
 
-A draft can pass all 27 patterns and still read as obviously AI because it has no soul. If
+A draft can pass all 31 patterns and still read as obviously AI because it has no soul. If
 Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite — it's going
 back to `persona/voice.md` and injecting the author's actual rhetorical devices, opinions,
 and attitude into the flat sections.
@@ -340,7 +340,7 @@ and attitude into the flat sections.
 Rewrite any hits. This is not optional.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
-in isolation and check it against ALL 27 patterns. Rewrites frequently introduce the same
+in isolation and check it against ALL 31 patterns. Rewrites frequently introduce the same
 pattern in a different surface form. This is especially true for:
 - #2 (Parallel Binary) — the most likely pattern to survive a rewrite, because describing
   a comparison naturally produces mirrored clauses. If you rewrote a parallel binary and the
@@ -349,7 +349,7 @@ pattern in a different surface form. This is especially true for:
 - #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
   question with a longer answer, but the structure is identical.
 
-Do not consider an anti-pattern fixed until the replacement passes a full 27-pattern scan
+Do not consider an anti-pattern fixed until the replacement passes a full 31-pattern scan
 on its own.
 
 **Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against
@@ -371,6 +371,11 @@ Run the tightening pass. Re-read the draft sentence by sentence with fresh eyes:
 - Kill bloated transitions: "Now that we've seen X, let's look at Y" can almost always be
   replaced by just starting Y.
 - Check for hedging filler that crept in: "basically," "essentially," "in order to."
+- One data point per beat: if a paragraph has two statistics making the same point ("reduced
+  from 45 minutes to 90 seconds, a 97% improvement, saving 6 hours per week"), pick the one
+  that hits hardest and cut the rest. The extras are noise.
+- Isolate the punchline: the final sentence of a key section should get its own line. If the
+  punchline is buried in a paragraph, give it a line break so it lands with weight.
 - The goal is to tighten without losing substance. A post that's 1,700 words of meat is
   better than 2,000 words with padding.
 
@@ -406,7 +411,7 @@ conversation — edit the file surgically.
 - Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — all
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
-  audit rule: every rewrite must pass a full 27-pattern scan on its own before it's
+  audit rule: every rewrite must pass a full 31-pattern scan on its own before it's
   considered fixed. Then run the voice check: re-read against `persona/voice.md` and
   redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or

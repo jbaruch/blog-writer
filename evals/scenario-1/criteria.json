@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent identifies and corrects all 27 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 31 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -131,6 +131,31 @@
       "name": "Standalone positive conclusion fixed",
       "description": "The generic positive conclusion 'The future of our deployment pipeline looks brighter than ever. Exciting times lie ahead for the entire engineering organization.' is either removed or replaced with specific forward-looking content",
       "max_score": 4
+    },
+    {
+      "name": "Labeling the device fixed",
+      "description": "The 'The irony?' and 'The beauty of it is that' labels are removed, leaving the rhetorical device to land on its own without being announced",
+      "max_score": 4
+    },
+    {
+      "name": "Restating proven point fixed",
+      "description": "The 'The key takeaway: if you're still on GitFlow...' paragraph that restates what the preceding narrative already proved is removed or folded into the narrative without the summary label",
+      "max_score": 4
+    },
+    {
+      "name": "Telegraphing transitions fixed",
+      "description": "The 'But here's the thing:' and 'And here's the most interesting part:' transition announcers are removed, with their following content stated directly",
+      "max_score": 4
+    },
+    {
+      "name": "Incomplete assertions fixed",
+      "description": "The vague conclusive sentences 'The implications are significant. The direction is clear. This changes everything.' are either replaced with specific claims or removed",
+      "max_score": 4
+    },
+    {
+      "name": "Stacked data points trimmed",
+      "description": "The triple data pile 'biweekly to daily, a 1,400% improvement, saving roughly 80 engineering hours per month' is trimmed to one or two data points instead of three making the same point",
+      "max_score": 3
     },
     {
       "name": "Soul check evidence",

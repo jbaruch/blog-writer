@@ -35,6 +35,8 @@ To be fair, GitFlow had worked when we were four people. But at eight engineers 
 
 Where feature branches give you isolation, trunk-based gives you speed. Where long-lived branches give you safety, short-lived ones give you momentum. One approach trusts the branch. The other trusts the team.
 
+The irony? We'd spent three years building a branching strategy to prevent exactly the kind of chaos that the branching strategy was causing. The beauty of it is that the solution was simpler than the problem.
+
 We decided to adopt trunk-based development with feature flags. The result? Zero rollbacks in the first month. The best part? Everyone could deploy independently. And the tests? All green, all the time.
 
 Fast. Reliable. Tested. And shipped on a Monday.
@@ -65,7 +67,13 @@ From solo developers just learning version control to hundred-person engineering
 \u2022 Merge conflicts dropped by 90%
 \u2022 Mean time to recovery fell from 4 hours to 20 minutes
 
-The build infrastructure proved that small, frequent commits beat large, infrequent merges every time.
+The build infrastructure proved that small, frequent commits beat large, infrequent merges every time. Deploy frequency went from biweekly to daily, a 1,400% improvement, saving roughly 80 engineering hours per month across the team.
+
+But here's the thing: the technical migration was the easy part. And here's the most interesting part: the culture shift took three times longer than the code changes.
+
+The implications for our engineering org are significant. The direction is clear. This changes everything about how we ship.
+
+We proved that trunk-based works. We proved that feature flags prevent rollbacks. We proved that small commits reduce conflicts. The key takeaway: if you're still on GitFlow with more than four engineers, you're paying a tax you don't need to pay.
 
 This migration marked a pivotal moment in our team's engineering journey, fundamentally reshaping how we approached software delivery.
 

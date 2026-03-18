@@ -634,6 +634,10 @@ The inflation doesn't have to use the word "pivotal" or "significant."
   inflation that frames a mundane choice as historically momentous.
 - "It was at this moment that everything changed." — narrative inflation without any
   specific AI vocabulary tells.
+- **Editorial superlatives:** "The most underrated announcement," "The most important shift
+  this year," "The most predictable turn in AI history." The superlative form is significance
+  inflation cranked to maximum — it doesn't just assert importance, it asserts MOST importance.
+  Let the content prove the claim; don't announce the ranking.
 
 **Why it's a tell:** LLMs inflate significance because they pattern-match on authoritative
 encyclopedia prose. A version bump is not a pivotal moment. A migration is not a
@@ -908,3 +912,166 @@ catch — and it stacks with other tells to create an overall "AI-generated" imp
 **Instead:** Sentence case for all headings. Capitalize only the first word and proper nouns.
 - ✅ "## How we built the new pipeline"
 - ✅ "## Key takeaways from the migration"
+
+---
+
+## 28. Labeling the Device
+
+**The tell:** Announcing the rhetorical move you're about to make instead of just making it.
+Naming irony, beauty, paradox, or a pattern before executing it.
+
+**Symptoms:**
+- "The irony?" / "The irony is that..."
+- "The beauty of it is..."
+- "The paradox here is..."
+- "Compound effect." / "That's the scale."
+- "Here's the kicker:"
+- "The punchline:" / "Plot twist:"
+
+**Examples:**
+- ❌ "The irony? Anthropic brands itself as safety-first, but reliability is safety tier zero."
+- ❌ "Post 1: 12 corrections. Post 5: three. Compound effect."
+- ❌ "The beauty of it is that the whole thing fits in a single file."
+
+**Structural variants:**
+The label doesn't have to be a standalone sentence.
+- "There's a certain irony in the fact that..." — buried in a clause instead of a standalone
+  fragment, but still labeling.
+- "Which brings us to the paradox at the heart of this approach..." — transition that labels
+  the device while pretending to introduce it.
+- Naming an emotion the reader should feel: "The surprising part is..." — if it's really
+  surprising, the reader will be surprised without the label.
+
+**Why it's a tell:** When you label a rhetorical device, you kill it. "The irony?" warns the
+reader that irony is coming, so they process it analytically instead of feeling it. A human
+writer trusts the device to land on its own. LLMs label devices because they're constructing
+rhetoric from a template — "insert ironic observation here" — and the label is the template
+leaking through.
+
+**Instead:** Delete the label. Let the device do its own work.
+- ✅ "Anthropic brands itself as safety-first, but their API was down for six hours last
+  Tuesday."
+- ✅ "Post 1: 12 corrections. Post 5: three."
+- ✅ "The whole thing fits in a single file."
+
+---
+
+## 29. Restating the Proven Point
+
+**The tell:** A concluding paragraph that summarizes what the narrative already demonstrated.
+The story proved the point, and then a paragraph explains what the reader just read.
+
+**Symptoms:**
+- A paragraph at the end of a section starting with "The key takeaway:", "The main lesson:",
+  "What this shows is...", "In other words..."
+- A summary sentence that could be deleted without the reader losing any information
+- The concluding paragraph says the same thing as the preceding narrative but in abstract terms
+
+**Examples:**
+- ❌ "We added input validation. The error rate dropped from twelve per hour to zero.
+  [paragraph break] The key takeaway: input validation matters."
+- ❌ "Three teams adopted the framework. Two shipped faster. One abandoned it after a week.
+  [paragraph break] What this shows is that the framework works for most teams but isn't
+  universal."
+
+**Structural variants:**
+The restatement doesn't have to be labeled with "key takeaway."
+- "In short, the migration paid off." — after two paragraphs that already showed it paying
+  off with specific metrics.
+- "All of this goes to show that..." — burying the restatement in a transition to the next
+  section.
+- A TLDR bullet that restates a section's narrative instead of provoking curiosity is this
+  pattern at the post level.
+
+**Why it's a tell:** This is the tail-end mirror of #9 (Preamble Announcements). Where #9
+announces what the post is about to say, this pattern announces what the post just said.
+LLMs do it because they're trained on explanatory text (textbooks, documentation) where
+summaries serve a pedagogical purpose. In a blog post, the reader doesn't need a teacher
+restating the lesson — they just lived through the story.
+
+**Instead:** End on the strongest moment in the narrative. If the data or story proves the
+point, stop. Trust the reader to connect the dots.
+- ✅ "We added input validation. The error rate dropped from twelve per hour to zero."
+  (End. Done. The reader gets it.)
+
+---
+
+## 30. Telegraphing Transitions
+
+**The tell:** Announcing that something important is about to be said, instead of just
+saying it. Mid-post preamble announcements that create artificial suspense.
+
+**Symptoms:**
+- "But here's the thing:"
+- "Here's what I mean:"
+- "And here's the most interesting part:"
+- "Now, here's where it gets interesting:"
+- "This is where things get tricky:"
+- "The important thing to understand is:"
+
+**Examples:**
+- ❌ "We migrated to trunk-based development. But here's the thing: the migration wasn't
+  the hard part."
+- ❌ "The agent handled most of the work. And here's the most interesting part: it caught
+  a bug we'd missed for months."
+
+**Structural variants:**
+The telegraph can be subtle.
+- "What's worth paying attention to here is..." — politely announcing importance instead of
+  demonstrating it.
+- "The part that really matters is..." — same move with different words.
+- "This next part is crucial:" — labeling the importance of what follows rather than letting
+  the content earn its own weight.
+- Any sentence that could be deleted while leaving the following sentence perfectly intact is
+  this pattern.
+
+**Why it's a tell:** These are the mid-post cousins of #9 (Preamble Announcements). LLMs
+insert them because they model writing as a sequence of importance signals followed by content.
+A human writer makes something important by WHAT they say, not by announcing that importance
+is coming. The telegraph is an empty calorie — it takes up space without adding meaning, and
+it trains the reader to ignore your emphasis because you emphasize everything.
+
+**Instead:** Delete the telegraph and start with the content.
+- ✅ "We migrated to trunk-based development. The migration wasn't the hard part."
+- ✅ "The agent handled most of the work. It caught a bug we'd missed for months."
+
+---
+
+## 31. Incomplete Assertions
+
+**The tell:** A sentence that sounds conclusive but says nothing specific. It asserts that
+something is clear, significant, or important without naming what it actually is.
+
+**Symptoms:**
+- "The direction is clear."
+- "The implications are significant."
+- "The impact cannot be overstated."
+- "This changes everything."
+- "The writing is on the wall."
+- "The takeaway is obvious."
+
+**Examples:**
+- ❌ "The direction is clear." (What direction? Clear to whom?)
+- ❌ "The implications for the industry are significant." (Name one.)
+- ❌ "This fundamentally changes the game." (How? For whom?)
+
+**Structural variants:**
+The assertion can be dressed up with specificity that doesn't actually specify.
+- "The future of developer tooling will never be the same." — sounds specific (developer
+  tooling) but says nothing about HOW it will be different.
+- "These results speak for themselves." — sounds confident but is actually an abdication;
+  the writer's job is to speak for the results.
+- "The numbers tell the story." — close cousin of "speak for themselves." If the numbers
+  tell a story, tell the reader which story.
+
+**Why it's a tell:** LLMs generate these because they're trained on persuasive text that
+asserts conclusions. But the assertion is a placeholder — the model knows a conclusion
+belongs here but doesn't have a specific one. A human writer knows what the direction is
+and says it: "Everything will run on tokens within three years." An LLM says "The direction
+is clear" and moves on.
+
+**Instead:** Say the specific thing, or delete the sentence entirely.
+- ✅ "Everything will run on tokens within three years."
+- ✅ "Deploy times dropped 80%. The migration was worth it."
+- Or just delete the sentence — if the evidence is already there, the reader drew the
+  conclusion before you did.
