@@ -117,8 +117,9 @@ Before submitting a draft, check:
 - [ ] Would you be embarrassed to read any sentence out loud at a conference?
 - [ ] Is the bio kicker actually funny AND connected to the post's content?
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
-  then skeleton scan (compare grammatical structure of adjacent sentences). Rewrite any hits,
-  then re-check each rewrite against all 24 patterns before considering it fixed.
+  then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
+  (holistic read for sterile, voiceless writing). Rewrite any hits, then re-check each
+  rewrite against all 27 patterns before considering it fixed.
 
 ---
 

@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent identifies and corrects all 22 specific AI writing anti-patterns seeded throughout the draft. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 27 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -111,6 +111,31 @@
       "name": "Inline-header lists fixed",
       "description": "The bold-colon bullet list ('**Feature flags:** Control what...', '**Short-lived branches:** Keep...', '**Automated testing:** Run...', '**Incremental rollouts:** Deploy...') is rewritten as narrative prose or plain bullets without the glossary template",
       "max_score": 5
+    },
+    {
+      "name": "Vague attributions fixed",
+      "description": "The 'Industry experts widely agree that trunk-based development represents the future' and 'According to recent reports' and 'Many seasoned practitioners have noted' are either replaced with named sources or removed",
+      "max_score": 5
+    },
+    {
+      "name": "Boldface overuse fixed",
+      "description": "The paragraph with excessive bold ('**feature flags** to control **rollout percentages**, configured **branch policies** through our **CI pipeline**, and tracked **deploy metrics** on the **Datadog dashboard**. The **automated testing** suite ran on every **commit**, giving us **confidence** in each **deployment**') has bold formatting removed from prose",
+      "max_score": 5
+    },
+    {
+      "name": "Title case headings fixed",
+      "description": "The title-case headings 'The Decision To Embrace Change' and 'Results And Future Outlook' are converted to sentence case (only first word and proper nouns capitalized)",
+      "max_score": 5
+    },
+    {
+      "name": "Standalone positive conclusion fixed",
+      "description": "The generic positive conclusion 'The future of our deployment pipeline looks brighter than ever. Exciting times lie ahead for the entire engineering organization.' is either removed or replaced with specific forward-looking content",
+      "max_score": 4
+    },
+    {
+      "name": "Soul check evidence",
+      "description": "The edit report or cleaned draft shows evidence of holistic voice assessment beyond individual pattern fixes: the cleaned draft has opinions, varied energy, personality, or first-person voice where appropriate -- not just sterile pattern-free prose",
+      "max_score": 4
     }
   ]
 }

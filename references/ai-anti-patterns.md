@@ -672,6 +672,13 @@ The pivot word doesn't have to be "Despite."
   moved forward." — "Although" + "Even so" is the same sandwich.
 - The optimism half can be disguised as a forward-looking statement: "Future improvements
   are expected to address these limitations." — vague future tense is the tell.
+- **Standalone positive conclusions** — the optimism half of the sandwich without the
+  challenge preamble. "The future looks bright." "Exciting times lie ahead." "This is just
+  the beginning of the journey toward excellence." These can appear as the last sentence of
+  a post, a section closer, or a TLDR bullet. The tell is vague optimism that asserts a
+  bright future without naming a single specific thing that will happen.
+- "As [tool/approach] continues to evolve, it will reshape how we think about [topic]." —
+  forward-looking vagueness masquerading as a conclusion.
 
 **Why it's a tell:** This is a structural formula, not analysis. The "despite" pivot is
 a template the LLM fills in for any subject. Real analysis of challenges names specific
@@ -805,3 +812,99 @@ it's just not how practitioners talk about things that didn't work.
 - ✅ "The migration didn't fix the latency."
 - ✅ "More replicas didn't help."
 - ✅ "Still broken after the refactor."
+
+---
+
+## 25. Vague Attributions
+
+**The tell:** Citing unnamed "experts," "reports," or "observers" to lend authority to a
+claim without naming an actual source.
+
+**Symptoms:**
+- "Experts argue that..."
+- "Industry reports suggest..."
+- "Observers have noted..."
+- "Many developers believe..."
+- "Studies have shown..."
+- "According to recent research..."
+
+**Examples:**
+- ❌ "Experts argue that this approach will dominate the next decade of software development."
+- ❌ "Industry reports suggest adoption has tripled year over year."
+- ❌ "Many seasoned engineers have noted the shift toward this paradigm."
+
+**Structural variants:**
+The attribution doesn't have to be at the start of the sentence.
+- "...a trend that analysts have widely recognized." — vague attribution buried at the end.
+- "The community has largely embraced..." — "the community" is a weasel-word collective
+  standing in for unnamed individuals.
+- "It's widely accepted that..." / "It's generally understood that..." — passive-voice
+  attributions to nobody in particular.
+
+**Why it's a tell:** LLMs can't cite real sources, so they invent authoritative-sounding
+collectives. A human writer either names the source ("Kelsey Hightower said on stage at
+KubeCon...") or makes the claim on their own authority ("I think this approach wins").
+The vague attribution is a confidence trick — it borrows credibility from a source that
+doesn't exist.
+
+**Instead:** Name the actual source, or own the opinion yourself.
+- ✅ "ThoughtWorks put it on their 'Adopt' ring in the last Technology Radar."
+- ✅ "I've seen three teams adopt this in the last year, and two of them stuck with it."
+
+---
+
+## 26. Boldface Overuse
+
+**The tell:** Mechanical bolding of key terms throughout prose paragraphs, as if the text
+is a study guide or a sales page highlighting features.
+
+**Symptoms:**
+- Multiple `**bolded terms**` per paragraph in body prose (not headings, not code)
+- Every new concept gets bolded on first mention like a textbook definition
+- Bold used for emphasis on words that don't need it: "This is **really** important"
+- The bolding pattern is uniform — every Nth sentence has a bold term
+
+**Examples:**
+- ❌ "The **spec-driven approach** ensures that the **agent** operates within **guardrails**,
+  producing **deterministic output** that matches the **developer's intent**."
+- ❌ "We used **Tessl** to define the **skill**, added **rules** for the **context window**,
+  and deployed the **tile** to production."
+
+**Structural variants:**
+- Italics used the same way — `*every concept*` gets emphasized on first appearance.
+- Bold-colon inline headers outside of lists: "**The key insight:** we needed to..." in
+  the middle of a flowing paragraph.
+- Bold used on every instance of a term, not just first mention — the page looks like it
+  was attacked by a highlighter.
+
+**Why it's a tell:** LLMs bold terms to signal "this is important" because they can't
+achieve emphasis through sentence structure or narrative position. A human writer makes
+something important by where they put it in the story and how they set it up, not by
+formatting it in bold. When everything is emphasized, nothing is.
+
+**Instead:** Remove the bold from prose. If a term needs emphasis, earn it through the
+sentence around it. Reserve bold for actual structural elements: headings, the occasional
+single-word emphasis where the reader genuinely needs a visual anchor.
+- ✅ "The spec-driven approach keeps the agent inside guardrails. The output is
+  deterministic — it matches what you asked for."
+
+---
+
+## 27. Title Case Headings
+
+**The tell:** Headings where Every Significant Word Is Capitalized, like a book title or
+a news headline.
+
+**Symptoms:**
+- "## Strategic Negotiations And Global Partnerships"
+- "## How We Built The New Pipeline"
+- "## Key Takeaways From The Migration"
+
+**Why it's a tell:** Blog posts use sentence case ("How we built the new pipeline"). Title
+case is the default for LLMs because their training data includes a disproportionate amount
+of formal titles, academic papers, and news headlines. It's a small tell but an easy one to
+catch — and it stacks with other tells to create an overall "AI-generated" impression.
+
+**Instead:** Sentence case for all headings. Capitalize only the first word and proper nouns.
+- ✅ "## How we built the new pipeline"
+- ✅ "## Key takeaways from the migration"

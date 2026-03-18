@@ -31,7 +31,7 @@ The CI pipeline \u2013 which had been configured by a contractor two years ago \
 
 To be fair, GitFlow had worked when we were four people. But at eight engineers with three active feature branches, the build infrastructure was buckling. It bears mentioning that the merge queue alone added two hours to every release.
 
-## The Decision
+## The Decision To Embrace Change
 
 Where feature branches give you isolation, trunk-based gives you speed. Where long-lived branches give you safety, short-lived ones give you momentum. One approach trusts the branch. The other trusts the team.
 
@@ -49,9 +49,11 @@ The pipeline \u2013 which we had built over three sprints \u2013 handled the tra
 
 We reviewed the pipeline configuration. We updated the branch protection rules. We enabled the feature flag service. We migrated the first three services. We monitored for regressions closely. We documented the new workflow thoroughly. We trained the team on the process.
 
+Industry experts widely agree that trunk-based development represents the future of collaborative engineering. According to recent reports, teams that adopt this approach see dramatic improvements in velocity and quality. Many seasoned practitioners have noted the shift.
+
 What I find genuinely interesting about this transition is that it fundamentally transforms how you think about the development landscape. I keep coming back to the idea that trunk-based development isn\u2019t just a technical choice\u2026 it\u2019s a cultural one. The team delved into the codebase with renewed energy, navigating the complexity of the migration and fostering a more robust and seamless development experience. This pivotal shift was nothing short of transformative.
 
-## The Results
+## Results And Future Outlook
 
 We shipped the new pipeline on a Thursday \ud83d\ude80 and by Monday our deploy frequency had tripled \ud83d\udd25. The team was finally able to ship features daily instead of biweekly \ud83c\udf89.
 
@@ -68,6 +70,10 @@ The build infrastructure proved that small, frequent commits beat large, infrequ
 This migration marked a pivotal moment in our team's engineering journey, fundamentally reshaping how we approached software delivery.
 
 Despite the initial learning curve, trunk-based development continued to thrive in our organization. Despite these challenges, future improvements to our CI pipeline could further enhance our deployment capabilities.
+
+The future of our deployment pipeline looks brighter than ever. Exciting times lie ahead for the entire engineering organization.
+
+We used **feature flags** to control **rollout percentages**, configured **branch policies** through our **CI pipeline**, and tracked **deploy metrics** on the **Datadog dashboard**. The **automated testing** suite ran on every **commit**, giving us **confidence** in each **deployment**.
 
 Here's what we learned:
 

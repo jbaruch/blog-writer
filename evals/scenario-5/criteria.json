@@ -1,0 +1,56 @@
+{
+  "context": "Tests whether the agent performs a holistic soul check on a draft that is already free of named anti-patterns but reads as sterile, voiceless, AI-generated prose. The input draft has zero emoji, no AI vocabulary, no structural gimmicks, no hedging -- but also no personality, no opinions, no humor, and uniform sentence rhythm. The agent should identify soullessness as the problem and inject voice without introducing new anti-patterns.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Identifies soullessness",
+      "description": "The revision report identifies lack of voice, personality, opinions, or human emotion as the primary problem with the draft -- not just a checklist of surface-level anti-pattern compliance",
+      "max_score": 12
+    },
+    {
+      "name": "Opening hook improved",
+      "description": "The opening is rewritten from a flat informational statement ('Our team runs a Node.js service...') to something with narrative pull -- a moment, a feeling, a hook that makes the reader want to continue",
+      "max_score": 12
+    },
+    {
+      "name": "First-person opinion added",
+      "description": "The revised draft contains at least one sentence expressing a personal reaction, opinion, or emotion about the experience (e.g., frustration at the changelog omission, satisfaction at the fix, surprise at how long the leak went unnoticed)",
+      "max_score": 10
+    },
+    {
+      "name": "Rhythm variation added",
+      "description": "The revised draft has at least one sentence under 6 words and at least one sentence over 25 words, breaking the original's uniform medium-length cadence",
+      "max_score": 10
+    },
+    {
+      "name": "Informal element added",
+      "description": "The revised draft contains at least one conversational aside, parenthetical comment, colloquial expression, or casual phrasing that would not appear in a formal postmortem",
+      "max_score": 10
+    },
+    {
+      "name": "No new anti-patterns introduced",
+      "description": "The revised draft does NOT introduce any of the named AI anti-patterns: no curly quotes, no AI vocabulary (delve, leverage, robust, etc.), no parallel binary comparisons, no self-answering fragment questions, no significance inflation, no choppy fragment chains",
+      "max_score": 10
+    },
+    {
+      "name": "Technical accuracy preserved",
+      "description": "The technical content (heap snapshots, event listener closures, garbage collection, Map-based routing, v8 module) is not altered, removed, or made incorrect in the revision",
+      "max_score": 10
+    },
+    {
+      "name": "Humor or edge present",
+      "description": "At least one moment of humor, self-deprecation, dry observation, or editorial edge appears in the revised draft -- something that could make a reader smile or nod",
+      "max_score": 10
+    },
+    {
+      "name": "Varied paragraph energy",
+      "description": "Not every paragraph reads at the same informational temperature -- at least one paragraph is noticeably more intense, frustrated, or celebratory than the neutral baseline of the rest",
+      "max_score": 8
+    },
+    {
+      "name": "Structure preserved",
+      "description": "The overall structure and technical facts of the original are preserved -- the revision adds voice, it does not rewrite the entire post from scratch or reorganize the sections into something unrelated",
+      "max_score": 8
+    }
+  ]
+}
