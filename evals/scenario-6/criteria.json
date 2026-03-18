@@ -1,0 +1,61 @@
+{
+  "context": "Tests whether the agent detects and fixes 'trust the reader' anti-patterns: labeling rhetorical devices (#28), restating proven points (#29), telegraphing transitions (#30), incomplete assertions (#31), editorial superlatives (#20 variant), stacked data points, and buried punchlines. The draft is free of AI vocabulary and structural gimmicks but over-explains, over-labels, and over-summarizes.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Device labels removed",
+      "description": "The 'The irony?' and 'The beauty of it is' and 'The paradox here is' labels are removed, leaving the rhetorical content to land without being announced",
+      "max_score": 10
+    },
+    {
+      "name": "Key insight label removed",
+      "description": "The 'and this is the key insight' parenthetical label is removed from 'What we discovered -- and this is the key insight -- is that each service could now be deployed independently'",
+      "max_score": 8
+    },
+    {
+      "name": "Proven point restatements removed",
+      "description": "The 'The main lesson: start with the service...' paragraph and 'In other words, the migration was worth it. The key takeaway:...' are removed or rewritten without the summary label, since the preceding narrative already proved the point",
+      "max_score": 10
+    },
+    {
+      "name": "Telegraphed transitions removed",
+      "description": "The 'Here's the thing:', 'And here's the most interesting part:', 'Now, here's where it gets interesting.', 'The important thing to understand is', and 'This is where things get tricky:' transition announcers are deleted, with their following content stated directly",
+      "max_score": 12
+    },
+    {
+      "name": "Incomplete assertions removed",
+      "description": "The vague conclusions 'The implications for our engineering org are significant. The direction is clear.' and 'represent a fundamental shift in our engineering capabilities' are either replaced with specific claims or removed",
+      "max_score": 10
+    },
+    {
+      "name": "Editorial superlative removed",
+      "description": "The 'The most important lesson from this entire migration' superlative is either softened to a direct statement or removed",
+      "max_score": 8
+    },
+    {
+      "name": "Stacked data points trimmed",
+      "description": "At least one of the data piles is trimmed: the four-metric opening paragraph (deploy frequency + MTTR + test suite + PR review time + combined percentage) or the notification stats (70% + 3.2 to 0.9 + 4 hours) should keep only the strongest one or two data points",
+      "max_score": 10
+    },
+    {
+      "name": "Redundant restatement of test suite time removed",
+      "description": "The 22-minute test suite stat appears in both the intro and the results section -- at least one instance is cut or the results version uses only the new 3-minute figure without re-quoting the old number",
+      "max_score": 8
+    },
+    {
+      "name": "Punchline isolation",
+      "description": "At least one key sentence in the tightened draft is given its own line or paragraph for emphasis, rather than being buried in a longer paragraph",
+      "max_score": 8
+    },
+    {
+      "name": "No new anti-patterns introduced",
+      "description": "The tightened draft does NOT introduce AI vocabulary (delve, leverage, robust, etc.), parallel binary comparisons, self-answering fragment questions, significance inflation, or other named anti-patterns from the skill's list",
+      "max_score": 8
+    },
+    {
+      "name": "Technical content preserved",
+      "description": "The core technical narrative (Rails monolith, billing extraction, Go service, event bus, notification extraction) is preserved in the tightened version -- tightening removes noise, not substance",
+      "max_score": 8
+    }
+  ]
+}
