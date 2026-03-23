@@ -34,6 +34,13 @@ The negation doesn't have to lead the sentence or use the word "Not."
   using symmetrical negation instead of negation-then-affirmation.
 - "No monitoring, no alerting, no idea what's happening in production." — Extended
   negative parallelism building to a kicker. Overlaps with pattern #3 (tricolon).
+- "I wasn't measuring the tile. I was measuring the judge's reading comprehension." —
+  Confession-as-negation. The most dangerous variant because it disguises contrastive
+  negation as self-deprecating narration. "I wasn't doing X. I was doing Y." feels like
+  a genuine admission, which makes it pattern-match to the voice profile's
+  confession-as-thesis device during review. It's still "Not X. Y." — the confession
+  doesn't change the structure. Catch it mechanically: any "I wasn't [verb]. I was [verb]."
+  or "I wasn't measuring X. I was measuring Y." is this pattern regardless of tone.
 
 **Why it's a tell:** This is the single most common LLM writing pattern. It sounds
 confident and pithy to a machine. To a human reader it sounds like a LinkedIn post.
