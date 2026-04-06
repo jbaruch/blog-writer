@@ -3,7 +3,7 @@ name: blog-writer
 description: >
   Write developer blog posts from video transcripts, meeting notes, or rough ideas.
   Extracts narrative from source material, structures content with hooks and technical sections,
-  formats code examples with placeholders, and checks drafts against 24 AI anti-patterns.
+  formats code examples with placeholders, and checks drafts against 32 AI anti-patterns.
   Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript
   into a blog, work on blog content, or mentions "blog" in the context of content creation.
   Also trigger when the user provides a video transcript and wants written content derived from it,
