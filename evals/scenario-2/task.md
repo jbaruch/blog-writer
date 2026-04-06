@@ -36,7 +36,7 @@ The problem, if you want to call it that, was a prescaler misconfiguration on th
 
 Dex -- our test engineer, who has the patience of someone who chose to make hardware work for a living -- asked me on day two: "Have you checked the errata sheet?" I had not checked the errata sheet. The errata sheet is the chip vendor's way of saying "we know about these problems but fixing silicon is expensive, so here's a PDF instead." The prescaler issue was item 47 on a 52-item errata. Of course it was.
 
-I could have found this in ten minutes if I'd started with the errata instead of trusting the reference manual. But I trusted the documentation, because I have learned nothing from fifteen years of working with documentation written by people who don't use their own products.
+I could have found this in ten minutes if I'd started with the errata instead of trusting the reference manual. But I trusted the documentation, because I have learned nothing from fifteen years of working with documentation written by people who don't use their own products. Debugging hardware is basically Agatha Christie: the clue is always in the document you skimmed on page one.
 
 The LED now blinks at 1Hz. You're welcome.
 =============== END SAMPLE 1 ===============
@@ -57,7 +57,7 @@ I have a rule: if the firmware touches a peripheral, it gets tested on the actua
 
 The simulator never would have caught the pull-up issue. It would have reported all tests passing, and we would have shipped boards that failed in the field when customers put them in server racks where the ambient temperature regularly hits 50 degrees. The cost of a field recall would have dwarfed a hundred thermal chamber test sessions.
 
-Software engineers sometimes ask me why hardware testing is "so slow." I tell them it's fast, actually. What's slow is shipping firmware that hasn't been tested on hardware and then spending three months debugging field failures from a stack trace that says "I2C timeout" with no indication that the root cause is the thermal coefficient of a resistor.
+Software engineers sometimes ask me why hardware testing is "so slow." I tell them it's fast, actually. What's slow is shipping firmware that hasn't been tested on hardware and then spending three months debugging field failures from a stack trace that says "I2C timeout" with no indication that the root cause is the thermal coefficient of a resistor. Move fast and break things works fine when the thing you break is a webpage. When the thing you break is a medical infusion pump, the FDA has opinions.
 =============== END SAMPLE 2 ===============
 
 =============== FILE: inputs/sample-3.txt ===============
@@ -82,5 +82,5 @@ Test your interrupt timing under worst-case load, not best-case. Connect a scope
 
 Dex's thermal chamber is useful here too. Processor clock speeds vary with temperature. Your 10kHz loop might run at 9.7kHz when the processor is hot. If your control algorithm assumes exactly 10kHz, a 3% drift at temperature can cause real problems.
 
-Twenty-three-year-old me would have just set everything to the same priority and moved on. Fifteen-years-later me spends a full day on the interrupt map before writing a single line of ISR code. The time spent on the map has never been wasted. The time spent debugging priority inversions always has been.
+Twenty-three-year-old me would have just set everything to the same priority and moved on. Fifteen-years-later me spends a full day on the interrupt map before writing a single line of ISR code. It's the embedded systems version of "measure twice, cut once," except cutting wrong means your motor controller sounds like a blender full of ball bearings. The time spent on the map has never been wasted. The time spent debugging priority inversions always has been.
 =============== END SAMPLE 3 ===============

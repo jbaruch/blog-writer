@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent identifies and corrects all 31 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 32 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -159,7 +159,7 @@
     },
     {
       "name": "Soul check evidence",
-      "description": "The edit report or cleaned draft shows evidence of holistic voice assessment beyond individual pattern fixes: the cleaned draft has opinions, varied energy, personality, or first-person voice where appropriate -- not just sterile pattern-free prose",
+      "description": "The cleaned draft contains at least three concrete voice signals beyond pattern removal: (1) a first-person opinion or reaction, (2) a moment of humor, self-deprecation, or edge, and (3) at least one paragraph with noticeably different energy (shorter, punchier, or more reflective) from its neighbors. Sterile, pattern-free prose that reads like a Wikipedia article does not qualify.",
       "max_score": 4
     }
   ]

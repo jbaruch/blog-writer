@@ -11,7 +11,7 @@ gates at each step.
 
 ## Anti-pattern detection
 
-Drafts are checked against 31 named AI writing anti-patterns, each with symptoms,
+Drafts are checked against 32 named AI writing anti-patterns, each with symptoms,
 examples, and alternatives (plus structural variants where applicable). The check runs
 in three passes:
 
@@ -21,7 +21,7 @@ in three passes:
 - **Soul check** — holistic read for sterile, voiceless writing that passes pattern
   checks but still reads as obviously AI
 
-Every rewrite is re-audited against all 31 patterns before it's considered fixed.
+Every rewrite is re-audited against all 32 patterns before it's considered fixed.
 
 The anti-pattern list auto-updates from
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)

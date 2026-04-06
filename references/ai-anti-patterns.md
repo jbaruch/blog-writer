@@ -1088,3 +1088,48 @@ is clear" and moves on.
 - ✅ "Deploy times dropped 80%. The migration was worth it."
 - Or just delete the sentence — if the evidence is already there, the reader drew the
   conclusion before you did.
+
+---
+
+## 32. Stacked Data Points
+
+**The tell:** Multiple statistics making the same point piled into a single sentence or
+passage. Each number restates what the previous one already proved, but from a different
+angle.
+
+**Symptoms:**
+- Three or more data points in a row that all say "this improved"
+- A raw number, a percentage, AND a time/cost savings all describing the same change
+- "From X to Y, a Z% improvement, saving N hours per week"
+- The second and third numbers don't add new information — they restate the first
+
+**Examples:**
+- ❌ "Deploy frequency went from biweekly to daily, a 1,400% improvement, saving roughly
+  80 engineering hours per month."
+- ❌ "Reduced from 45 minutes to 90 seconds, a 97% improvement, saving 6 hours per week."
+- ❌ "Error rate dropped from 12 per hour to zero — a 100% reduction that eliminated
+  roughly 2,000 false alerts per month."
+
+**Structural variants:**
+The stack doesn't have to be in one sentence.
+- "Build times dropped from 20 minutes to 3 minutes. That's an 85% reduction. Over a
+  month, it saves the team 40 hours." — Three sentences, one fact restated three ways.
+- A TLDR bullet with two statistics making the same point is this pattern in compressed
+  form.
+- Data stacking across a paragraph: the opening sentence states the metric, the middle
+  restates it as a percentage, and the closing converts it to business impact. Each sentence
+  sounds like it's adding information, but it's the same number in a different costume.
+
+**Why it's a tell:** LLMs stack data points because they pattern-match on "evidence" —
+more numbers sounds more convincing. But past the first strong number, each additional
+statistic dilutes the impact. "From biweekly to daily" is vivid. "A 1,400% improvement"
+restates it abstractly. "Saving 80 engineering hours" restates it a third time in business
+terms. The reader gets the point at "biweekly to daily" — the rest is noise.
+
+**Instead:** Pick the one number that hits hardest and cut the rest. Usually that's the
+most concrete, human-scale metric — not the percentage.
+- ✅ "Deploy frequency went from biweekly to daily."
+- ✅ "Build times dropped from 20 minutes to 3."
+- If two metrics genuinely add different information (one about speed, one about
+  reliability), they can coexist. The test: would a reader learn something NEW from the
+  second number that the first didn't already tell them?
