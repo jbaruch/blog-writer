@@ -300,7 +300,27 @@ Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md`
 the draft:
 
 **Pass 1 — Surface scan:** Read the draft against each of the 31 patterns, looking for
-the forms described in the examples and structural variants.
+the forms described in the examples and structural variants. For the following patterns,
+do a dedicated mechanical sweep instead of relying on contextual reading alone:
+
+- **Fragments (#3, #4):** Find every sentence under six words in the draft and check
+  whether 3+ appear consecutively. Surrounding sentences can make fragments feel embedded
+  when they're actually standalone. Count periods, not vibes.
+- **Em-dashes (#8):** Count em-dashes per section. More than two in a section is a flag.
+  Don't judge whether each em-dash is "justified" — just count them first.
+- **AI vocabulary (#12):** Scan the draft for the watchlist words (delve, leverage, tapestry,
+  landscape, pivotal, crucial, seamless, etc.). One in a post is fine. Two or more is a
+  contamination event. Do a literal word search, not a vibe read — these words hide in
+  otherwise clean paragraphs.
+- **Low burstiness (#14):** Count the word length of each sentence in every paragraph. Flag
+  any run of 3+ consecutive sentences within 5 words of each other in length. Uniform
+  sentence length is invisible when reading for content but obvious when counting. The fix
+  is genuine variety — a mix of short, medium, and long sentences — not merging everything
+  into one compound sentence, which just trades seven monotone beats for one run-on.
+- **Synonym cycling (#17):** After the surface scan, build a term inventory: list every
+  noun phrase used for each core concept in the post. If any concept has more than one
+  name, flag it. Cross-section cycling (one term in the intro, a different one in the
+  conclusion) is the most common miss.
 
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
 look at the grammatical skeleton only. Ask: "Do these two sentences have the same shape?"

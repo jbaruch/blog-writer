@@ -145,6 +145,12 @@ Fragments don't have to be noun phrases.
 - "New model. Retrained from scratch. Still hallucinating." — Mixed lengths, but still a
   chain of fragments substituting rhythm for meaning.
 - Any sequence of three or more sentences under six words where none carries a full thought.
+- **Examples-after-a-colon trap:** "AI is good at local problems. Buffer overflows. Missing
+  null checks. SQL injection." — The colon or introductory sentence makes the fragments
+  *feel* like an embedded list, but each one has its own period, making it a fragment chain.
+  If the items are period-terminated, they're fragments regardless of what precedes them.
+  The fix is a comma-separated list inside a single sentence: "...local problems -- buffer
+  overflows, missing null checks, SQL injection in a query builder."
 
 **Why it's a tell:** It substitutes rhythm for meaning. Every fragment carries equal
 weight, which means none of them carry any weight.
