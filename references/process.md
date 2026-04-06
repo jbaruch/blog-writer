@@ -300,7 +300,11 @@ Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md`
 the draft:
 
 **Pass 1 — Surface scan:** Read the draft against each of the 31 patterns, looking for
-the forms described in the examples and structural variants.
+the forms described in the examples and structural variants. For fragment-based patterns
+(#3, #4), do a dedicated mechanical sweep: find every sentence under six words in the
+draft and check whether 3+ appear consecutively. Do not rely on contextual reading for
+these — surrounding sentences can make fragments feel embedded when they're actually
+standalone. Count periods, not vibes.
 
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
 look at the grammatical skeleton only. Ask: "Do these two sentences have the same shape?"
