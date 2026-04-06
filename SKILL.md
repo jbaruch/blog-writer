@@ -138,14 +138,14 @@ The anti-pattern check is a **defined procedure**, not a vibe check. Do not impr
    THOSE definitions, not your own.
 
 2. **Follow the three-pass procedure exactly as written in `references/process.md`.** Pass 1
-   is the surface scan against all 31 patterns. Pass 2 is the skeleton scan on adjacent
+   is the surface scan against all 32 patterns. Pass 2 is the skeleton scan on adjacent
    sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
    that passes pattern checks but still reads as AI. Then the rewrite audit. Then the voice
    check. In that order. Do not skip passes, do not merge them, do not substitute your own
    method.
 
 3. **Do not invent patterns that aren't in the file.** If something feels "AI-ish" but
-   doesn't match any of the 31 defined patterns or their structural variants, leave it
+   doesn't match any of the 32 defined patterns or their structural variants, leave it
    alone. The pattern list is curated and maintained — false positives from improvised
    rules damage the author's voice more than the pattern they're trying to fix.
 

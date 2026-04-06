@@ -119,7 +119,7 @@ Before submitting a draft, check:
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
   (holistic read for sterile, voiceless writing). Rewrite any hits, then re-check each
-  rewrite against all 31 patterns before considering it fixed.
+  rewrite against all 32 patterns before considering it fixed.
 
 ---
 

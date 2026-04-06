@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent identifies and corrects all 31 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 32 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
