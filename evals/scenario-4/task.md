@@ -4,7 +4,7 @@
 
 A new contributor (Mateo Silva) submitted his first blog post draft. The technical content and narrative are solid -- it's about building a rate limiter that accidentally took down their own health check endpoint. Mateo hasn't written for this blog before and isn't familiar with the formatting conventions for summaries, visual asset references, and overall structure.
 
-Before publication, the draft needs a formatting review to bring it in line with how the blog handles things. Preserve the actual content -- this is a formatting and tightening pass, not a rewrite. Document what you changed so Mateo can learn the conventions for his next post.
+Before publication, the draft needs a formatting review to bring it in line with how the blog handles things. Preserve the actual content -- this is a formatting and tightening pass, not a rewrite. Tightening includes removing filler words (basically, essentially, in order to, etc.) that add nothing to the sentence. Document what you changed so Mateo can learn the conventions for his next post.
 
 ## Output Specification
 
