@@ -314,7 +314,9 @@ do a dedicated mechanical sweep instead of relying on contextual reading alone:
   otherwise clean paragraphs.
 - **Low burstiness (#14):** Count the word length of each sentence in every paragraph. Flag
   any run of 3+ consecutive sentences within 5 words of each other in length. Uniform
-  sentence length is invisible when reading for content but obvious when counting.
+  sentence length is invisible when reading for content but obvious when counting. The fix
+  is genuine variety — a mix of short, medium, and long sentences — not merging everything
+  into one compound sentence, which just trades seven monotone beats for one run-on.
 - **Synonym cycling (#17):** After the surface scan, build a term inventory: list every
   noun phrase used for each core concept in the post. If any concept has more than one
   name, flag it. Cross-section cycling (one term in the intro, a different one in the
