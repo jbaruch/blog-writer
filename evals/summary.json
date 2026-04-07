@@ -1,5 +1,5 @@
 {
-  "total_scenarios": 7,
+  "total_scenarios": 8,
   "instructions_coverage": {
     "total_instructions": 75,
     "instructions_tested": 70,

@@ -1,5 +1,5 @@
 {
-  "context": "Tests whether the agent identifies and corrects all 32 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
+  "context": "Tests whether the agent identifies and corrects all 37 specific AI writing anti-patterns seeded throughout the draft, plus performs a holistic soul check. Each criterion checks that a particular named anti-pattern was detected and removed or rewritten.",
   "type": "weighted_checklist",
   "checklist": [
     {
@@ -156,6 +156,31 @@
       "name": "Stacked data points trimmed",
       "description": "The triple data pile 'biweekly to daily, a 1,400% improvement, saving roughly 80 engineering hours per month' is trimmed to one or two data points instead of three making the same point",
       "max_score": 3
+    },
+    {
+      "name": "Amplifier intensifiers fixed",
+      "description": "The 'truly remarkable', 'improved dramatically', 'incredibly smooth' amplifier + adjective constructions are replaced with specific facts or evidence, or the amplifiers are removed",
+      "max_score": 5
+    },
+    {
+      "name": "Unproven assessment adjectives fixed",
+      "description": "The 'comprehensive, enterprise-grade pipeline' and 'elegant and innovative workflow' assessment adjectives are replaced with specific evidence of what the pipeline does, or removed",
+      "max_score": 5
+    },
+    {
+      "name": "Temporal filler removed",
+      "description": "The 'In today's rapidly evolving software development landscape' and 'has never been more critical' temporal filler phrases are deleted or replaced with a specific fact",
+      "max_score": 5
+    },
+    {
+      "name": "Corporate clichés fixed",
+      "description": "The 'passionate team of engineers', 'end-to-end migration solution', 'empowered every developer', and 'drive real business value' corporate phrases are replaced with specific facts or removed",
+      "max_score": 5
+    },
+    {
+      "name": "Euphemistic smoothing fixed",
+      "description": "The 'encountered some challenges with merge frequency' and 'presented some complexity' euphemistic phrases are replaced with direct, honest descriptions of what actually went wrong",
+      "max_score": 5
     },
     {
       "name": "Soul check evidence",

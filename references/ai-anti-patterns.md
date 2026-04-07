@@ -322,11 +322,38 @@ them, and they don't need the post summarized back at them.
 These are subtler than the formal hedges above but equally empty. They pad sentences
 without adding meaning.
 
+**Structural variants — introductory filler words:**
+
+These words serve as verbal scaffolding — they helped the writer organize their thoughts
+while drafting, but in the final text they add zero information. They're the written
+equivalent of "um" and "so" in speech. Each one can almost always be deleted without
+changing the meaning. When they can't be deleted (rare), they're doing real work — marking
+a genuine contrast, a genuine concession, or a genuine sequence.
+
+The watchlist (delete unless doing real grammatical work):
+- **False-emphasis openers:** "of course", "naturally", "obviously", "clearly", "certainly",
+  "indeed", "in fact", "as a matter of fact", "needless to say"
+- **False-concession openers:** "to be honest", "honestly", "frankly", "admittedly",
+  "truth be told"
+- **False-structure markers:** "first of all", "on another note", "on a related note",
+  "speaking of which", "that said", "with that in mind", "that being said"
+- **Padding connectors:** "additionally", "furthermore", "moreover" (when they connect two
+  points that don't need a connector — the paragraph break does it), "also" (at sentence
+  start as filler), "in addition to this"
+- **Downtoners:** "somewhat", "rather", "quite", "fairly", "pretty much" — these soften
+  claims that should either be stated directly or supported with evidence
+
+**The delete test:** remove the filler word and re-read the sentence. If the meaning is
+identical, the word was scaffolding. If the sentence now reads as too abrupt or loses a
+genuine logical connection, the word was earning its place — keep it.
+
 **Why it's a tell:** These are throat-clearing. They signal the writer isn't confident
 enough to just make the point. LLMs insert them as politeness padding. The didactic
 variants are worse — they talk down to the reader, implying they need to be told what's
 important. The casual filler hedges are sneakier — they sound conversational but still
-add zero information.
+add zero information. The introductory fillers are sneakiest of all — they sound like
+natural English transitions but in aggregate they bloat the text with empty calories,
+one per sentence, until the reader feels like they're wading through cotton.
 
 **Instead:** Delete the hedge and start with the actual point. If it's important, the
 reader will know because you showed them why, not because you announced it. For casual
@@ -354,9 +381,18 @@ Verbs: "delve", "underscore", "highlight" (as verb), "foster", "leverage", "harn
 "spearhead", "bolster", "enhance" (when inflating mundane improvements), "garner",
 "align with", "resonate with", "exemplify", "encompass"
 
+Pretentious-for-no-reason verbs (use the plain alternative): "utilize" (use), "leverage"
+(use), "facilitate" (help, enable), "demonstrate" (show), "implement" (build, add, write —
+when the verb is vague filler, not a technical term), "optimize" (improve, speed up, shrink —
+when vague), "indicate" (show, mean), "enable the creation of" (let you create)
+
 Nouns: "tapestry", "landscape" (abstract), "realm", "journey" (abstract), "ecosystem",
 "paradigm", "trajectory", "blueprint", "interplay", "intricacies", "testament", "focal
 point", "commitment" (abstract), "diverse array"
+
+Pretentious-for-no-reason nouns: "functionality" (feature), "methodology" (method, approach),
+"utilization" (use), "implementation" (when used as a noun to avoid a verb: "the
+implementation of X" → "we built X")
 
 Adjectives: "pivotal", "crucial", "vital", "nuanced", "multifaceted", "robust", "seamless",
 "comprehensive", "cutting-edge", "groundbreaking", "transformative", "enduring", "vibrant",
@@ -377,28 +413,42 @@ to pattern-match on these words even if they can't articulate why.
 **Instead:** Use plain words. "Delve into" → "look at." "Leverage" → "use."
 "Navigate the landscape" → "figure out." "Pivotal" → "important" (or better: show
 why it matters instead of asserting it). "Nuanced" → "detailed" or just describe the
-actual nuance.
+actual nuance. "Utilize" → "use." "Facilitate" → "help." "Methodology" → "method."
+"Functionality" → "feature." "Prior to" → "before." "In order to" → "to."
+"Subsequent" → "next."
+
+The test for pretentious vocabulary: replace the fancy word with the plain one. If nothing
+is lost, it was showing off. If the fancy word carries a precise technical nuance the plain
+word lacks, keep it — but only if you're sure the reader needs that nuance.
 
 One of these words in a 2,000-word post is fine. Three in a paragraph is a contamination
 event. Scan for them.
 
 ---
 
-## 13. Copula Avoidance
+## 13. Copula Avoidance and Nominal Style
 
 **The tell:** LLMs avoid simple "is", "are", and "has" constructions, substituting
-elaborate verbs that inflate the significance of mundane statements.
+elaborate verbs that inflate the significance of mundane statements. They also hide
+actions behind verbal nouns (nominal style), turning verbs into -tion/-ment/-ance nouns
+that require filler verbs to function.
 
 **Symptoms:**
 - "serves as" / "stands as" / "acts as" instead of "is"
 - "boasts" / "features" / "offers" instead of "has"
 - "represents" / "marks" / "signals" instead of "is"
 - "underscores" / "highlights" / "reflects" instead of "shows"
+- "the implementation of X" instead of "we implemented X"
+- "perform an evaluation" instead of "evaluate"
+- "provides support for" instead of "supports"
 
 **Examples:**
 - ❌ "This feature serves as a bridge between the developer and the runtime."
 - ❌ "The config file stands as the single source of truth."
 - ❌ "The dashboard boasts a real-time monitoring panel."
+- ❌ "The utilization of the API requires careful consideration."
+- ❌ "We conducted an analysis of the failure modes."
+- ❌ "The execution of the pipeline enables the generation of artifacts."
 
 **Structural variants:**
 The inflated verb doesn't always replace "is" — it can replace any simple verb.
@@ -407,14 +457,28 @@ The inflated verb doesn't always replace "is" — it can replace any simple verb
 - "The framework facilitates seamless integration" instead of "The framework connects to..."
 - Any verb that makes a mundane statement sound like a press release.
 
+Nominal style has its own variants:
+- A noun ending in -tion/-ment/-ance/-ence + a supporting verb (perform, conduct, provide,
+  ensure, enable, carry out) is almost always a verb hiding behind a noun. Replace the whole
+  construction with the verb it's hiding.
+- "The deployment of the service was completed" → "We deployed the service."
+- Passive voice compounds the problem: "An investigation was conducted" → "We investigated."
+  The noun hides the action; the passive hides the actor. Fix both.
+
 **Why it's a tell:** These substitutions make everything sound ceremonial. A config
 file doesn't "stand as" anything. It IS the source of truth. The inflated verb implies
-the sentence is making a grander point than it actually is.
+the sentence is making a grander point than it actually is. Nominal style does the same
+thing in reverse — it drains the action from a sentence, making it read like a government
+memo. Active verbs create motion in the reader's head. Nouns create still lifes.
 
-**Instead:** Use "is", "are", "has." They're not boring — they're precise.
+**Instead:** Use "is", "are", "has." They're not boring — they're precise. And use verbs
+for actions — they're not informal, they're alive.
 - ✅ "This feature connects the developer to the runtime."
 - ✅ "The config file is the source of truth."
 - ✅ "The dashboard has a real-time monitoring panel."
+- ✅ "We used the API." (not "the utilization of the API")
+- ✅ "We analyzed the failure modes." (not "conducted an analysis of")
+- ✅ "The pipeline runs and produces artifacts." (not "the execution enables the generation")
 
 ---
 
@@ -660,6 +724,16 @@ written equivalent of an applause sign.
 **Instead:** Show the impact with specifics. Let the reader decide if it's significant.
 - ✅ "The v2.0 release cut the config file from 200 lines to 12."
 - ✅ "After the migration, deploys went from 45 minutes to 90 seconds."
+
+**The repair is not to tone it down — it's to replace the evaluation with the fact that
+earns it.** When you catch a significance-inflated sentence, ask: "What fact would make
+the reader reach this conclusion on their own?" Write that fact. Don't write
+"groundbreaking performance improvements" — write "p95 latency dropped from 800ms to 12ms."
+Don't write "a revolutionary approach to testing" — write "we deleted 6,000 lines of mocks
+and the test suite got faster."
+
+The strongest evaluations are the ones the reader makes themselves. Give them the evidence.
+Never give them the verdict.
 
 ---
 
@@ -1133,3 +1207,292 @@ most concrete, human-scale metric — not the percentage.
 - If two metrics genuinely add different information (one about speed, one about
   reliability), they can coexist. The test: would a reader learn something NEW from the
   second number that the first didn't already tell them?
+
+---
+
+## 33. Amplifier Intensifiers
+
+**The tell:** Adverbs stacked on top of evaluative adjectives to make claims sound
+stronger. "Very", "truly", "really", "incredibly", "extremely", "absolutely",
+"remarkably", "exceptionally", "fundamentally" before an adjective or verb.
+
+**Symptoms:**
+- Adverb + evaluative adjective where removing the adverb changes nothing
+- The amplifier is doing the work the *evidence* should be doing
+- Often clustered: "truly remarkable", "incredibly powerful", "extremely efficient"
+
+**Examples:**
+- ❌ "This is a truly powerful feature."
+- ❌ "The results were incredibly promising."
+- ❌ "We were extremely impressed with the performance."
+- ❌ "The API is remarkably simple to use."
+- ❌ "This fundamentally changes how we think about deployment."
+
+**Structural variants:**
+- "Absolutely" before a non-gradable adjective: "absolutely essential", "absolutely
+  critical" — redundant by definition (essential is already absolute).
+- "Really" as filler intensifier: "It really does simplify the workflow." Remove "really"
+  and the sentence is identical.
+- "Just" as a false-modesty amplifier: "It just works." Sounds casual but functions as
+  an amplifier — it asserts reliability without evidence.
+- Amplifiers hiding in verbs: "dramatically improved", "significantly reduced",
+  "substantially increased" — the adverb inflates a vague verb instead of letting a
+  specific number speak for itself.
+
+**Why it's a tell:** Amplifiers signal that the author is trying to *convince* rather
+than *prove*. They're a substitute for evidence. "Very powerful" is weaker than
+"handles 10K concurrent connections" because the reader has to take your word for it.
+Facts don't need amplifiers. If you need to write "incredibly fast," you haven't found
+the number yet.
+
+**Instead:** Replace the amplifier + adjective with the fact that proves the claim.
+- ✅ "This feature handles 10K concurrent connections." (not "truly powerful")
+- ✅ "Error rate dropped from 12% to 0.3%." (not "incredibly promising")
+- ✅ "We shipped it to production that week." (not "extremely impressed")
+- ✅ "Three endpoints. No auth dance. Returns JSON." (not "remarkably simple")
+- ✅ "Deploy time went from 45 minutes to 90 seconds." (not "dramatically improved")
+
+The test: remove the amplifier. If the sentence means the same thing, the amplifier was
+dead weight. If the sentence now feels too weak, the problem isn't the missing amplifier —
+it's the missing fact.
+
+---
+
+## 34. Unproven Assessment Adjectives
+
+**The tell:** Evaluative adjectives that assert a quality without providing the fact that
+proves it. The adjective does *word work* — it makes the author feel like they've said
+something meaningful — but the reader learns nothing they can verify.
+
+**Symptoms:**
+- An adjective the reader can't verify from the sentence alone
+- The adjective could apply to any product/feature/tool — it's not specific to this one
+- Stripping the adjective from the sentence leaves it empty or trivially obvious
+- Multiple assessment adjectives stacked: "innovative, robust, and scalable"
+
+**Examples:**
+- ❌ "A robust and scalable solution for modern teams."
+- ❌ "An elegant API design that developers love."
+- ❌ "Comprehensive documentation with everything you need."
+- ❌ "Our innovative approach to CI/CD pipelines."
+- ❌ "A seamless developer experience from start to finish."
+
+**Structural variants:**
+- Assessment adjective + vague noun: "quality content", "effective solution",
+  "powerful platform" — the noun is as empty as the adjective.
+- Adjective chains that substitute for research: "fast, reliable, and easy to use" —
+  three unsupported claims in a row. Each one should be a fact.
+- Assessment buried in a relative clause: "the framework, which provides a seamless
+  experience, also supports..." — the assessment hides inside a clause to look like
+  incidental description.
+- Assessment as assumed context: "Given the robust architecture..." — the adjective is
+  presented as a premise rather than a claim, so it never gets questioned.
+
+**The false-work test:** Strip all evaluative adjectives from the paragraph. Read what's
+left. If the skeleton is empty — "A solution for teams," "An API design," "Documentation"
+— the paragraph needs *research*, not better adjectives. The author did *word work* instead
+of finding the facts that would make the reader reach the conclusion on their own.
+
+**Why it's a tell:** LLMs reach for assessment adjectives because they pattern-match on
+marketing copy and product descriptions. They've learned that "innovative" sounds like
+praise, but they can't provide the evidence because they don't have it. Human writers
+who know their subject lead with the evidence and let the adjective become unnecessary.
+
+**Instead:** Replace each adjective with the specific fact that earns it.
+- ✅ "Handles 50K RPS on a single node. Add nodes to grow linearly." (not "robust and scalable")
+- ✅ "Three endpoints. No auth dance. Returns JSON." (not "elegant API")
+- ✅ "400 pages. Every method has a runnable example." (not "comprehensive documentation")
+- ✅ "We deleted the Jenkinsfile and replaced it with 12 lines of YAML." (not "innovative approach")
+- ✅ "Install, run one command, deploy. No config file." (not "seamless experience")
+
+Any evaluative adjective that the reader has to take on faith is this pattern. If you can't
+immediately follow the adjective with the evidence, delete the adjective and go find the
+evidence.
+
+---
+
+## 35. Temporal Filler (Time Parasites)
+
+**The tell:** Phrases that assert present-tense relevance when present tense is already
+the default. The reader assumes everything you write is current unless you say otherwise —
+so "in today's world" adds zero information.
+
+**Symptoms:**
+- Sentence opens with a temporal phrase asserting "now" or "currently"
+- The temporal phrase can be deleted without changing the meaning
+- Often paired with a vague noun: "landscape," "era," "world," "climate"
+- Used to make a mundane observation sound urgent
+
+**The watchlist:**
+
+Opening phrases (delete entirely): "In today's [anything]", "In the current [anything]",
+"Now more than ever", "In this day and age", "In the modern era", "As we move into [year]",
+"In an increasingly [adjective] world", "In the age of [technology]", "As [technology]
+continues to evolve", "In the rapidly evolving landscape of", "At a time when",
+"In the ever-changing world of"
+
+Urgency filler (delete or replace with data): "today" (when not contrasting with a specific
+past), "currently" (when not contrasting with a planned future state), "nowadays", "these
+days", "at this point in time", "going forward"
+
+**Examples:**
+- ❌ "In today's rapidly evolving tech landscape, developers need better tools."
+- ❌ "Now more than ever, observability matters."
+- ❌ "In the age of AI, testing is critical."
+- ❌ "As cloud-native architectures continue to evolve, teams face new challenges."
+- ❌ "In an increasingly distributed world, latency is king."
+
+**Structural variants:**
+- Mid-sentence insertion: "Developers, in today's fast-paced environment, need..." — same
+  parasite, different position.
+- Pseudo-contrast with no actual past: "Today, teams deploy hundreds of times a day." — If
+  you're not explicitly comparing to a specific past state, "today" is filler.
+- Compound temporal + significance: "In today's landscape, it's more important than ever
+  to..." — combines temporal filler (#35) with significance inflation (#20). Double flag.
+
+**Why it's a tell:** LLMs front-load temporal phrases to create a sense of urgency and
+relevance. Human writers writing about current technology don't need to remind the reader
+it's current — the context makes that obvious. The temporal phrase is a crutch: it lets
+the writer skip the work of explaining *why* the topic matters by asserting that it matters
+because it's happening *now*. The book "Пиши, сокращай" calls these "паразиты времени"
+(time parasites) — they pollute the sentence with meaningless information.
+
+**Instead:** Delete the temporal phrase. If the sentence collapses without it, the sentence
+had no real content — replace it with a specific fact that earns the reader's attention.
+- ✅ "Developers spend 40% of their time context-switching between tools." (not "In today's
+  rapidly evolving tech landscape, developers need better tools.")
+- ✅ "When your p99 latency hits 2 seconds, users leave." (not "Now more than ever,
+  observability matters.")
+- ✅ "LLMs generate plausible code that passes linting and fails in production." (not "In
+  the age of AI, testing is critical.")
+
+If you ARE contrasting with a specific past state, the temporal marker is earned:
+- ✅ "Five years ago, deploying meant a weekend maintenance window. Now it's a git push."
+  — "Now" contrasts with "five years ago." The temporal phrase does work.
+
+---
+
+## 36. Corporate Cliché Phrases
+
+**The tell:** Multi-word phrases borrowed from corporate marketing and "About Us" pages.
+Each individual word might pass a vocabulary check, but the phrase as a whole is an empty
+calorie — it says something that any company could say about any product.
+
+**Symptoms:**
+- The phrase could describe any competitor's product without changing a word
+- It asserts a quality ("passionate," "trusted," "comprehensive") without evidence
+- It addresses no specific reader need — it's written to impress, not to inform
+- Multiple cliché phrases cluster together, reinforcing each other's emptiness
+
+**The watchlist:**
+
+Team/company phrases: "passionate team of engineers", "team of like-minded professionals",
+"dedicated team", "world-class engineers", "our talented team", "driven by innovation"
+
+Product phrases: "end-to-end solution", "one-stop shop", "best-in-class", "industry-leading",
+"enterprise-grade", "production-ready" (when not followed by what that means), "battle-tested"
+(without the battle), "turnkey solution", "out-of-the-box"
+
+Relationship phrases: "trusted by industry leaders", "trusted partner", "your success is our
+success", "we're committed to [vague noun]", "empowering developers to", "enabling teams to"
+
+Value phrases: "solve your business problems", "drive business value", "accelerate your
+digital transformation", "unlock the full potential of", "take your [X] to the next level",
+"supercharge your workflow"
+
+**Examples:**
+- ❌ "Our passionate team of engineers built an end-to-end solution for modern development teams."
+- ❌ "Trusted by industry leaders, our platform empowers developers to ship faster."
+- ❌ "We're committed to helping teams unlock the full potential of their CI/CD pipelines."
+- ❌ "A best-in-class, enterprise-grade platform that drives real business value."
+
+**Structural variants:**
+- Cliché-as-aside: "The tool — trusted by thousands of developers — integrates with..." —
+  corporate cliché hiding inside em-dashes.
+- Testimonial framing: "Teams love our solution because it's production-ready and
+  battle-tested." — The cliché phrases masquerade as user sentiment.
+- Cliché chain: when 2+ corporate phrases appear in the same sentence, the sentence is
+  almost certainly empty. "Our world-class team built an industry-leading, enterprise-grade
+  platform" is four clichés in one sentence and says nothing.
+
+**The interchangeability test:** Replace the product/company name with a competitor's. If the
+sentence still works perfectly, it's a corporate cliché. "Acme's passionate team built an
+end-to-end solution" → "Globex's passionate team built an end-to-end solution." Nothing
+changed. The sentence was about no one.
+
+**Why it's a tell:** LLMs train on corporate websites, marketing copy, and landing pages.
+These phrases are statistically dominant in that corpus. When an LLM describes a product,
+it defaults to the vocabulary of product marketing because that's what it's seen most. Human
+writers with actual experience describe what the product *does*, not what category of praise
+it belongs to.
+
+**Instead:** Replace the phrase with the specific fact it's hiding behind.
+- ✅ "Four engineers built it over six months. Two of them had shipped container runtimes
+  before." (not "our passionate team of engineers")
+- ✅ "Covers build, test, deploy, and rollback — one config file, no glue scripts." (not
+  "end-to-end solution")
+- ✅ "Stripe and Shopify run their deploy pipelines on it." (not "trusted by industry leaders")
+- ✅ "Cut our deploy time from 45 minutes to 90 seconds." (not "drives real business value")
+
+One corporate cliché in a 2,000-word post is a yellow flag. Two or more in the same
+paragraph is a contamination event — the paragraph needs to be rewritten with facts.
+
+---
+
+## 37. Euphemistic Smoothing
+
+**The tell:** Softening uncomfortable truths with padded, indirect language. Instead of
+saying what happened, the writer wraps it in a cushion of formal or abstract phrasing
+that reduces the reader's ability to understand the actual situation.
+
+**Symptoms:**
+- A negative event is described without any sharp edges
+- The sentence uses more words than a plain description would
+- Removing the euphemism reveals a simpler, more honest statement
+- The writer seems to be protecting someone (the product, the team, themselves) from
+  looking bad
+
+**Examples:**
+- ❌ "We encountered some challenges during the migration." → It broke.
+- ❌ "Performance was suboptimal under load." → It was slow.
+- ❌ "The initial results were not entirely aligned with expectations." → It gave wrong answers.
+- ❌ "There were some issues with data consistency." → We lost data.
+- ❌ "The deployment process presented some complexity." → Deploys kept failing.
+- ❌ "The team had to make some adjustments to the timeline." → We missed the deadline.
+
+**Structural variants:**
+- Passive euphemism: "Errors were encountered" — hides both the actor and the severity.
+  Who encountered them? How bad were they? The passive + euphemism combo conceals everything.
+- Hedge-wrapped euphemism: "There were arguably some minor inconsistencies in the output."
+  — hedging (#10) + euphemism together. The sentence has four layers of padding around
+  "the output was wrong."
+- Euphemism-as-positive-spin: "This gave us an opportunity to revisit our approach." — The
+  "opportunity" was a failure. Say so.
+- Technical euphemism: "The system exhibited non-deterministic behavior" — it crashed
+  randomly. Technical vocabulary used not for precision but to soften the blow.
+- Euphemistic smoothing of others' failures: "The vendor's solution didn't fully meet our
+  requirements" — when the vendor's product was broken and you switched away. Being polite
+  is fine; being so smooth the reader can't tell what happened is not.
+
+**Why it's a tell:** LLMs are trained with RLHF to be diplomatic and non-confrontational.
+They default to softening negative events because their training rewards inoffensive output.
+But blog posts — especially technical ones — earn trust through honesty. When you describe
+a failure, the reader wants to know what actually happened so they can avoid it. Smoothing
+the failure robs them of that knowledge. The book "Пиши, сокращай" calls this "сглаженные
+углы" (smoothed corners) — language designed to hide inconvenient truths rather than
+communicate them.
+
+**Instead:** Say what happened. Use plain, specific language. If it broke, say it broke.
+If it was slow, say how slow. The reader respects honesty more than polish.
+- ✅ "The migration broke three production tables. We rolled back at 2 AM." (not "encountered
+  some challenges")
+- ✅ "Response time hit 12 seconds under load. Users saw timeout errors." (not "suboptimal
+  performance")
+- ✅ "It hallucinated API endpoints that don't exist." (not "results were not entirely aligned
+  with expectations")
+- ✅ "We lost two hours of transaction data." (not "issues with data consistency")
+- ✅ "We missed the deadline by three weeks." (not "adjustments to the timeline")
+
+Euphemistic smoothing is the opposite of the blog's core principle: show the failure, earn
+trust, then show the fix. If you smooth the failure, there's nothing to fix and nothing to
+trust.

@@ -201,6 +201,15 @@ numbering per type:
 Screenshot, Code, Link, and Fact each have their own counter starting at 01. The outline
 is where placeholder planning happens — don't defer it to the draft.
 
+### 2e: Honest Limitations
+
+If the post involves a product, tool, or approach, ask the author: "What can't this do?
+Where does it fall short? What should the reader know before trying it?" Include at least
+one limitation or caveat in the outline. Acknowledging what doesn't work builds more trust
+than any amount of praise — it shows the author has real experience, not just marketing
+talking points. The limitation doesn't need its own section; it can live inside the
+technical meat or the broader point as a natural aside.
+
 **Checkpoint:** Author approves the main idea, CTA, and structure outline.
 
 ---
@@ -226,7 +235,16 @@ profile before writing a single sentence.
 4. **Code blocks are part of the story.** Don't dump code without context. Set up why the
    reader is about to see this code, show it, then explain what it means.
 
-5. **Maintain narrative density in EVERY section, not just the opening.** This is the most
+5. **Sentence and paragraph craft.** Apply the rules from `references/tone-guide.md` section
+   "Sentence & Paragraph Craft" while writing — not just during review. Key checks:
+   - One new idea per sentence. If you're cramming, split.
+   - Generalize before listing unfamiliar items ("three tools: X, Y, Z").
+   - Strong subjects (real actors) and strong verbs (real actions). Don't hide actions
+     behind state verbs or nominalizations.
+   - One topic per paragraph. First sentence = main idea or hook.
+   - Every paragraph must advance the reader toward the main idea (point B from Phase 2).
+
+6. **Maintain narrative density in EVERY section, not just the opening.** This is the most
    common quality failure. The opening hook always has personality because writers focus
    there. But by mid-post, the voice drifts toward report/analyst style. Watch for:
    - Passive summaries replacing specific moments ("Implementation proceeded" vs "I hit
@@ -239,7 +257,7 @@ profile before writing a single sentence.
    Re-read `references/tone-guide.md` section "Narrative Density: Show, Don't Summarize"
    for the full diagnostic.
 
-6. **Placeholders use INDEPENDENT numbering per type.** There is NO shared counter
+7. **Placeholders use INDEPENDENT numbering per type.** There is NO shared counter
    across types. Screenshots start at 01 and increment on their own. Code starts at
    01 and increments on its own. Same for Links and Facts. WRONG: Screenshot 01,
    Code 02, Screenshot 03. RIGHT: Screenshot 01, Code 01, Screenshot 02.
@@ -249,20 +267,20 @@ profile before writing a single sentence.
    ```
    The last number of each type = total assets of that type the author needs to prepare.
 
-7. **Aim for 1,500-2,000 words.** 2,000 is a target, not a cliff. A tight 2,200 that
+8. **Aim for 1,500-2,000 words.** 2,000 is a target, not a cliff. A tight 2,200 that
    earns every sentence is better than a padded 1,800. If you're under 1,200, you're
    probably not going deep enough on the technical content. Don't pad to hit a number
    and don't butcher good content to stay under one.
 
-8. **Write the TLDR last.** ALWAYS bullets, 2-4 items. Never prose paragraphs. Each bullet is a standalone
+9. **Write the TLDR last.** ALWAYS bullets, 2-4 items. Never prose paragraphs. Each bullet is a standalone
    provocation — something that makes the reader think "wait, really?" The TLDR sells the
    journey, it doesn't summarize the destination.
 
-9. **End with the author bio.** Follow the schema in `persona/bio.md`. The kicker
+10. **End with the author bio.** Follow the schema in `persona/bio.md`. The kicker
    must connect to something specific in THIS post. Propose a kicker and confirm with the
    author — don't reuse the same one across posts unless nothing better fits.
 
-10. **The Comparison Trap.** Posts that involve before/after demos, A/B tests, or tool
+11. **The Comparison Trap.** Posts that involve before/after demos, A/B tests, or tool
     comparisons are magnets for patterns #1, #2, #5, and #6. The content naturally involves
     contrasts (old vs. new, broken vs. fixed, input vs. output), and every sentence about
     those contrasts will default to mirrored grammatical structure unless you actively fight
@@ -294,12 +312,19 @@ Link 01, Screenshot 02.
 02, Screenshot 03, Code 02, Link 01, Screenshot 04. That's 4 screenshots, 2 code blocks,
 1 link — each count is immediately obvious from the last number in its sequence.
 
+**Prioritize demonstrations over static illustrations.** A screenshot of the product in
+action (terminal output mid-run, UI responding to input, a before/after diff) is worth
+more than a polished hero image. A video or GIF of the workflow beats a screenshot. When
+planning placeholders, prefer assets that show the product *doing something* — the reader
+should be able to picture themselves using it. If the source material includes a live demo
+moment, that's your strongest placeholder.
+
 ### After writing:
 
 Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md` and scan
 the draft:
 
-**Pass 1 — Surface scan:** Read the draft against each of the 32 patterns, looking for
+**Pass 1 — Surface scan:** Read the draft against each of the 37 patterns, looking for
 the forms described in the examples and structural variants. For the following patterns,
 do a dedicated mechanical sweep instead of relying on contextual reading alone:
 
@@ -325,6 +350,40 @@ do a dedicated mechanical sweep instead of relying on contextual reading alone:
   Count how many of those numbers describe the same change. If two or more data points
   make the same point (e.g., a raw number AND a percentage AND a time savings), keep the
   strongest one and cut the rest.
+- **Temporal filler (#35):** Scan for the watchlist phrases ("In today's", "Now more than
+  ever", "In the age of", "In the current", "As [X] continues to evolve", "In an
+  increasingly"). These hide in opening sentences and topic transitions. If the temporal
+  phrase can be deleted without changing the meaning, delete it. If the sentence collapses
+  without it, the sentence had no content — replace with a specific fact.
+- **Corporate cliché phrases (#36):** After the surface scan, check whether any product or
+  tool description uses composite corporate phrases ("end-to-end solution", "trusted by
+  industry leaders", "passionate team", "drives business value"). Apply the
+  interchangeability test: swap the product name for a competitor's. If the sentence still
+  works, it's a cliché — replace with a specific fact.
+- **Introductory filler words (#10):** Scan for the watchlist words from the "introductory
+  filler words" variant in pattern #10: "of course", "naturally", "obviously", "clearly",
+  "certainly", "indeed", "in fact", "honestly", "frankly", "additionally", "furthermore",
+  "moreover", "first of all", "that said", "that being said", "needless to say". For each
+  hit, apply the delete test: remove the word and re-read the sentence. If the meaning is
+  unchanged, delete. These accumulate invisibly — one per paragraph is death by a thousand
+  cuts.
+
+**Craft sweep (between Pass 1 and Pass 2):** Check the draft against `references/tone-guide.md`
+section "Sentence & Paragraph Craft":
+- **Overloaded sentences:** Find any sentence that answers 3+ distinct questions (what? how?
+  for whom? why?). Split it.
+- **Cold lists:** Find enumerations of 3+ unfamiliar items introduced without a category
+  label. Add a generalization ("three tools:", "two reasons:").
+- **Weak subjects:** Find sentences where the subject is an abstract noun or nominalization
+  ("the implementation of," "the presence of," "reforestation"). Check whether a real actor
+  is hiding. If so, rewrite with the actor as subject.
+- **Nested subordination:** Find sentences with 2+ subordinating conjunctions (which, that,
+  because, when, although, if). If they're nested (one inside another), flatten by splitting.
+- **Paragraph topics:** Read only the first sentence of each paragraph in sequence. Do they
+  tell a coherent story? Flag any that are vague ("Let's consider another aspect...") or
+  that don't connect to the preceding paragraph's conclusion.
+- **Goal alignment:** For each paragraph, ask "does this advance the reader toward point B?"
+  Flag any paragraph that's interesting but tangential.
 
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
 look at the grammatical skeleton only. Ask: "Do these two sentences have the same shape?"
@@ -356,7 +415,7 @@ not checking against specific patterns but reacting to the overall feel. Look fo
 - Uniform energy — every paragraph has the same emotional temperature
 - Press-release tone — sounds like it was written to impress rather than to communicate
 
-A draft can pass all 32 patterns and still read as obviously AI because it has no soul. If
+A draft can pass all 37 patterns and still read as obviously AI because it has no soul. If
 Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite — it's going
 back to `persona/voice.md` and injecting the author's actual rhetorical devices, opinions,
 and attitude into the flat sections.
@@ -364,7 +423,7 @@ and attitude into the flat sections.
 Rewrite any hits. This is not optional.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
-in isolation and check it against ALL 32 patterns. Rewrites frequently introduce the same
+in isolation and check it against ALL 37 patterns. Rewrites frequently introduce the same
 pattern in a different surface form. This is especially true for:
 - #2 (Parallel Binary) — the most likely pattern to survive a rewrite, because describing
   a comparison naturally produces mirrored clauses. If you rewrote a parallel binary and the
@@ -373,7 +432,7 @@ pattern in a different surface form. This is especially true for:
 - #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
   question with a longer answer, but the structure is identical.
 
-Do not consider an anti-pattern fixed until the replacement passes a full 32-pattern scan
+Do not consider an anti-pattern fixed until the replacement passes a full 37-pattern scan
 on its own.
 
 **Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against
@@ -400,6 +459,10 @@ Run the tightening pass. Re-read the draft sentence by sentence with fresh eyes:
   that hits hardest and cut the rest. The extras are noise.
 - Isolate the punchline: the final sentence of a key section should get its own line. If the
   punchline is buried in a paragraph, give it a line break so it lands with weight.
+- Black marker test: mentally redact the product or tool name from every product-facing
+  paragraph. If the paragraph could describe any competitor's product just as well, it's
+  not specific enough. Add concrete details — specific features, real numbers, actual
+  behavior — that only apply to this product.
 - The goal is to tighten without losing substance. A post that's 1,700 words of meat is
   better than 2,000 words with padding.
 
@@ -435,7 +498,7 @@ conversation — edit the file surgically.
 - Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — all
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
-  audit rule: every rewrite must pass a full 32-pattern scan on its own before it's
+  audit rule: every rewrite must pass a full 37-pattern scan on its own before it's
   considered fixed. Then run the voice check: re-read against `persona/voice.md` and
   redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or

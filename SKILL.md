@@ -3,7 +3,7 @@ name: blog-writer
 description: >
   Write developer blog posts from video transcripts, meeting notes, or rough ideas.
   Extracts narrative from source material, structures content with hooks and technical sections,
-  formats code examples with placeholders, and checks drafts against 32 AI anti-patterns.
+  formats code examples with placeholders, and checks drafts against 37 AI anti-patterns.
   Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript
   into a blog, work on blog content, or mentions "blog" in the context of content creation.
   Also trigger when the user provides a video transcript and wants written content derived from it,
@@ -30,29 +30,22 @@ when reading or writing files.
 **Before anything else**, check if `~/.claude/blog-writer-persona/` exists (as a real
 directory or a symlink).
 
-**If it exists and `persona/voice.md` has content:** Persona is ready. Skip to
-"Before You Start."
+| State | Action |
+|-------|--------|
+| Exists and `persona/voice.md` has content | Persona ready — skip to "Before You Start" |
+| Exists but `persona/voice.md` is empty or missing | Read `references/setup.md` and run onboarding; do not proceed until complete |
+| Directory doesn't exist | First-time setup — see below |
 
-**If it exists but `persona/voice.md` is empty or missing:** Read `references/setup.md`
-and run the interactive onboarding flow. Do not proceed with blog writing until the
-persona is set up.
+**First-time setup:** Ask the author where to store persona files:
 
-**If the directory doesn't exist:** First-time setup. Ask:
-
-> Where should I store your persona files (voice profile, bio, examples)?
->
 > 1. `~/.claude/blog-writer-persona/` ← **default** (recommended)
-> 2. A custom path (e.g., Google Drive for backup) — I'll create a symlink so the
->    skill always finds them
+> 2. A custom path — I'll create a symlink so the skill always finds them
 
-If the author picks **option 1**: create `~/.claude/blog-writer-persona/`.
-
-If the author picks **option 2**: ask for the full path, create the directory there, then
-create a symlink:
-```bash
-ln -s /their/chosen/path ~/.claude/blog-writer-persona
-```
-This way the skill always reads from the same path regardless of where the data lives.
+- **Option 1:** Create `~/.claude/blog-writer-persona/`.
+- **Option 2:** Ask for the full path, create it, then run:
+  ```bash
+  ln -s /their/chosen/path ~/.claude/blog-writer-persona
+  ```
 
 Then read `references/setup.md` and run the interactive onboarding flow.
 
@@ -87,7 +80,7 @@ Read these reference files in order:
    tone, rhetorical devices, and voice-specific examples.
 2. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-3. `references/ai-anti-patterns.md` — 24 named AI writing patterns to never use. Each has
+3. `references/ai-anti-patterns.md` — 37 named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
 4. `references/process.md` — The workflow from transcript to published draft.
@@ -109,49 +102,36 @@ The full process is in `references/process.md`. Here are the phases and their ga
 
 Do not skip phases. Do not write prose before Phase 3.
 
-## Persona Adherence (Periodic Re-anchor)
+## Persona Adherence
 
-Long conversations lose context. The persona is not optional — it defines the entire voice
-of the output. To prevent drift:
+**Rule:** Re-read `persona/voice.md` before every writing action — before the Phase 3 first
+draft, before every Phase 4 revision, and before the anti-pattern rewrite voice check.
 
-1. **Re-read `persona/voice.md` before every writing action** — before Phase 3 first draft,
-   before every revision in Phase 4, and before the anti-pattern rewrite voice check. Not
-   "remember what it said" — actually re-read the file.
+At the start of Phase 3 and Phase 4, confirm you can name at least 3 rhetorical devices
+from the profile; if you can't, read it again.
 
-2. **If you think the persona is empty, missing, or unfamiliar — ASK, don't assume.** The
-   persona was set up earlier in the session or in a previous session. If you can't find it
-   at `~/.claude/blog-writer-persona/`, ask the author — don't claim it doesn't exist.
-   It exists. You may have lost track of the path.
-
-3. **Voice spot-check at phase transitions.** At the start of Phase 3 and Phase 4, re-read
-   `persona/voice.md` and confirm to yourself (not to the author) that you can name at least
-   3 rhetorical devices from the profile. If you can't, you haven't internalized it — read
-   it again.
+> **General rule — if you can't find a required file, ask the author. Don't claim it
+> doesn't exist, don't assume its contents, don't skip the step.**
 
 ## Anti-Pattern Check Adherence
 
-The anti-pattern check is a **defined procedure**, not a vibe check. Do not improvise it.
+The anti-pattern check is a **defined procedure**, not a vibe check.
 
-1. **Always re-read `references/ai-anti-patterns.md` before running the check.** Do not
-   rely on your general knowledge of AI writing patterns. The file contains 24 specific
-   patterns with specific symptoms, examples, structural variants, and alternatives. Use
-   THOSE definitions, not your own.
+1. **Always re-read `references/ai-anti-patterns.md` before running the check.** Use the
+   file's definitions — specific patterns, symptoms, examples, structural variants, and
+   alternatives — not your general knowledge of AI writing patterns.
 
 2. **Follow the three-pass procedure exactly as written in `references/process.md`.** Pass 1
-   is the surface scan against all 32 patterns. Pass 2 is the skeleton scan on adjacent
+   is the surface scan against all 37 patterns. Pass 2 is the skeleton scan on adjacent
    sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
    that passes pattern checks but still reads as AI. Then the rewrite audit. Then the voice
    check. In that order. Do not skip passes, do not merge them, do not substitute your own
    method.
 
 3. **Do not invent patterns that aren't in the file.** If something feels "AI-ish" but
-   doesn't match any of the 32 defined patterns or their structural variants, leave it
-   alone. The pattern list is curated and maintained — false positives from improvised
-   rules damage the author's voice more than the pattern they're trying to fix.
-
-4. **If you can't find or read the anti-pattern file — ASK.** Same rule as the persona:
-   never wing it from memory, never claim the file doesn't exist. Ask the author where it
-   is.
+   doesn't match any of the 37 defined patterns or their structural variants, leave it
+   alone. False positives from improvised rules damage the author's voice more than the
+   pattern they're trying to fix.
 
 ## Quick Reference: Blog Anatomy
 
@@ -217,9 +197,6 @@ After reconstructing the narrative:
    `[Link 01: plugin page on the registry]`
    `[Screenshot 03: terminal showing install command]`
    `[Fact 01: "25% of Y Combinator startups" claim — find source]`
-   In this example: 3 screenshots, 1 code block, 1 link, 1 fact — each count is
-   the last number in its sequence. WRONG: Screenshot 01, Code 02, Link 03.
-   RIGHT: Screenshot 01, Code 01, Link 01.
 3. For code placeholders, include best-guess content and flag:
    `<!-- VERIFY: reconstructed from transcript, confirm actual code -->`
 4. For CLI commands, reconstruct from context and flag if uncertain
