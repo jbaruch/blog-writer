@@ -18,6 +18,6 @@ jobs:
         with:
           token: ${{ secrets.TESSL_API_TOKEN }}
       - run: tessl skill review --threshold 85
-      - uses: jbaruch/tessl-smart-publish@v1
+      - uses: tesslio/patch-version-publish@v1
         with:
           token: ${{ secrets.TESSL_API_TOKEN }}
