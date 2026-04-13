@@ -197,9 +197,17 @@ numbering per type:
 - `[Screenshot 01: the Grafana panel showing memory usage]`
 - `[Code 01: the rate limiter middleware config]`
 - `[Link 01: OWASP rate limiting guide]`
+- `[Diagram 01: request flow through the middleware stack]`
 
-Screenshot, Code, Link, and Fact each have their own counter starting at 01. The outline
-is where placeholder planning happens — don't defer it to the draft.
+Screenshot, Code, Link, Fact, and Diagram each have their own counter starting at 01.
+The outline is where placeholder planning happens — don't defer it to the draft.
+
+**When to use a diagram vs. a screenshot.** A screenshot of the real system (terminal
+output, UI state, a dashboard mid-incident) is almost always more honest than a diagram.
+Use a diagram when the concept is structural — architecture, request flow, component
+relationships, state transitions — and no single screen capture can show it. Don't
+default to a diagram because it looks professional; default to the artifact that proves
+the point with the least abstraction.
 
 ### 2e: Honest Limitations
 
@@ -259,11 +267,12 @@ profile before writing a single sentence.
 
 7. **Placeholders use INDEPENDENT numbering per type.** There is NO shared counter
    across types. Screenshots start at 01 and increment on their own. Code starts at
-   01 and increments on its own. Same for Links and Facts. WRONG: Screenshot 01,
-   Code 02, Screenshot 03. RIGHT: Screenshot 01, Code 01, Screenshot 02.
+   01 and increments on its own. Same for Links, Facts, and Diagrams. WRONG: Screenshot
+   01, Code 02, Screenshot 03. RIGHT: Screenshot 01, Code 01, Screenshot 02.
    ```
    [Screenshot 03: the agent re-ingesting 100 files]
    [Code 02: the config file after installing the plugin]
+   [Diagram 01: request flow through the rate limiter middleware]
    ```
    The last number of each type = total assets of that type the author needs to prepare.
 
@@ -298,19 +307,22 @@ profile before writing a single sentence.
 
 Each placeholder type has its own **independent** numbering sequence, zero-padded.
 Counters are **separate per type** — there is NO shared counter. A post can have
-Screenshot 10, Code 03, Link 05, and Fact 02 all at the same time. The last number
-of each type tells the author exactly how many of that asset they need to prepare.
-WRONG: Screenshot 01, Code 02, Link 03, Screenshot 04. RIGHT: Screenshot 01, Code 01,
-Link 01, Screenshot 02.
+Screenshot 10, Code 03, Link 05, Fact 02, and Diagram 03 all at the same time. The
+last number of each type tells the author exactly how many of that asset they need
+to prepare. WRONG: Screenshot 01, Code 02, Link 03, Screenshot 04. RIGHT: Screenshot
+01, Code 01, Link 01, Screenshot 02.
 
 - Screenshots: `[Screenshot 01: description]`, `[Screenshot 02: description]`, ...
 - Code to verify: `[Code 01: description] <!-- VERIFY: reconstructed from transcript -->`
 - Links to confirm: `[Link 01: description]`
 - Facts to check: `[Fact 01: description]`
+- Diagrams: `[Diagram 01: description]` followed by a fenced ```d2 block with the
+  diagram source, then `<!-- VERIFY: diagram reconstructed from narrative context, confirm architecture -->`
 
 **Example in a draft:** a post might contain, in order: Screenshot 01, Code 01, Screenshot
-02, Screenshot 03, Code 02, Link 01, Screenshot 04. That's 4 screenshots, 2 code blocks,
-1 link — each count is immediately obvious from the last number in its sequence.
+02, Diagram 01, Screenshot 03, Code 02, Link 01, Screenshot 04. That's 4 screenshots, 2
+code blocks, 1 link, 1 diagram — each count is immediately obvious from the last number
+in its sequence.
 
 **Prioritize demonstrations over static illustrations.** A screenshot of the product in
 action (terminal output mid-run, UI responding to input, a before/after diff) is worth
@@ -318,6 +330,14 @@ more than a polished hero image. A video or GIF of the workflow beats a screensh
 planning placeholders, prefer assets that show the product *doing something* — the reader
 should be able to picture themselves using it. If the source material includes a live demo
 moment, that's your strongest placeholder.
+
+**Diagrams earn their place by clarifying complexity prose can't carry.** A diagram is the
+right choice when the reader needs to see structure — how components connect, how a request
+moves through a stack, how state changes — and the narrative would otherwise have to spell
+out relationships the eye grasps instantly. A diagram is the wrong choice when it decorates
+rather than clarifies, when a screenshot of the real system would do the same work, or when
+the prose already makes the structure obvious. Integrate diagrams like any other asset: set
+up what the reader is about to see, show it, then interpret what matters about it.
 
 ### After writing:
 

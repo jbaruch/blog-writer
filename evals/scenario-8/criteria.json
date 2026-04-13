@@ -1,0 +1,86 @@
+{
+  "context": "Tests whether the agent adds a Diagram placeholder with embedded D2 source when the transcript describes a multi-component architecture or request flow that prose alone cannot clarify. Also verifies independent numbering (Diagram counter separate from Screenshot, Code, Link, Fact), a VERIFY comment on the diagram, the draft-summary reporting Diagram counts, and editorial judgement about when a diagram earns its place.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Draft file naming",
+      "description": "A file named blog-draft-per-tenant-rate-limiter.md exists in the working directory",
+      "max_score": 5
+    },
+    {
+      "name": "Diagram placeholder present",
+      "description": "The draft contains at least one Diagram placeholder using the format [Diagram NN: description] where NN is zero-padded (e.g., [Diagram 01: request flow through the rate limiter middleware])",
+      "max_score": 10
+    },
+    {
+      "name": "Diagram has D2 source block",
+      "description": "The Diagram placeholder is immediately followed (after the bracketed line) by a fenced code block tagged as d2 (```d2 ... ```) containing diagram source code, not just a placeholder description",
+      "max_score": 12
+    },
+    {
+      "name": "D2 source reflects transcript components",
+      "description": "The D2 source references the actual components described in the transcript: at minimum the client/edge load balancer, the rate-limiter middleware, Redis, and the API. A control-plane node is a plus but not required. The source is not a generic placeholder diagram.",
+      "max_score": 10
+    },
+    {
+      "name": "Diagram VERIFY comment",
+      "description": "The Diagram placeholder block includes a VERIFY HTML comment indicating the diagram was reconstructed from narrative context (e.g., <!-- VERIFY: diagram reconstructed from narrative context, confirm architecture -->)",
+      "max_score": 8
+    },
+    {
+      "name": "Diagram placed in the flow section",
+      "description": "The Diagram placeholder appears inside the section that explains the request flow or architecture (the section describing how client, middleware, Redis, and API interact), NOT in the opening hook or the author bio",
+      "max_score": 6
+    },
+    {
+      "name": "Independent numbering preserved",
+      "description": "The Diagram counter is independent of Screenshot, Code, Link, and Fact counters. If the draft contains Screenshot 01, Code 01, and Diagram 01, all three coexist starting at 01. The draft does NOT use a shared counter across types (e.g., Screenshot 01, Code 02, Diagram 03 where 03 reflects a shared total).",
+      "max_score": 8
+    },
+    {
+      "name": "Draft summary counts diagrams",
+      "description": "draft-summary.md (or the equivalent conversational summary produced with the deliverables) lists Diagram placeholder count alongside Screenshot, Code, Link, and Fact counts",
+      "max_score": 6
+    },
+    {
+      "name": "Screenshot placeholders still used where appropriate",
+      "description": "The draft retains Screenshot placeholders for the concrete artifacts Mira pulled up in the transcript (the middleware config file and the Grafana dashboard) instead of replacing every visual with a diagram",
+      "max_score": 6
+    },
+    {
+      "name": "Code VERIFY comment present",
+      "description": "At least one Code placeholder or reconstructed code block includes a VERIFY comment (the Redis INCR key pattern or the middleware config are natural candidates)",
+      "max_score": 5
+    },
+    {
+      "name": "Opening is narrative",
+      "description": "The first section after the TLDR opens with a story or specific moment (Mira's onboarding-tenant bug, Dev's earlier failure, or the big-customer-DDoS-by-accident scenario), NOT a thesis statement or a 'In this post we will explore' preamble",
+      "max_score": 5
+    },
+    {
+      "name": "TLDR is bullets",
+      "description": "The draft contains a TLDR section that uses 2-4 bullet points (lines starting with - or *), placed before the opening hook, not prose paragraphs",
+      "max_score": 5
+    },
+    {
+      "name": "Dev appears as recurring character",
+      "description": "Dev (the recurring character from the voice profile and transcript) appears in the draft with dialogue, reaction, or a quoted prior-experience aside -- not merely named in passing",
+      "max_score": 5
+    },
+    {
+      "name": "Bio post-specific kicker",
+      "description": "The draft ends with an author bio for Mira Okafor whose rotating kicker (final sentence) references something specific from THIS post (e.g., 429s, fail-closed, sliding windows, Redis failover)",
+      "max_score": 5
+    },
+    {
+      "name": "No preamble announcement",
+      "description": "The draft does NOT contain phrases like 'In this post, we will', 'Let's explore', 'What follows is', or 'Let's take a look at'",
+      "max_score": 4
+    },
+    {
+      "name": "Word count range",
+      "description": "The blog post body (excluding the author bio section) contains between 1,500 and 2,200 words",
+      "max_score": 5
+    }
+  ]
+}

@@ -180,24 +180,31 @@ Read it at the start of every session; update it when a post is published.
 - Each post must stand alone — a reader hitting part 2 first should not be lost
 - End with a teaser for the next installment when applicable
 
-## Screenshot and Code Handling
+## Screenshot, Code, and Diagram Handling
 
 The author's video transcript will reference things visible on screen that Claude cannot see.
 After reconstructing the narrative:
 
 1. Identify every moment where something was shown on screen, code was demonstrated,
-   a link was referenced, or a fact needs verification
+   a link was referenced, a fact needs verification, or a concept would benefit from a
+   diagram (architecture, flow, system relationships)
 2. Insert placeholders with **INDEPENDENT numbering per type**. Screenshots count
    separately from Code, which counts separately from Links, which counts separately
-   from Facts. There is NO shared counter. Each type starts at 01 and increments
-   within its own sequence only:
+   from Facts, which count separately from Diagrams. There is NO shared counter. Each
+   type starts at 01 and increments within its own sequence only:
    `[Screenshot 01: the agent's terminal output showing it re-ingested 100 files]`
    `[Code 01: config file dependency block after plugin install]`
    `[Screenshot 02: the app UI showing outdated information]`
    `[Link 01: plugin page on the registry]`
    `[Screenshot 03: terminal showing install command]`
    `[Fact 01: "25% of Y Combinator startups" claim — find source]`
+   `[Diagram 01: architecture showing plugin registry flow]`
 3. For code placeholders, include best-guess content and flag:
    `<!-- VERIFY: reconstructed from transcript, confirm actual code -->`
 4. For CLI commands, reconstruct from context and flag if uncertain
-5. Ask the author to confirm or replace all placeholders before finalizing
+5. For diagram placeholders, generate D2 source inline in a fenced `d2` block and flag:
+   `<!-- VERIFY: diagram reconstructed from narrative context, confirm architecture -->`
+   Diagrams earn their place when they clarify complexity that prose can't convey
+   (multi-step flows, component relationships, state transitions). If a single screenshot
+   of the real system would be more honest and more specific, use a screenshot instead.
+6. Ask the author to confirm or replace all placeholders before finalizing

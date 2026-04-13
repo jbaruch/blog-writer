@@ -97,14 +97,14 @@
       "why_given": "particular preference"
     },
     {
-      "instruction": "Placeholder numbering must be independent per type (Screenshot, Code, Link, Fact) with NO shared counter",
-      "original_snippets": "Insert placeholders with **INDEPENDENT numbering per type**. Screenshots count separately from Code, which counts separately from Links, which counts separately from Facts. There is NO shared counter. Each type starts at 01 ... WRONG: Screenshot 01, Code 02, Link 03. RIGHT: Screenshot 01, Code 01, Link 01.",
-      "relevant_when": "Any blog draft that includes placeholders for screenshots, code, links, or facts",
+      "instruction": "Placeholder numbering must be independent per type (Screenshot, Code, Link, Fact, Diagram) with NO shared counter",
+      "original_snippets": "Insert placeholders with **INDEPENDENT numbering per type**. Screenshots count separately from Code, which counts separately from Links, which counts separately from Facts, which count separately from Diagrams. There is NO shared counter. Each type starts at 01 ... WRONG: Screenshot 01, Code 02, Link 03. RIGHT: Screenshot 01, Code 01, Link 01.",
+      "relevant_when": "Any blog draft that includes placeholders for screenshots, code, links, facts, or diagrams",
       "why_given": "particular preference"
     },
     {
       "instruction": "Placeholders must be zero-padded (01, 02, etc.)",
-      "original_snippets": "[Screenshot 01: the agent's terminal output showing it re-ingested 100 files] [Code 01: config file dependency block after plugin install] [Screenshot 02: the app UI showing outdated information]",
+      "original_snippets": "[Screenshot 01: the agent's terminal output showing it re-ingested 100 files] [Code 01: config file dependency block after plugin install] [Screenshot 02: the app UI showing outdated information] [Diagram 01: architecture showing plugin registry flow]",
       "relevant_when": "Any blog draft that includes placeholders",
       "why_given": "particular preference"
     },
@@ -151,8 +151,8 @@
       "why_given": "particular preference"
     },
     {
-      "instruction": "Structure outline must include proposed placeholder locations with independently numbered types",
-      "original_snippets": "Include proposed placeholder locations in the outline -- each type numbered independently: '[Screenshot 01: ...]', '[Screenshot 02: ...]', '[Code 01: ...]', '[Link 01: ...]', etc.",
+      "instruction": "Structure outline must include proposed placeholder locations with independently numbered types (Screenshot, Code, Link, Fact, Diagram)",
+      "original_snippets": "Include proposed placeholder locations in the outline -- each type numbered independently: '[Screenshot 01: ...]', '[Screenshot 02: ...]', '[Code 01: ...]', '[Link 01: ...]', '[Diagram 01: ...]', etc.",
       "relevant_when": "Phase 2 editorial planning",
       "why_given": "particular preference"
     },

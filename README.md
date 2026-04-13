@@ -9,6 +9,15 @@ polished blog posts in the author's own voice. The skill follows a phased workfl
 intake, clarification, editorial planning, first draft, and revision — with quality
 gates at each step.
 
+## Placeholders
+
+Drafts use five placeholder types with independent numbering per type: Screenshot,
+Code, Link, Fact, and Diagram. Code and Diagram placeholders include best-guess content
+(reconstructed code blocks and inline D2 diagram source) plus a VERIFY comment for the
+author to confirm. Diagrams earn their place when structure — architecture, request
+flow, state transitions — is the point; a screenshot of the real system wins when it
+can show the same thing with less abstraction.
+
 ## Anti-pattern detection
 
 Drafts are checked against 32 named AI writing anti-patterns, each with symptoms,
