@@ -12,6 +12,8 @@ description: >
 
 # Blog Writer
 
+Process steps in order. Do not skip ahead.
+
 Write developer blog posts for practitioners who build things, break things, and have
 opinions about their tools. The voice is the author's own — configured through persona
 files that capture their style, rhetorical devices, and personality.
@@ -78,13 +80,18 @@ Read these reference files in order:
 
 1. `persona/voice.md` — The author's voice. Read this first, every time. It contains the
    tone, rhetorical devices, and voice-specific examples.
-2. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
+2. `persona/framework.md` — (If it exists and has content) Post-level architecture: opening
+   modes, argument shape by post type, density philosophy, first-person rules, closing modes,
+   and off-voice moves. **When this file exists and has content, it overrides the "Blog
+   Anatomy" section below and the narrative-density doctrine in `references/tone-guide.md`.**
+   Read it immediately after `persona/voice.md`, before any other reference file.
+3. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-3. `references/ai-anti-patterns.md` — 37 named AI writing patterns to never use. Each has
+4. `references/ai-anti-patterns.md` — 37 named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
-4. `references/process.md` — The workflow from transcript to published draft.
-5. `persona/product.md` — (If it exists and has content) Index of product docs and
+5. `references/process.md` — The workflow from transcript to published draft.
+6. `persona/product.md` — (If it exists and has content) Index of product docs and
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
    fetch only the specific pages relevant to the post's topic during Phase 0.
 
@@ -134,6 +141,10 @@ The anti-pattern check is a **defined procedure**, not a vibe check.
    pattern they're trying to fix.
 
 ## Quick Reference: Blog Anatomy
+
+> **Fallback only.** If `persona/framework.md` exists and has content, that file governs
+> post-level architecture (opening modes, argument shape, density philosophy, closing modes)
+> and overrides this entire section. Read it instead.
 
 Posts are stories about real problems that happen to involve a technology (and optionally a
 product). The reader should learn something even if they never touch the author's stack.
