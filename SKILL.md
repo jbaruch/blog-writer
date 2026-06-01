@@ -78,13 +78,17 @@ Read these reference files in order:
 
 1. `persona/voice.md` — The author's voice. Read this first, every time. It contains the
    tone, rhetorical devices, and voice-specific examples.
-2. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
+2. `persona/framework.md` — (If it exists) Post-level architecture: opening modes, argument
+   shape by post type, density philosophy, first-person rules, closing modes, and off-voice
+   moves. **When this file exists, it overrides the "Blog Anatomy" section below and the
+   narrative-density doctrine in `references/tone-guide.md`.** Read it immediately after
+   `voice.md`, before any other reference file.
+3. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-3. `references/ai-anti-patterns.md` — 37 named AI writing patterns to never use. Each has
+4. `references/ai-anti-patterns.md` — 37 named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
-4. `references/process.md` — The workflow from transcript to published draft.
-5. `persona/product.md` — (If it exists and has content) Index of product docs and
+5. `references/process.md` — The workflow from transcript to published draft.
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
    fetch only the specific pages relevant to the post's topic during Phase 0.
 
@@ -146,8 +150,9 @@ shape:
 not prose. Each bullet should make the reader think "wait, really?" not "yeah, obvious."
 Written last, placed first.
 
-**Opening hook** — A personal story, a public embarrassment, a confession. Never a thesis
-statement. Never "In this post, we'll explore..."
+**Opening hook** — **If `persona/framework.md` exists, use its opening modes instead of
+this description.** Generic default: a personal story, a public embarrassment, a
+confession. Never a thesis statement. Never "In this post, we'll explore..."
 
 **The problem, demonstrated** — Show the failure. Screenshots, code, terminal output. Let the
 reader feel the pain before offering the fix.
