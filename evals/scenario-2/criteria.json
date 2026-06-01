@@ -4,57 +4,57 @@
   "checklist": [
     {
       "name": "Voice one-paragraph section",
-      "description": "~/.claude/blog-writer-persona/voice.md contains a section titled 'The Voice in One Paragraph' (or closely equivalent) with a synthesized description of the author's voice",
+      "description": "voice.md contains a section titled 'The Voice in One Paragraph' (or closely equivalent) with a synthesized description of the author's voice",
       "max_score": 10
     },
     {
       "name": "Rhetorical devices with quotes",
-      "description": "~/.claude/blog-writer-persona/voice.md contains a section on rhetorical devices with at least 3 named devices, each illustrated with direct quotes pulled from the writing samples",
+      "description": "voice.md contains a section on rhetorical devices with at least 3 named devices, each illustrated with direct quotes pulled from the writing samples",
       "max_score": 10
     },
     {
       "name": "Cultural reference analysis",
-      "description": "~/.claude/blog-writer-persona/voice.md contains a section analyzing the cultural reference style (what domains, how often, whether explained or left for the reader)",
+      "description": "voice.md contains a section analyzing the cultural reference style (what domains, how often, whether explained or left for the reader)",
       "max_score": 8
     },
     {
       "name": "Recurring characters identified",
-      "description": "~/.claude/blog-writer-persona/voice.md contains a section on recurring characters that identifies Dex as a recurring figure and describes their role/dynamic with the author",
+      "description": "voice.md contains a section on recurring characters that identifies Dex as a recurring figure and describes their role/dynamic with the author",
       "max_score": 10
     },
     {
       "name": "Voice consistency notes",
-      "description": "~/.claude/blog-writer-persona/voice.md contains a section on voice consistency (how the voice behaves in technical sections, whether it changes register)",
+      "description": "voice.md contains a section on voice consistency (how the voice behaves in technical sections, whether it changes register)",
       "max_score": 8
     },
     {
       "name": "Humor analysis present",
-      "description": "~/.claude/blog-writer-persona/voice.md analyzes the author's humor style (type, frequency, calibration) -- either as a standalone section or clearly integrated into the rhetorical devices section",
+      "description": "voice.md analyzes the author's humor style (type, frequency, calibration) -- either as a standalone section or clearly integrated into the rhetorical devices section",
       "max_score": 8
     },
     {
       "name": "Bio schema present",
-      "description": "~/.claude/blog-writer-persona/bio.md contains a bio template/schema with variable parts marked, incorporating the provided info (name, role at Lattice Systems, embedded systems background)",
+      "description": "bio.md contains a bio template/schema with variable parts marked, incorporating the provided info (name, role at Lattice Systems, embedded systems background)",
       "max_score": 10
     },
     {
       "name": "Bio kicker notes",
-      "description": "~/.claude/blog-writer-persona/bio.md contains a section on kicker notes specifying that the kicker should be rotating and describing the expected tone (matching the author's style)",
+      "description": "bio.md contains a section on kicker notes specifying that the kicker should be rotating and describing the expected tone (matching the author's style)",
       "max_score": 8
     },
     {
       "name": "Examples file created",
-      "description": "~/.claude/blog-writer-persona/examples.md exists and lists all three writing samples with their titles and/or URLs",
+      "description": "examples.md exists and lists all three writing samples with their titles and/or URLs",
       "max_score": 8
     },
     {
       "name": "Examples have pattern annotations",
-      "description": "Each entry in ~/.claude/blog-writer-persona/examples.md includes a note about what voice patterns that sample demonstrates (not just the title/URL)",
+      "description": "Each entry in examples.md includes a note about what voice patterns that sample demonstrates (not just the title/URL)",
       "max_score": 10
     },
     {
       "name": "Product context skipped",
-      "description": "No ~/.claude/blog-writer-persona/product.md file is created, OR it exists but is empty/explicitly states no product context -- since the author said to skip product context",
+      "description": "No product.md file is created, OR it exists but is empty/explicitly states no product context -- since the author said to skip product context",
       "max_score": 10
     }
   ]
