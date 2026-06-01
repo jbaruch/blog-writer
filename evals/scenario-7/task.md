@@ -2,11 +2,9 @@
 
 ## Problem/Feature Description
 
-A staff engineer submitted a blog post about migrating from Nagios to Prometheus. The draft has already been through a basic editing pass -- there are no obvious AI vocabulary problems ("delve", "leverage", "tapestry"), no structural gimmicks (no parallel binaries, no self-answering fragments, no choppy fragment chains), no emoji, and no formatting issues.
+A staff engineer submitted a blog post about migrating from Nagios to Prometheus. It has already had a light copyedit -- no AI-vocabulary tells, no structural gimmicks, no emoji, clean formatting -- but it still reads like a rough draft rather than finished writing.
 
-But the writing has deeper problems. Sentences are overloaded with multiple ideas crammed together. Lists of tools appear without context. Abstract nouns do the work that real actors should. Subordinate clauses nest three levels deep. Adjectives substitute for evidence. Failures are smoothed over with euphemisms. Features are listed as raw specs without explaining what they mean for the reader. And the conclusion is vague assessments where specific results should be.
-
-Review the draft for these craft and substance issues. Produce a revised version that fixes the writing problems while preserving the technical content. Also produce a report documenting each issue and the fix.
+Give it a craft and substance editing pass: sharpen the prose and make its claims concrete, while preserving the technical content. Also produce a report documenting each change you made -- the original text, what was wrong with it, and your replacement.
 
 ## Output Specification
 
