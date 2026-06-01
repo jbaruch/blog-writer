@@ -13,9 +13,15 @@
       "why_given": "particular preference"
     },
     {
-      "instruction": "Read reference files in a specific order: voice.md first, then tone-guide.md, ai-anti-patterns.md, process.md, product.md",
-      "original_snippets": "Read these reference files in order: 1. `persona/voice.md` ... 2. `references/tone-guide.md` ... 3. `references/ai-anti-patterns.md` ... 4. `references/process.md` ... 5. `persona/product.md`",
+      "instruction": "Read reference files in a specific order: voice.md first, then framework.md (if it exists and has content), then tone-guide.md, ai-anti-patterns.md, process.md, product.md",
+      "original_snippets": "Read these reference files in order: 1. `persona/voice.md` ... 2. `persona/framework.md` -- (If it exists and has content) ... Read it immediately after `persona/voice.md`, before any other reference file. 3. `references/tone-guide.md` ... 4. `references/ai-anti-patterns.md` ... 5. `references/process.md` ... 6. `persona/product.md`",
       "relevant_when": "Starting a blog writing session with a configured persona",
+      "why_given": "particular preference"
+    },
+    {
+      "instruction": "If persona/framework.md exists and has content, read it immediately after voice.md; it overrides the Blog Anatomy section and the narrative-density doctrine in tone-guide.md",
+      "original_snippets": "**When this file exists and has content, it overrides the \"Blog Anatomy\" section below and the narrative-density doctrine in `references/tone-guide.md`.** ... > **Fallback only.** If `persona/framework.md` exists and has content, that file governs post-level architecture (opening modes, argument shape, density philosophy, closing modes) and overrides this entire section. Read it instead.",
+      "relevant_when": "Starting a blog writing session for a persona that defines post-level architecture in framework.md",
       "why_given": "particular preference"
     },
     {

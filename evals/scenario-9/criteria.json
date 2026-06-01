@@ -1,0 +1,51 @@
+{
+  "context": "Tests whether the agent, when a persona ships a persona/framework.md, follows that file's post-level architecture (opening mode, argument shape, closing) and lets it override the skill's generic Blog Anatomy default instead of defaulting to the personal-story opening hook. The persona's voice.md is deliberately playful/anecdotal at the sentence level while framework.md prescribes a claim-first architecture, so the agent must apply framework.md over the generic default. Planning-only task, so grading is on the editorial plan, not a full draft.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Opening follows the persona's framework, not the generic hook",
+      "description": "The proposed opening leads with the finding/claim (a result-lead or position-claim) as the persona's framework prescribes -- the thesis is stated up front. It does NOT open with a personal story, a scene-setting anecdote, or a confession. A plan that proposes warming up before the finding fails this criterion.",
+      "max_score": 18
+    },
+    {
+      "name": "Generic personal-story opening is not used",
+      "description": "The editorial plan does NOT fall back to the skill's default Blog Anatomy opening hook (a personal story, public embarrassment, or confession). If the plan proposes that default hook, the persona's framework was not applied as an override and this criterion fails.",
+      "max_score": 12
+    },
+    {
+      "name": "Argument shape matches the framework",
+      "description": "The section outline follows the framework's claim-first shape -- claim, then the evidence that earns it, then the implication for the reader -- rather than a slow narrative build. A dedicated section addresses the strongest counter-argument (e.g., the codegen ergonomics cost or jsoniter's reputation) with data.",
+      "max_score": 14
+    },
+    {
+      "name": "Closing follows the framework",
+      "description": "The proposed ending lands on a concrete, applicable decision rule for the reader (e.g., when to reach for codegen vs stdlib) rather than a reflective wrap-up or a paragraph that restates what the post already proved.",
+      "max_score": 10
+    },
+    {
+      "name": "Research bank file naming",
+      "description": "A file named blog-research-json-parsing-showdown.md exists, using the slug provided in the task.",
+      "max_score": 8
+    },
+    {
+      "name": "Main idea template format",
+      "description": "The editorial plan states a main idea following 'This post shows that [specific claim], demonstrated by [specific evidence]' or a close equivalent that names both a specific claim and the specific evidence (the p99 numbers).",
+      "max_score": 10
+    },
+    {
+      "name": "Clarification questions are numbered with guesses",
+      "description": "The clarification questions are numbered (1, 2, 3, ...) and at least half include the agent's best guess from context so the author can confirm or correct (e.g., the unreproduced jsoniter p99 spike, the untested languages, or the unmeasured build-time impact).",
+      "max_score": 12
+    },
+    {
+      "name": "Placeholder locations in outline",
+      "description": "The section outline includes proposed placeholder locations (e.g., a benchmark results chart, a code sample, or a link) with each type numbered independently starting at 01.",
+      "max_score": 8
+    },
+    {
+      "name": "No prose draft written",
+      "description": "No actual blog post draft, blog body prose, or blog-draft-*.md file was produced -- only the planning artifacts (research bank, editorial plan, clarification questions).",
+      "max_score": 8
+    }
+  ]
+}
