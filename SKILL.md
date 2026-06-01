@@ -78,11 +78,11 @@ Read these reference files in order:
 
 1. `persona/voice.md` — The author's voice. Read this first, every time. It contains the
    tone, rhetorical devices, and voice-specific examples.
-2. `persona/framework.md` — (If it exists) Post-level architecture: opening modes, argument
-   shape by post type, density philosophy, first-person rules, closing modes, and off-voice
-   moves. **When this file exists, it overrides the "Blog Anatomy" section below and the
-   narrative-density doctrine in `references/tone-guide.md`.** Read it immediately after
-   `voice.md`, before any other reference file.
+2. `persona/framework.md` — (If it exists and has content) Post-level architecture: opening
+   modes, argument shape by post type, density philosophy, first-person rules, closing modes,
+   and off-voice moves. **When this file exists and has content, it overrides the "Blog
+   Anatomy" section below and the narrative-density doctrine in `references/tone-guide.md`.**
+   Read it immediately after `persona/voice.md`, before any other reference file.
 3. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
 4. `references/ai-anti-patterns.md` — 37 named AI writing patterns to never use. Each has
@@ -140,9 +140,9 @@ The anti-pattern check is a **defined procedure**, not a vibe check.
 
 ## Quick Reference: Blog Anatomy
 
-> **Fallback only.** If `persona/framework.md` exists, that file governs post-level
-> architecture (opening modes, argument shape, density philosophy, closing modes) and
-> overrides this entire section. Read it instead.
+> **Fallback only.** If `persona/framework.md` exists and has content, that file governs
+> post-level architecture (opening modes, argument shape, density philosophy, closing modes)
+> and overrides this entire section. Read it instead.
 
 Posts are stories about real problems that happen to involve a technology (and optionally a
 product). The reader should learn something even if they never touch the author's stack.
