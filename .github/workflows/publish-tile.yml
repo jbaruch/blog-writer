@@ -16,8 +16,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: tesslio/setup-tessl@v2
         with:
-          token: ${{ secrets.TESSL_API_TOKEN }}
+          token: ${{ secrets.TESSL_TOKEN }}
       - run: tessl skill review --threshold 85
       - uses: tesslio/patch-version-publish@v1
         with:
-          token: ${{ secrets.TESSL_API_TOKEN }}
+          token: ${{ secrets.TESSL_TOKEN }}
