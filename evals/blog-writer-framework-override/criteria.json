@@ -1,0 +1,51 @@
+{
+  "context": "Measures whether the skill applies a persona's persona/framework.md to shape the editorial plan, overriding the skill's generic Blog Anatomy default. The framework.md fixture states the persona's architecture positively (conclusion-first, evidence-driven, counter-argument section, rule-of-thumb close) without enumerating what to avoid; the skill's Blog Anatomy default is the personal-story/confession opening. Criteria grade the generated plan's concrete shape against the source finding, not the presence of any literal from the prompt -- a baseline that ignores framework.md and reaches for the default narrative hook should score low.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Opening fronts the benchmark conclusion",
+      "description": "The proposed opening leads with the actual finding from the notes -- that the most-starred library (jsoniter) was within noise of stdlib on p99 under realistic payloads while the unglamorous codegen parser won by ~4.1x -- placed in the first beat, before any background or warm-up. Failure: the plan withholds the result for a later reveal or opens with a scene the reader has to wade through to reach the point.",
+      "max_score": 20
+    },
+    {
+      "name": "Argument order earns the conclusion",
+      "description": "The section outline moves conclusion -> the measurements that justify it (p50/p99, allocations per op) -> implication for the reader's own library choice, rather than a slow narrative build that arrives at the verdict at the end.",
+      "max_score": 14
+    },
+    {
+      "name": "Strongest objection gets its own section",
+      "description": "A dedicated section raises and answers the strongest objection with data -- the codegen parser's regeneration/ergonomics cost, or jsoniter's popularity-vs-measured-performance gap -- instead of glossing over the tradeoff.",
+      "max_score": 12
+    },
+    {
+      "name": "Closing is a decision rule",
+      "description": "The proposed ending gives the reader a concrete when-to-choose-what rule tied to the finding (e.g., when codegen's speed is worth its ergonomics cost versus when stdlib is fine), not a reflective wrap-up or a paragraph restating what the post already proved.",
+      "max_score": 12
+    },
+    {
+      "name": "Generic narrative hook is not the default opening",
+      "description": "The plan does not fall back to the skill's default Blog Anatomy opening hook (a personal story, a public embarrassment, or a confession). Proposing that default instead of the persona's architecture means framework.md was not applied as an override -- the failure this scenario is built to catch.",
+      "max_score": 10
+    },
+    {
+      "name": "Research bank file naming",
+      "description": "A file named blog-research-json-parsing-showdown.md exists, using the slug given in the task.",
+      "max_score": 8
+    },
+    {
+      "name": "Main idea template format",
+      "description": "The editorial plan states a main idea following 'This post shows that [specific claim], demonstrated by [specific evidence]' or a close equivalent that names both a specific claim and the specific evidence (the measured p99 gap).",
+      "max_score": 10
+    },
+    {
+      "name": "Clarification questions are numbered with guesses",
+      "description": "The clarification questions are numbered (1, 2, 3, ...) and at least half include the agent's best guess from context so the author can confirm or correct -- for example the unreproduced jsoniter p99 spike, the untested non-Go languages, or the unmeasured codegen build-time impact.",
+      "max_score": 8
+    },
+    {
+      "name": "No prose draft written",
+      "description": "No actual blog post draft, blog body prose, or blog-draft-*.md file is produced -- only the planning artifacts (research bank, editorial plan, clarification questions).",
+      "max_score": 6
+    }
+  ]
+}
