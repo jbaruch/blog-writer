@@ -1,41 +1,41 @@
 {
-  "context": "Tests whether the agent detects and fixes sentence/paragraph craft problems and replaces assessments with facts. The draft has no classic AI vocabulary contamination or structural gimmicks, but suffers from overloaded sentences, cold lists, weak subjects, nested subordination, introductory filler words, amplifier intensifiers, unproven assessment adjectives, euphemistic smoothing, features without benefits, stacked data points, and empty conclusions. Also tests whether the agent flags the absence of honest limitations.",
+  "context": "Tests whether the agent detects and fixes sentence/paragraph craft problems and replaces assessments with facts. The draft has no classic AI vocabulary contamination or structural gimmicks, but suffers from overloaded sentences, cold lists, weak subjects, nested subordination, introductory filler words, amplifier intensifiers, unproven assessment adjectives, euphemistic smoothing, features without benefits, stacked data points, and empty conclusions. Also tests whether the agent flags the absence of honest limitations. The task deliberately does NOT enumerate these problems, so a baseline that does a generic copyedit will miss the tile's specific craft-sweep fixes.",
   "type": "weighted_checklist",
   "checklist": [
     {
       "name": "Overloaded sentence split",
       "description": "The mega-sentence about evaluating 'multiple tools, frameworks, and approaches, including Prometheus, Grafana, Datadog, New Relic, and Thanos, by our infrastructure team over the course of several months in order to determine the best path forward...' is split into multiple sentences, each carrying one idea",
-      "max_score": 8
+      "max_score": 6
     },
     {
       "name": "Cold list generalized",
       "description": "The list of monitoring tools (Prometheus, Datadog, New Relic, Thanos, VictoriaMetrics) is introduced with a category label (e.g., 'five monitoring tools' or 'several observability platforms') before listing them, rather than dropped cold",
-      "max_score": 8
+      "max_score": 6
     },
     {
       "name": "Weak subjects strengthened",
       "description": "'The implementation of a new monitoring solution required...' and 'The presence of outdated monitoring configurations... meant that...' are rewritten with real actors as subjects (e.g., 'We evaluated...' or 'Our Nagios setup had...' or 'Three teams had maintained...')",
-      "max_score": 10
+      "max_score": 8
     },
     {
       "name": "Nested subordination flattened",
       "description": "The deeply nested sentence about the infrastructure team ('which had been working... since January, when we first approved... after the quarterly planning meeting where Sasha presented... that included...') is split into shorter sentences with at most one level of subordination",
-      "max_score": 8
+      "max_score": 6
     },
     {
       "name": "Introductory filler words removed",
       "description": "The filler words 'Of course', 'naturally', 'Obviously', 'Frankly', 'Additionally', 'Furthermore', 'Moreover', 'Also' (as sentence opener), and 'In addition to this' are deleted without changing the sentence meaning",
-      "max_score": 10
+      "max_score": 6
     },
     {
       "name": "Amplifier intensifiers replaced with facts",
       "description": "The 'truly powerful', 'remarkably flexible', 'incredibly active', 'extremely impressed' amplifier + adjective pairs are either replaced with specific evidence (what makes the query language powerful, what makes alerting flexible) or the amplifiers are removed",
-      "max_score": 10
+      "max_score": 9
     },
     {
       "name": "Unproven assessments replaced with evidence",
       "description": "The 'robust, scalable, and comprehensive', 'elegant and innovative approach', and 'seamless observability experience' assessment adjectives are either replaced with facts that prove the claim or removed. The false-work test applies: if stripping the adjectives leaves the sentence empty, it needs research, not better adjectives.",
-      "max_score": 10
+      "max_score": 9
     },
     {
       "name": "Euphemistic smoothing fixed",
@@ -50,12 +50,12 @@
     {
       "name": "Stacked data points trimmed",
       "description": "The four-way data pile ('60%, from $8,400 per month to $3,360 per month, saving us $60,480 annually, which represents a 5x return') is reduced to one or two data points that make the strongest case",
-      "max_score": 8
+      "max_score": 6
     },
     {
       "name": "Empty results replaced with evidence",
       "description": "The vague results ('handles our current load well', 'haven't had any issues', 'team is happy with the tooling') are either replaced with specific metrics or evidence, or flagged in the report as needing facts from the author",
-      "max_score": 10
+      "max_score": 9
     },
     {
       "name": "Honest limitation present or flagged",
@@ -65,7 +65,7 @@
     {
       "name": "No new anti-patterns introduced",
       "description": "The revised draft does NOT introduce AI vocabulary (delve, leverage, tapestry, etc.), parallel binary comparisons, self-answering fragment questions, significance inflation, choppy fragment chains, or other named anti-patterns from the skill's list",
-      "max_score": 6
+      "max_score": 5
     },
     {
       "name": "Technical content preserved",
