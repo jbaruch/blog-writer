@@ -10,10 +10,7 @@ Analyze the source material, create a structured research bank, identify gaps wh
 
 ## Output Specification
 
-Produce the following files:
-- `blog-research-json-parsing-showdown.md` -- structured research notes from the source material
-- `editorial-plan.md` -- the editorial plan for the blog post
-- `clarification-questions.md` -- questions you'd need answered before writing the draft
+Produce the planning artifacts this workflow calls for before any drafting: structured research notes from the source material, the editorial plan, and the clarification questions you'd need answered first. Do not write the blog post itself.
 
 ## Input Files
 

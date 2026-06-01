@@ -12,6 +12,8 @@ description: >
 
 # Blog Writer
 
+Process steps in order. Do not skip ahead.
+
 Write developer blog posts for practitioners who build things, break things, and have
 opinions about their tools. The voice is the author's own — configured through persona
 files that capture their style, rhetorical devices, and personality.
