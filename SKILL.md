@@ -89,6 +89,7 @@ Read these reference files in order:
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
 5. `references/process.md` — The workflow from transcript to published draft.
+6. `persona/product.md` — (If it exists and has content) Index of product docs and
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
    fetch only the specific pages relevant to the post's topic during Phase 0.
 
@@ -139,6 +140,10 @@ The anti-pattern check is a **defined procedure**, not a vibe check.
 
 ## Quick Reference: Blog Anatomy
 
+> **Fallback only.** If `persona/framework.md` exists, that file governs post-level
+> architecture (opening modes, argument shape, density philosophy, closing modes) and
+> overrides this entire section. Read it instead.
+
 Posts are stories about real problems that happen to involve a technology (and optionally a
 product). The reader should learn something even if they never touch the author's stack.
 
@@ -150,9 +155,8 @@ shape:
 not prose. Each bullet should make the reader think "wait, really?" not "yeah, obvious."
 Written last, placed first.
 
-**Opening hook** — **If `persona/framework.md` exists, use its opening modes instead of
-this description.** Generic default: a personal story, a public embarrassment, a
-confession. Never a thesis statement. Never "In this post, we'll explore..."
+**Opening hook** — A personal story, a public embarrassment, a confession. Never a thesis
+statement. Never "In this post, we'll explore..."
 
 **The problem, demonstrated** — Show the failure. Screenshots, code, terminal output. Let the
 reader feel the pain before offering the fix.
