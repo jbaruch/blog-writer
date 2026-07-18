@@ -17,7 +17,35 @@ jobs:
       - uses: tesslio/setup-tessl@v2
         with:
           token: ${{ secrets.TESSL_TOKEN }}
-      - run: tessl skill review --threshold 85
+      # Wraps the plugin's own `tessl skill review` call to tolerate a tessl
+      # "out of credits" (403) billing outage: only that signature skips
+      # (publishing unreviewed, self-healing when credits return); every other
+      # non-zero exit still hard-fails. Tracked in jbaruch/coding-policy#188.
+      - name: Skill review (credit-outage tolerant)
+        shell: bash
+        run: |
+          set -eo pipefail
+          set +e
+          review_out="$(tessl skill review --threshold 85 2>&1)"
+          rc=$?
+          set -e
+          printf '%s\n' "$review_out"
+          [ "$rc" -eq 0 ] && exit 0
+          # Require BOTH the credit phrase AND a 403 (fixed-string) so only the
+          # billing outage skips; anything else hard-fails (fail-safe).
+          if printf '%s' "$review_out" | grep -qiF 'run out of credits' \
+             && printf '%s' "$review_out" | grep -qF '403'; then
+            resume="$(date -u -d "$(date -u +%Y-%m-01) +1 month" +%Y-%m-01)" || resume="the 1st of next month"
+            echo "::warning::tessl org out of credits (403) — skipping skill review. Publishing UNREVIEWED; resumes by $resume (monthly reset)."
+            {
+              echo "### ⚠️ Skill review skipped — tessl credits exhausted"
+              echo ""
+              echo "Publishing **without** review (tessl 403). Self-heals when credits return; resumes by **$resume**. Tracking: jbaruch/coding-policy#188."
+            } >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          echo "::error::tessl skill review failed (exit $rc) — not a credits outage; blocking publish."
+          exit "$rc"
       - uses: tesslio/patch-version-publish@v1
         with:
           token: ${{ secrets.TESSL_TOKEN }}
