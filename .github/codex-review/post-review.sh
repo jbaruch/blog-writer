@@ -58,13 +58,24 @@ main() {
     body="${body}"$'\n\n'"## Findings"$'\n'"${findings_md}"
   fi
 
-  local payload
+  local payload attempt=0 max=3
   payload=$(jq -n --arg event "$event" --arg body "$body" '{event: $event, body: $body}')
 
-  if ! printf '%s' "$payload" | gh api "repos/${owner}/${repo}/pulls/${pr}/reviews" --method POST --input - >&2; then
-    echo "error: failed to submit the review on ${owner}/${repo}#${pr} — see the gh error above (token scope, PR state)" >&2
-    exit 1
-  fi
+  # Retry on a transient GitHub API failure (5xx / network) — a policy verdict
+  # must not be lost to a blip. gh exits non-zero on HTTP errors; back off and
+  # retry before giving up.
+  while :; do
+    attempt=$((attempt + 1))
+    if printf '%s' "$payload" | gh api "repos/${owner}/${repo}/pulls/${pr}/reviews" --method POST --input - >&2; then
+      break
+    fi
+    if (( attempt >= max )); then
+      echo "error: failed to submit the review on ${owner}/${repo}#${pr} after ${max} attempts — see the gh error above (token scope, PR state, or a GitHub API outage)" >&2
+      exit 1
+    fi
+    echo "post-review: submit attempt ${attempt} failed — retrying in $(( attempt * 5 ))s" >&2
+    sleep $(( attempt * 5 ))
+  done
 
   jq -n --arg event "$event" --argjson findings "$findings_count" \
     '{state: "posted", event: $event, findings: $findings}'
