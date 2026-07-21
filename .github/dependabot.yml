@@ -1,0 +1,13 @@
+# Renewal mechanism for pinned GitHub Actions refs, per
+# `jbaruch/coding-policy: dependency-management` Freshness (every pinned
+# dependency needs a stated, automated renewal mechanism). Dependabot opens a
+# weekly PR when the pinned reusable publish workflow — or any action ref —
+# advances on its default branch; the publish CI is the acceptance check.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    commit-message:
+      prefix: "chore(ci)"
