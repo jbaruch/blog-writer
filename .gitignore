@@ -3,3 +3,7 @@
 .codex/
 .mcp.json
 persona/
+.agents/
+.vscode/
+AGENTS.md
+CLAUDE.md
