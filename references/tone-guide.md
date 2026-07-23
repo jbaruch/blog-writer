@@ -61,7 +61,7 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**Read `references/ai-anti-patterns.md` for the full list.** It contains 37 named patterns
+**Read `references/ai-anti-patterns.md` for the full list.** It contains 38 named patterns
 with symptoms, examples, and alternatives. Scan the draft against every one of them during
 Phase 3 and Phase 4. Zero tolerance.
 
@@ -71,7 +71,7 @@ Quick index for scanning:
 3. Asyndetic tricolon with a kicker — "X. Y. Z. And then..."
 4. Choppy fragment chains — noun-phrase fragments as drama
 5. Symmetrical LLM patterns — fortune-cookie balance
-6. Self-answering fragment questions — "The result? Great."
+6. Self-answering fragment questions — "The result? Great."; colon reveals — "The best part: it learns."
 7. Parenthetical em-dashes — paired dashes as fancy commas
 8. Excessive em-dashes — more than two per section
 9. Preamble announcements — "In this post, we'll explore..."
@@ -103,6 +103,7 @@ Quick index for scanning:
 35. Temporal filler (time parasites) — "In today's rapidly evolving landscape", "now more than ever"
 36. Corporate cliché phrases — "passionate team", "end-to-end solution", "trusted by industry leaders"
 37. Euphemistic smoothing — "encountered challenges" instead of "it broke"; softening failures
+38. Fake-profound kickers — mic-drop metaphor endings; delete, don't rewrite into a better metaphor
 
 ---
 
@@ -407,7 +408,7 @@ Before submitting a draft, check:
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
   (holistic read for sterile, voiceless writing). Rewrite any hits, then re-check each
-  rewrite against all 37 patterns before considering it fixed.
+  rewrite against all 38 patterns before considering it fixed.
 
 ---
 
