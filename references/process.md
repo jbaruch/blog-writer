@@ -344,7 +344,7 @@ up what the reader is about to see, show it, then interpret what matters about i
 Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md` and scan
 the draft:
 
-**Pass 1 — Surface scan:** Read the draft against each of the 37 patterns, looking for
+**Pass 1 — Surface scan:** Read the draft against each of the 38 patterns, looking for
 the forms described in the examples and structural variants. For the following patterns,
 do a dedicated mechanical sweep instead of relying on contextual reading alone:
 
@@ -435,7 +435,7 @@ not checking against specific patterns but reacting to the overall feel. Look fo
 - Uniform energy — every paragraph has the same emotional temperature
 - Press-release tone — sounds like it was written to impress rather than to communicate
 
-A draft can pass all 37 patterns and still read as obviously AI because it has no soul. If
+A draft can pass all 38 patterns and still read as obviously AI because it has no soul. If
 Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite — it's going
 back to `persona/voice.md` and injecting the author's actual rhetorical devices, opinions,
 and attitude into the flat sections.
@@ -443,7 +443,7 @@ and attitude into the flat sections.
 Rewrite any hits. This is not optional.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
-in isolation and check it against ALL 37 patterns. Rewrites frequently introduce the same
+in isolation and check it against ALL 38 patterns. Rewrites frequently introduce the same
 pattern in a different surface form. This is especially true for:
 - #2 (Parallel Binary) — the most likely pattern to survive a rewrite, because describing
   a comparison naturally produces mirrored clauses. If you rewrote a parallel binary and the
@@ -452,13 +452,25 @@ pattern in a different surface form. This is especially true for:
 - #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
   question with a longer answer, but the structure is identical.
 
-Do not consider an anti-pattern fixed until the replacement passes a full 37-pattern scan
+Do not consider an anti-pattern fixed until the replacement passes a full 38-pattern scan
 on its own.
 
 **Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against
 `persona/voice.md`. Does it still sound like the author? If the rewrite is correct but
 flat, redo it using the author's rhetorical devices. A mechanically clean sentence that
 sounds like a different person is not a fix.
+
+**Proportionality check:** After all rewrites are done, compare the edited draft against
+the pre-scan version and ask two questions at the draft level:
+- Is the amount of rewriting proportional to the actual slop found? If the scan flagged
+  five sentences and forty changed, the editing pass over-reached. Zero tolerance applies
+  to the named patterns — not to everything in their vicinity.
+- Would the author recognize this draft as their own voice? The scan's failure mode is
+  laundering the voice out along with the patterns: every paragraph equally tidy, every
+  edge sanded off, distinctive lines rewritten "for consistency." A voice device that
+  merely resembles a pattern (the carve-outs in `ai-anti-patterns.md` list the known
+  cases) stays. If the answer to this question is no, restore the human sentences the
+  scan didn't actually flag.
 
 Run the product accuracy check (if configured). If `persona/product.md` exists and contains
 content, verify every claim the draft makes about the product — feature names, CLI commands,
@@ -518,7 +530,7 @@ conversation — edit the file surgically.
 - Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — all
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
-  audit rule: every rewrite must pass a full 37-pattern scan on its own before it's
+  audit rule: every rewrite must pass a full 38-pattern scan on its own before it's
   considered fixed. Then run the voice check: re-read against `persona/voice.md` and
   redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or
