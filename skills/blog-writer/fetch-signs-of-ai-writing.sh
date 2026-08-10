@@ -15,6 +15,11 @@
 #       well past a comfortable inline read, so output always lands in a file
 #       and the path is what comes back on stdout.
 #
+# The fetch is atomic with respect to the destination: the download lands in a
+# script-owned staging file beside it and is moved into place only after the
+# status and size checks pass. A failed or truncated fetch therefore never
+# replaces or empties an existing file at the caller's path.
+#
 # Output (stdout):
 #   On success, a single JSON object:
 #     {"ok": true, "path": "<file>", "bytes": N}
@@ -64,21 +69,25 @@ if [ "$#" -eq 1 ]; then
     echo "error: destination directory is not writable: ${out_dir}" >&2
     exit 2
   fi
-  created_temp=0
 else
-  if ! out_path=$(mktemp "${TMPDIR:-/tmp}/signs-of-ai-writing.XXXXXX"); then
-    echo "error: could not create a temporary file under ${TMPDIR:-/tmp}" >&2
-    exit 2
-  fi
-  created_temp=1
+  out_dir=${TMPDIR:-/tmp}
+  out_path=""
 fi
 
-# Only the file this script created is ours to remove. A caller-supplied
-# destination stays put, successful or not — deleting someone else's path on a
-# failed fetch would destroy content this script never owned.
-discard_temp_on_failure() {
-  if [ "$created_temp" -eq 1 ] && [ -e "$out_path" ]; then
-    rm -f "$out_path"
+# The download always lands in a script-owned staging file, never on the
+# caller's path. curl truncates its --output target the moment it starts
+# writing, so pointing it at the destination would destroy an existing file
+# before the status and size checks have decided whether the fetch is any good.
+# The staging file is created alongside the destination so the final move is a
+# same-filesystem rename rather than a copy that could half-finish.
+if ! staging=$(mktemp "${out_dir}/.signs-of-ai-writing.XXXXXX"); then
+  echo "error: could not create a staging file under ${out_dir}" >&2
+  exit 2
+fi
+
+discard_staging() {
+  if [ -e "$staging" ]; then
+    rm -f "$staging"
   fi
 }
 
@@ -87,25 +96,36 @@ if ! http_status=$(curl --silent --location --show-error \
   --user-agent "$USER_AGENT" \
   --max-time 30 \
   --write-out '%{http_code}' \
-  --output "$out_path" \
+  --output "$staging" \
   "$ARTICLE_URL"); then
-  discard_temp_on_failure
+  discard_staging
   echo "error: curl could not reach Wikipedia (network error or timeout) — proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
 
 if [ "$http_status" != "200" ]; then
-  discard_temp_on_failure
+  discard_staging
   echo "error: Wikipedia returned HTTP ${http_status} for the article — proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
 
-bytes=$(wc -c < "$out_path" | tr -d ' ')
+bytes=$(wc -c < "$staging" | tr -d ' ')
 
 if [ "$bytes" -lt "$MIN_BYTES" ]; then
-  discard_temp_on_failure
+  discard_staging
   echo "error: fetched body is ${bytes} bytes, under the ${MIN_BYTES}-byte floor — the page is likely an error stub rather than the article; proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
+fi
+
+# Every validation passed, so the result is now fit to occupy the destination.
+if [ -n "$out_path" ]; then
+  if ! mv -f "$staging" "$out_path"; then
+    discard_staging
+    echo "error: could not move the fetched article into place at ${out_path}" >&2
+    exit 2
+  fi
+else
+  out_path=$staging
 fi
 
 jq -n --arg path "$out_path" --argjson bytes "$bytes" '{ok: true, path: $path, bytes: $bytes}'

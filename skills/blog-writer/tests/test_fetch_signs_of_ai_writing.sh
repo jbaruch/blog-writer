@@ -14,7 +14,9 @@
 #      test for the printf-interpolation bug.
 #   7. Arg-count validation — more than one argument exits 2 with usage.
 #   8. Bad destination — a directory that does not exist exits 2.
-#   9. Hygiene — no default-named temp file is left in TMPDIR once the suite
+#   9. Atomicity — a failed fetch leaves an existing destination file byte-for-byte
+#      intact and strands no staging file beside it.
+#  10. Hygiene — no default-named temp file is left in TMPDIR once the suite
 #      finishes, covering both the script's own failure-path cleanup and the
 #      success path whose reported file the caller owns.
 #
@@ -118,13 +120,29 @@ cleanup_case() {
   LAST_TMP=""
 }
 
-# Counts leftover default-named temp files, so a leak shows up as a test failure
-# rather than as silent litter in TMPDIR.
+# Counts leftover script-named temp files, so a leak shows up as a test failure
+# rather than as silent litter in TMPDIR. find's diagnostic is surfaced and its
+# exit status checked: an unreadable TMPDIR would otherwise yield an empty count
+# and let the hygiene assertion pass on a directory it never actually read.
 count_stray_temps() {
-  find "${TMPDIR:-/tmp}" -maxdepth 1 -name 'signs-of-ai-writing.*' 2>/dev/null | wc -l | tr -d ' '
+  local dir=${TMPDIR:-/tmp} out status
+  out=$(find "$dir" -maxdepth 1 -name '*signs-of-ai-writing.*')
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    echo "error: could not scan ${dir} for stray temp files (find exited ${status}) — the hygiene check cannot be trusted" >&2
+    return 1
+  fi
+  if [ -z "$out" ]; then
+    echo 0
+  else
+    printf '%s\n' "$out" | wc -l | tr -d ' '
+  fi
 }
 
-strays_before=$(count_stray_temps)
+if ! strays_before=$(count_stray_temps); then
+  echo "    FAIL: could not establish the temp-file baseline" >&2
+  exit 1
+fi
 
 echo "test_fetch_signs_of_ai_writing"
 
@@ -216,6 +234,25 @@ if run_case "json escaping: a quote in the path still yields valid JSON" 0 200 0
 fi
 rm -rf "$quote_tmp"
 
+# 6b. Atomicity — a failed fetch must not disturb an existing destination file.
+atomic_tmp=$(mktemp -d)
+printf 'original contents' > "${atomic_tmp}/existing.txt"
+if run_case "atomicity: a failed fetch leaves the destination untouched" 1 503 0 "$(long_body)" "${atomic_tmp}/existing.txt"; then
+  if [ "$(cat "${atomic_tmp}/existing.txt")" != "original contents" ]; then
+    fail "a failed fetch modified the caller's file, got: $(cat "${atomic_tmp}/existing.txt")"
+  else
+    ok
+  fi
+  remaining=$(find "$atomic_tmp" -name '.signs-of-ai-writing.*')
+  if [ -n "$remaining" ]; then
+    fail "staging file left beside the destination: ${remaining}"
+  else
+    ok
+  fi
+  cleanup_case
+fi
+rm -rf "$atomic_tmp"
+
 # 7. Arg-count validation
 if run_case "usage: two arguments exit 2" 2 200 0 "$(long_body)" one two; then
   if ! grep -q "usage" <<<"$LAST_STDERR"; then
@@ -239,8 +276,9 @@ fi
 # 9. No stray temp files — the script removes its own mktemp file on failure,
 # and the tests remove the one it reports on success.
 echo "  hygiene: no default-named temp files are stranded"
-strays_after=$(count_stray_temps)
-if [ "$strays_after" != "$strays_before" ]; then
+if ! strays_after=$(count_stray_temps); then
+  fail "could not scan for stray temp files after the run"
+elif [ "$strays_after" != "$strays_before" ]; then
   fail "temp files leaked: ${strays_before} before, ${strays_after} after"
 else
   ok

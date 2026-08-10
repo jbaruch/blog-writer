@@ -1,0 +1,38 @@
+name: Tests
+
+# Runs the plugin's script test suites on every pull request and on main.
+# The publish pipeline runs the same suite through .github/pre-publish.sh, so a
+# suite that fails here also blocks the publish rather than only the merge.
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  scripts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # jq is what the fetch script uses to emit its JSON result, and the tests
+      # parse that result. ubuntu-latest ships both jq and curl, so this is a
+      # guard against a runner image change rather than an install step.
+      - name: Verify required tools are present
+        run: |
+          set -euo pipefail
+          for tool in jq curl; do
+            if ! command -v "$tool" >/dev/null; then
+              echo "error: ${tool} is not available on this runner — the script tests need it" >&2
+              exit 1
+            fi
+          done
+
+      - name: Run script test suites
+        run: |
+          set -euo pipefail
+          bash .github/pre-publish.sh
