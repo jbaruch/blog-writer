@@ -107,26 +107,50 @@ Read these reference files in order:
 
 Proceed immediately to Step 5.
 
-## Step 5 — Run the Phase Workflow
+## Step 5 — Run Phase 0: Intake
 
-The full process is in `references/process.md`. Here are the phases and their gates:
+Read the source material and build the narrative model: who is involved, what was built,
+what went wrong, what went right, what was shown on screen, and the jokes and references
+that surfaced naturally. Gather product context and previous posts in the series if either
+is configured. `references/process.md` Phase 0 has the full procedure.
 
-| Phase | What happens | Gate |
-|-------|-------------|------|
-| 0: Intake | Read source material, WebFetch relevant product docs (if configured), read series tracker | Gaps identified |
-| 1: Clarification | One question at a time with 1-4 options (including open answer), your best guess marked — author picks or corrects | Author confirms reconstruction |
-| 2: Planning | Lock main idea, CTA, and section outline | Author approves |
-| 3: First Draft | Write to `blog-draft-[slug].md`, run anti-pattern + accuracy + tightening checks | Draft delivered |
-| 4: Revision | Edit file based on feedback, re-run checks after changes | Author declares done |
+Gate: the gaps in your understanding are identified. Do not summarize, and do not start
+writing.
 
-Do not skip phases. Do not write prose before Phase 3.
+Proceed immediately to Step 6.
 
-Two rules bind every phase of this step:
+## Step 6 — Run Phase 1: Clarification
 
-**Persona adherence.** Re-read `persona/voice.md` before every writing action — before the
-Phase 3 first draft, before every Phase 4 revision, and before the anti-pattern rewrite
-voice check. At the start of Phase 3 and Phase 4, confirm you can name at least 3
-rhetorical devices from the profile; if you can't, read it again.
+Ask the author one question at a time, each with 1-4 concrete options plus an open answer,
+your best guess marked. Group questions by narrative, technical, visual, and context gaps.
+`references/process.md` Phase 1 has the question format and grouping rules.
+
+Gate: the author confirms the narrative reconstruction is accurate and no ambiguity
+remains.
+
+Proceed immediately to Step 7.
+
+## Step 7 — Run Phase 2: Editorial Planning
+
+Lock the main idea, the CTA, and the section outline. `references/process.md` Phase 2 has
+the main-idea template and the outline requirements.
+
+Gate: the author approves the plan.
+
+Proceed immediately to Step 8.
+
+## Step 8 — Run Phase 3: First Draft
+
+Write the draft to `blog-draft-[slug].md`, insert and confirm placeholders, then run the
+anti-pattern, accuracy, and tightening checks. `references/process.md` Phase 3 has the
+writing rules, the placeholder conventions, and the check procedure.
+
+Two rules bind this step and Step 9:
+
+**Persona adherence.** Re-read `persona/voice.md` before every writing action — before this
+draft, before every Step 9 revision, and before the anti-pattern rewrite voice check. At
+the start of this step and Step 9, confirm you can name at least 3 rhetorical devices from
+the profile; if you can't, read it again.
 
 **Anti-pattern check adherence.** The anti-pattern check is a defined procedure, not a vibe
 check.
@@ -149,8 +173,13 @@ check.
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
 
-Placeholder handling runs inside Phase 3 — `references/process.md` covers identifying
-what needs a placeholder, the per-type numbering, and confirming every placeholder with
-the author before the draft is finalized.
+Gate: the draft is delivered to the author.
+
+Proceed immediately to Step 9.
+
+## Step 9 — Run Phase 4: Revision
+
+Edit the draft file on the author's feedback, and re-run the Step 8 checks after every
+change. `references/process.md` Phase 4 has the revision procedure.
 
 Finish here when the author declares the post done.

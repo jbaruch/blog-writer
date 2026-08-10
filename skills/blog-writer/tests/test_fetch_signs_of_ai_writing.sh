@@ -112,8 +112,14 @@ run_case() {
 # dropping only LAST_TMP would strand that file in TMPDIR.
 cleanup_case() {
   local reported
-  if reported=$(jq -r '.path // empty' 2>/dev/null <<<"${LAST_STDOUT:-}") && [ -n "$reported" ]; then
-    rm -f "$reported"
+  # Failure cases print nothing, so only parse when there is stdout to parse.
+  # jq's own diagnostic stays visible: unparseable stdout from a case that was
+  # supposed to emit JSON is a real signal, not noise to be silenced.
+  if [ -n "${LAST_STDOUT:-}" ]; then
+    reported=$(jq -r '.path // empty' <<<"$LAST_STDOUT")
+    if [ -n "$reported" ]; then
+      rm -f "$reported"
+    fi
   fi
   if [ -n "${LAST_TMP:-}" ]; then
     rm -rf "$LAST_TMP"
@@ -227,8 +233,9 @@ if run_case "json escaping: a quote in the path still yields valid JSON" 0 200 0
   else
     ok
   fi
-  if [ "$(jq -r '.path' <<<"$LAST_STDOUT")" != "$weird_path" ]; then
-    fail "path did not round-trip through JSON, got: $(jq -r '.path' <<<"$LAST_STDOUT" 2>/dev/null)"
+  round_tripped=$(jq -r '.path' <<<"$LAST_STDOUT")
+  if [ "$round_tripped" != "$weird_path" ]; then
+    fail "path did not round-trip through JSON, got: ${round_tripped}"
   else
     ok
   fi
@@ -257,25 +264,47 @@ rm -rf "$atomic_tmp"
 
 # 6c. Interrupt — the EXIT trap must remove the staging file when the script is
 # killed mid-fetch, not only on its own explicit error branches.
+#
+# Synchronisation is a FIFO rendezvous, not a timed guess: the stub publishes its
+# PID once the fetch is under way, which is after the script created its staging
+# file. Both processes are then signalled, because bash defers a trapped signal
+# until its foreground child returns — killing only the script would leave it
+# blocked in the curl call with the TERM still pending.
 interrupt_tmp=$(mktemp -d)
+mkfifo "${interrupt_tmp}/ready"
+mkfifo "${interrupt_tmp}/block"
 cat > "${interrupt_tmp}/curl" <<'SLOWSTUB'
 #!/usr/bin/env bash
-# Stands in for a fetch that is still running when the signal arrives.
-sleep 30
+# Stands in for a fetch still running when the signal arrives.
+set -uo pipefail
+echo "$$" > "${READY_FIFO}"
+# Blocks in the kernel on a FIFO nobody writes — no polling, no CPU spin.
+read -r _ < "${BLOCK_FIFO}"
 SLOWSTUB
 chmod +x "${interrupt_tmp}/curl"
 echo "  interrupt: the staging file is removed when the script is killed"
-PATH="${interrupt_tmp}:${PATH}" "$SCRIPT" "${interrupt_tmp}/dest.txt" >/dev/null 2>&1 &
+
+READY_FIFO="${interrupt_tmp}/ready" BLOCK_FIFO="${interrupt_tmp}/block" \
+  PATH="${interrupt_tmp}:${PATH}" \
+  "$SCRIPT" "${interrupt_tmp}/dest.txt" >/dev/null 2>&1 &
 victim=$!
-# Give the script time to create its staging file and start the stub fetch.
-for _ in 1 2 3 4 5 6 7 8 9 10; do
-  if find "$interrupt_tmp" -name '.signs-of-ai-writing.*' | grep -q .; then
-    break
-  fi
-  sleep 0.2
-done
+
+# Blocks until the stub announces itself — a happens-after edge on the staging
+# file's creation, with no dependence on scheduling or the clock.
+read -r stub_pid < "${interrupt_tmp}/ready"
+
 kill -TERM "$victim"
-wait "$victim" || true
+kill -TERM "$stub_pid"
+
+victim_status=0
+wait "$victim" || victim_status=$?
+# The script maps TERM to exit 143, so that is the only status this case accepts.
+if [ "$victim_status" -ne 143 ]; then
+  fail "expected the interrupted script to exit 143, got ${victim_status}"
+else
+  ok
+fi
+
 stranded=$(find "$interrupt_tmp" -name '.signs-of-ai-writing.*')
 if [ -n "$stranded" ]; then
   fail "staging file survived an interrupt: ${stranded}"
