@@ -1,8 +1,9 @@
 name: Tests
 
-# Runs the plugin's script test suites on every pull request and on main.
-# The publish pipeline runs the same suite through .github/pre-publish.sh, so a
-# suite that fails here also blocks the publish rather than only the merge.
+# Runs the shell diagnostics gate and the plugin's script test suites on every
+# pull request and on main. The publish pipeline chains the same two gates
+# through .github/pre-publish.sh, so a failure here also blocks the publish
+# rather than only the merge.
 
 on:
   pull_request:
@@ -17,22 +18,28 @@ jobs:
   scripts:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # Pinned to a full commit SHA per dependency-management Freshness; the
+      # committed .github/dependabot.yml (github-actions ecosystem, weekly) is
+      # the renewal mechanism that advances this pin.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # jq is what the fetch script uses to emit its JSON result, and the tests
-      # parse that result. ubuntu-latest ships both jq and curl, so this is a
-      # guard against a runner image change rather than an install step.
+      # ubuntu-latest ships shellcheck, jq and curl, so these are guards against
+      # a runner image change rather than install steps. A missing tool fails
+      # loudly instead of silently skipping the gate it backs.
       - name: Verify required tools are present
         run: |
           set -euo pipefail
-          for tool in jq curl; do
+          for tool in shellcheck jq curl; do
             if ! command -v "$tool" >/dev/null; then
-              echo "error: ${tool} is not available on this runner — the script tests need it" >&2
+              echo "error: ${tool} is not available on this runner — the shell gates need it" >&2
               exit 1
             fi
           done
 
+      # Diagnostics at zero findings before the tests run, per
+      # language-diagnostics and code-formatting. Same command locally.
+      - name: Lint shell scripts
+        run: bash .github/lint-shell.sh
+
       - name: Run script test suites
-        run: |
-          set -euo pipefail
-          bash .github/pre-publish.sh
+        run: bash .github/run-script-tests.sh
