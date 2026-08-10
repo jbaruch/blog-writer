@@ -339,6 +339,26 @@ rather than clarifies, when a screenshot of the real system would do the same wo
 the prose already makes the structure obvious. Integrate diagrams like any other asset: set
 up what the reader is about to see, show it, then interpret what matters about it.
 
+### Inserting and confirming placeholders:
+
+The author's video transcript will reference things visible on screen that Claude cannot
+see. After reconstructing the narrative:
+
+1. Identify every moment where something was shown on screen, code was demonstrated, a link
+   was referenced, a fact needs verification, or a concept would benefit from a diagram
+   (architecture, flow, system relationships)
+2. Insert placeholders using the numbering conventions above — independent sequences per
+   type, no shared counter
+3. For code placeholders, include best-guess content and flag it:
+   `<!-- VERIFY: reconstructed from transcript, confirm actual code -->`
+4. For CLI commands, reconstruct from context and flag if uncertain
+5. For diagram placeholders, generate D2 source inline in a fenced `d2` block and flag it:
+   `<!-- VERIFY: diagram reconstructed from narrative context, confirm architecture -->`
+
+Before the draft is finalized, ask the author to confirm or replace every placeholder.
+Cover all five types — Screenshot, Code, Link, Fact, Diagram — and treat the `VERIFY`
+comments on reconstructed code and diagrams as open questions rather than resolved content.
+
 ### After writing:
 
 Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md` and scan

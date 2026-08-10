@@ -149,44 +149,8 @@ check.
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
 
-Run Steps 6 and 7 during the Phase 3 draft, before delivering it to the author.
+Placeholder handling runs inside Phase 3 — `references/process.md` covers identifying
+what needs a placeholder, the per-type numbering, and confirming every placeholder with
+the author before the draft is finalized.
 
-## Step 6 — Insert Placeholders
-
-The author's video transcript will reference things visible on screen that Claude cannot see.
-After reconstructing the narrative:
-
-1. Identify every moment where something was shown on screen, code was demonstrated,
-   a link was referenced, a fact needs verification, or a concept would benefit from a
-   diagram (architecture, flow, system relationships)
-2. Insert placeholders with **INDEPENDENT numbering per type**. Screenshots count
-   separately from Code, which counts separately from Links, which counts separately
-   from Facts, which count separately from Diagrams. There is NO shared counter. Each
-   type starts at 01 and increments within its own sequence only:
-   `[Screenshot 01: the agent's terminal output showing it re-ingested 100 files]`
-   `[Code 01: config file dependency block after plugin install]`
-   `[Screenshot 02: the app UI showing outdated information]`
-   `[Link 01: plugin page on the registry]`
-   `[Screenshot 03: terminal showing install command]`
-   `[Fact 01: "25% of Y Combinator startups" claim — find source]`
-   `[Diagram 01: architecture showing plugin registry flow]`
-3. For code placeholders, include best-guess content and flag:
-   `<!-- VERIFY: reconstructed from transcript, confirm actual code -->`
-4. For CLI commands, reconstruct from context and flag if uncertain
-5. For diagram placeholders, generate D2 source inline in a fenced `d2` block and flag:
-   `<!-- VERIFY: diagram reconstructed from narrative context, confirm architecture -->`
-   Diagrams earn their place when they clarify complexity that prose can't convey
-   (multi-step flows, component relationships, state transitions). If a single screenshot
-   of the real system would be more honest and more specific, use a screenshot instead.
-
-Proceed immediately to Step 7.
-
-## Step 7 — Confirm Placeholders With the Author
-
-Ask the author to confirm or replace every placeholder inserted in Step 6 before the draft
-is finalized. Cover all five types — Screenshot, Code, Link, Fact, Diagram — and treat the
-`VERIFY` comments on reconstructed code and diagrams as open questions rather than
-resolved content.
-
-Return to the Step 5 phase workflow and finish the remaining phases. Finish here when the
-author declares the post done.
+Finish here when the author declares the post done.

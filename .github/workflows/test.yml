@@ -23,18 +23,37 @@ jobs:
       # the renewal mechanism that advances this pin.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # ubuntu-latest ships shellcheck, jq and curl, so these are guards against
-      # a runner image change rather than install steps. A missing tool fails
-      # loudly instead of silently skipping the gate it backs.
-      - name: Verify required tools are present
+      # Installed rather than assumed, per ci-safety "Install, Don't Skip" — the
+      # gates must not depend on whatever a runner image happens to ship.
+      # ShellCheck comes from its upstream release at a pinned version so the
+      # diagnostics gate is reproducible; a distro package would drift with the
+      # image. Renewal: bump SHELLCHECK_VERSION when upstream releases, verified
+      # by this workflow's own run.
+      - name: Install shell gate tooling
+        env:
+          SHELLCHECK_VERSION: v0.11.0
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends jq curl xz-utils
+          curl --silent --show-error --location --fail \
+            "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
+            --output /tmp/shellcheck.tar.xz
+          tar -x -J -f /tmp/shellcheck.tar.xz -C /tmp
+          sudo install -m 0755 "/tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+
+      # A tool that failed to install must stop the run here rather than surface
+      # later as a confusing gate failure.
+      - name: Verify the tooling is usable
         run: |
           set -euo pipefail
           for tool in shellcheck jq curl; do
             if ! command -v "$tool" >/dev/null; then
-              echo "error: ${tool} is not available on this runner — the shell gates need it" >&2
+              echo "error: ${tool} is not on PATH after the install step — the shell gates need it" >&2
               exit 1
             fi
           done
+          shellcheck --version
 
       # Diagnostics at zero findings before the tests run, per
       # language-diagnostics and code-formatting. Same command locally.

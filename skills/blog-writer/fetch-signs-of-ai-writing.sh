@@ -85,11 +85,24 @@ if ! staging=$(mktemp "${out_dir}/.signs-of-ai-writing.XXXXXX"); then
   exit 2
 fi
 
+# The staging file is owned from creation until it either moves into place or
+# the script ends. An EXIT trap covers every way out — an explicit error branch,
+# an interrupt, or an unexpected failure under `set -e` in wc, tr, mv, or jq —
+# so no exit path can strand it. Ownership is released the moment the file stops
+# being staging: on a successful move it belongs to the caller's path, and with
+# no destination the caller owns the staging file itself.
+staging_owned=1
+
 discard_staging() {
-  if [ -e "$staging" ]; then
+  if [ "$staging_owned" -eq 1 ] && [ -e "$staging" ]; then
     rm -f "$staging"
   fi
+  return 0
 }
+
+trap discard_staging EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
 
 http_status=0
 if ! http_status=$(curl --silent --location --show-error \
@@ -98,13 +111,11 @@ if ! http_status=$(curl --silent --location --show-error \
   --write-out '%{http_code}' \
   --output "$staging" \
   "$ARTICLE_URL"); then
-  discard_staging
   echo "error: curl could not reach Wikipedia (network error or timeout) — proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
 
 if [ "$http_status" != "200" ]; then
-  discard_staging
   echo "error: Wikipedia returned HTTP ${http_status} for the article — proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
@@ -112,7 +123,6 @@ fi
 bytes=$(wc -c < "$staging" | tr -d ' ')
 
 if [ "$bytes" -lt "$MIN_BYTES" ]; then
-  discard_staging
   echo "error: fetched body is ${bytes} bytes, under the ${MIN_BYTES}-byte floor — the page is likely an error stub rather than the article; proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
@@ -120,12 +130,15 @@ fi
 # Every validation passed, so the result is now fit to occupy the destination.
 if [ -n "$out_path" ]; then
   if ! mv -f "$staging" "$out_path"; then
-    discard_staging
     echo "error: could not move the fetched article into place at ${out_path}" >&2
     exit 2
   fi
 else
   out_path=$staging
 fi
+
+# The file is the caller's from here, by either route. Releasing ownership stops
+# the EXIT trap from deleting the very result being reported.
+staging_owned=0
 
 jq -n --arg path "$out_path" --argjson bytes "$bytes" '{ok: true, path: $path, bytes: $bytes}'

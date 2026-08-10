@@ -16,7 +16,9 @@
 #   8. Bad destination — a directory that does not exist exits 2.
 #   9. Atomicity — a failed fetch leaves an existing destination file byte-for-byte
 #      intact and strands no staging file beside it.
-#  10. Hygiene — no default-named temp file is left in TMPDIR once the suite
+#  10. Interrupt — a SIGTERM mid-fetch removes the script-owned staging file
+#      via the EXIT trap rather than stranding it.
+#  11. Hygiene — no default-named temp file is left in TMPDIR once the suite
 #      finishes, covering both the script's own failure-path cleanup and the
 #      success path whose reported file the caller owns.
 #
@@ -252,6 +254,35 @@ if run_case "atomicity: a failed fetch leaves the destination untouched" 1 503 0
   cleanup_case
 fi
 rm -rf "$atomic_tmp"
+
+# 6c. Interrupt — the EXIT trap must remove the staging file when the script is
+# killed mid-fetch, not only on its own explicit error branches.
+interrupt_tmp=$(mktemp -d)
+cat > "${interrupt_tmp}/curl" <<'SLOWSTUB'
+#!/usr/bin/env bash
+# Stands in for a fetch that is still running when the signal arrives.
+sleep 30
+SLOWSTUB
+chmod +x "${interrupt_tmp}/curl"
+echo "  interrupt: the staging file is removed when the script is killed"
+PATH="${interrupt_tmp}:${PATH}" "$SCRIPT" "${interrupt_tmp}/dest.txt" >/dev/null 2>&1 &
+victim=$!
+# Give the script time to create its staging file and start the stub fetch.
+for _ in 1 2 3 4 5 6 7 8 9 10; do
+  if find "$interrupt_tmp" -name '.signs-of-ai-writing.*' | grep -q .; then
+    break
+  fi
+  sleep 0.2
+done
+kill -TERM "$victim"
+wait "$victim" || true
+stranded=$(find "$interrupt_tmp" -name '.signs-of-ai-writing.*')
+if [ -n "$stranded" ]; then
+  fail "staging file survived an interrupt: ${stranded}"
+else
+  ok
+fi
+rm -rf "$interrupt_tmp"
 
 # 7. Arg-count validation
 if run_case "usage: two arguments exit 2" 2 200 0 "$(long_body)" one two; then
