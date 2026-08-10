@@ -1,9 +1,10 @@
-name: Review & Publish Tile
+name: Review & Publish Plugin
 
 # Thin caller for the canonical fleet publish pipeline
 # (jbaruch/coding-policy#206). All steps live in the reusable workflow;
-# this file carries only the triggers and this repo's inputs. The display
-# name is unchanged so tooling that watches this run by name keeps working.
+# this file carries only the triggers and this repo's inputs. The release
+# tooling resolves this run by workflow filename (`publish.yml`), not by
+# display name, so the display name is free to track current terminology.
 
 on:
   push:
