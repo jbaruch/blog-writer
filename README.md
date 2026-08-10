@@ -44,7 +44,7 @@ in three passes:
 - **Soul check** — holistic read for sterile, voiceless writing that passes pattern
   checks but still reads as obviously AI
 
-Every rewrite is re-audited against all 32 patterns before it's considered fixed.
+Every rewrite is re-audited against all 38 patterns before it's considered fixed.
 
 The anti-pattern list auto-updates from
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)

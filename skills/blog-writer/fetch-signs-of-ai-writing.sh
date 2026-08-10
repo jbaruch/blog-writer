@@ -64,12 +64,23 @@ if [ "$#" -eq 1 ]; then
     echo "error: destination directory is not writable: ${out_dir}" >&2
     exit 2
   fi
+  created_temp=0
 else
   if ! out_path=$(mktemp "${TMPDIR:-/tmp}/signs-of-ai-writing.XXXXXX"); then
     echo "error: could not create a temporary file under ${TMPDIR:-/tmp}" >&2
     exit 2
   fi
+  created_temp=1
 fi
+
+# Only the file this script created is ours to remove. A caller-supplied
+# destination stays put, successful or not — deleting someone else's path on a
+# failed fetch would destroy content this script never owned.
+discard_temp_on_failure() {
+  if [ "$created_temp" -eq 1 ] && [ -e "$out_path" ]; then
+    rm -f "$out_path"
+  fi
+}
 
 http_status=0
 if ! http_status=$(curl --silent --location --show-error \
@@ -78,11 +89,13 @@ if ! http_status=$(curl --silent --location --show-error \
   --write-out '%{http_code}' \
   --output "$out_path" \
   "$ARTICLE_URL"); then
+  discard_temp_on_failure
   echo "error: curl could not reach Wikipedia (network error or timeout) — proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
 
 if [ "$http_status" != "200" ]; then
+  discard_temp_on_failure
   echo "error: Wikipedia returned HTTP ${http_status} for the article — proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi
@@ -90,6 +103,7 @@ fi
 bytes=$(wc -c < "$out_path" | tr -d ' ')
 
 if [ "$bytes" -lt "$MIN_BYTES" ]; then
+  discard_temp_on_failure
   echo "error: fetched body is ${bytes} bytes, under the ${MIN_BYTES}-byte floor — the page is likely an error stub rather than the article; proceed with references/ai-anti-patterns.md as-is" >&2
   exit 1
 fi

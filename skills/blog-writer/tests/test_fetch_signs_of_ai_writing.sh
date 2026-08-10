@@ -14,6 +14,9 @@
 #      test for the printf-interpolation bug.
 #   7. Arg-count validation — more than one argument exits 2 with usage.
 #   8. Bad destination — a directory that does not exist exits 2.
+#   9. Hygiene — no default-named temp file is left in TMPDIR once the suite
+#      finishes, covering both the script's own failure-path cleanup and the
+#      success path whose reported file the caller owns.
 #
 # Approach: put a stub `curl` first on PATH and invoke the real script as an
 # executable, so the tests exercise the shipped file rather than a sourced copy.
@@ -100,6 +103,29 @@ run_case() {
   return 0
 }
 
+# Removes the case directory and any file the script reported on stdout. Without
+# a destination argument the script mktemps outside the case directory, so
+# dropping only LAST_TMP would strand that file in TMPDIR.
+cleanup_case() {
+  local reported
+  if reported=$(jq -r '.path // empty' 2>/dev/null <<<"${LAST_STDOUT:-}") && [ -n "$reported" ]; then
+    rm -f "$reported"
+  fi
+  if [ -n "${LAST_TMP:-}" ]; then
+    rm -rf "$LAST_TMP"
+  fi
+  LAST_STDOUT=""
+  LAST_TMP=""
+}
+
+# Counts leftover default-named temp files, so a leak shows up as a test failure
+# rather than as silent litter in TMPDIR.
+count_stray_temps() {
+  find "${TMPDIR:-/tmp}" -maxdepth 1 -name 'signs-of-ai-writing.*' 2>/dev/null | wc -l | tr -d ' '
+}
+
+strays_before=$(count_stray_temps)
+
 echo "test_fetch_signs_of_ai_writing"
 
 # 1. Success
@@ -122,7 +148,7 @@ if run_case "success: 200 with a full body exits 0" 0 200 0 "$(long_body)"; then
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 
 # 2. HTTP error
@@ -132,7 +158,7 @@ if run_case "http error: 503 exits 1" 1 503 0 "$(long_body)"; then
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 
 # 3. Transport failure
@@ -142,7 +168,7 @@ if run_case "transport failure: curl exit 7 exits 1" 1 200 7 ""; then
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 
 # 4. Short body
@@ -152,7 +178,7 @@ if run_case "short body: 200 under the floor exits 1" 1 200 0 "too short"; then
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 
 # 5. Explicit destination honoured
@@ -168,7 +194,7 @@ if run_case "explicit destination is honoured" 0 200 0 "$(long_body)" "${dest_tm
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 rm -rf "$dest_tmp"
 
@@ -186,7 +212,7 @@ if run_case "json escaping: a quote in the path still yields valid JSON" 0 200 0
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 rm -rf "$quote_tmp"
 
@@ -197,7 +223,7 @@ if run_case "usage: two arguments exit 2" 2 200 0 "$(long_body)" one two; then
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
 fi
 
 # 8. Bad destination directory
@@ -207,7 +233,17 @@ if run_case "bad destination: missing directory exits 2" 2 200 0 "$(long_body)" 
   else
     ok
   fi
-  rm -rf "$LAST_TMP"
+  cleanup_case
+fi
+
+# 9. No stray temp files — the script removes its own mktemp file on failure,
+# and the tests remove the one it reports on success.
+echo "  hygiene: no default-named temp files are stranded"
+strays_after=$(count_stray_temps)
+if [ "$strays_after" != "$strays_before" ]; then
+  fail "temp files leaked: ${strays_before} before, ${strays_after} after"
+else
+  ok
 fi
 
 echo
