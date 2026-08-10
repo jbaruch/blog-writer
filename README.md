@@ -1,6 +1,20 @@
 # blog-writer
 
+[![tessl](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.tessl.io%2Fv1%2Fbadges%2Fjbaruch%2Fblog-writer)](https://tessl.io/registry/jbaruch/blog-writer)
+
 Write developer blog posts from video transcripts, meeting notes, or rough ideas.
+
+## Skills
+
+| Skill | What it does |
+|-------|--------------|
+| [`blog-writer`](skills/blog-writer/SKILL.md) | Turns a transcript, meeting notes, or a rough idea into a drafted blog post in the author's voice, then checks it against 38 AI writing anti-patterns |
+
+## Installation
+
+```bash
+tessl install jbaruch/blog-writer
+```
 
 ## What it does
 
@@ -20,7 +34,7 @@ can show the same thing with less abstraction.
 
 ## Anti-pattern detection
 
-Drafts are checked against 32 named AI writing anti-patterns, each with symptoms,
+Drafts are checked against 38 named AI writing anti-patterns, each with symptoms,
 examples, and alternatives (plus structural variants where applicable). The check runs
 in three passes:
 

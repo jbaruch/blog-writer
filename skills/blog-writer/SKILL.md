@@ -18,7 +18,7 @@ Write developer blog posts for practitioners who build things, break things, and
 opinions about their tools. The voice is the author's own — configured through persona
 files that capture their style, rhetorical devices, and personality.
 
-## Persona Directory
+## Step 1 — Resolve the Persona Path
 
 **Persona path:** `~/.claude/blog-writer-persona/`
 
@@ -27,14 +27,15 @@ absolute path. When you see "read `persona/voice.md`", that means read
 `~/.claude/blog-writer-persona/voice.md`. Always resolve `persona/` to this absolute path
 when reading or writing files.
 
-## Bootstrap
+Proceed immediately to Step 2.
 
-**Before anything else**, check if `~/.claude/blog-writer-persona/` exists (as a real
-directory or a symlink).
+## Step 2 — Bootstrap the Persona Directory
+
+Check if `~/.claude/blog-writer-persona/` exists (as a real directory or a symlink).
 
 | State | Action |
 |-------|--------|
-| Exists and `persona/voice.md` has content | Persona ready — skip to "Before You Start" |
+| Exists and `persona/voice.md` has content | Persona ready — proceed to Step 3 |
 | Exists but `persona/voice.md` is empty or missing | Read `references/setup.md` and run onboarding; do not proceed until complete |
 | Directory doesn't exist | First-time setup — see below |
 
@@ -51,30 +52,36 @@ directory or a symlink).
 
 Then read `references/setup.md` and run the interactive onboarding flow.
 
-## Before You Start
+Proceed immediately to Step 3 once the persona is ready.
 
-### Anti-pattern freshness check
+## Step 3 — Refresh the Anti-Pattern File
 
-Before reading the reference files, fetch the Wikipedia article
-"Wikipedia:Signs of AI writing" and compare it against `references/ai-anti-patterns.md`.
-Wikipedia's list is community-maintained and evolves as LLM writing patterns change.
+Fetch Wikipedia's "Signs of AI writing" article and compare it against
+`references/ai-anti-patterns.md`. Wikipedia's list is community-maintained and evolves as
+LLM writing patterns change.
 
-To fetch: Wikipedia blocks standard WebFetch requests. Use Bash instead:
+```bash
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/fetch-signs-of-ai-writing.sh
 ```
-curl -s -L -H "User-Agent: Mozilla/5.0" "https://en.wikipedia.org/w/index.php?title=Wikipedia:Signs_of_AI_writing&action=raw"
-```
-This returns the raw wikitext. If the output is too large to process inline, pipe it to
-a temp file and read it.
+
+The script writes the raw wikitext to a file and prints `{"ok": true, "path": ..., "bytes": ...}`.
+Read the file at `.path`.
+
+- **Exit 0** — read the article and continue below.
+- **Exit 1** — the fetch failed (network, HTTP error, or a body too short to be the
+  article). Proceed with `references/ai-anti-patterns.md` as-is; it is self-contained and
+  does not depend on this check.
+- **Exit 2** — a tool or usage error (curl missing, destination not writable). Report the
+  script's stderr diagnostic, then proceed with the current anti-pattern file as-is.
 
 If the article contains new patterns, vocabulary, or structural variants not already
 covered in the anti-patterns file, update the file to incorporate them. Keep the same
 format: pattern number, the tell, symptoms, examples, structural variants (where
 applicable), why it's a tell, and instead.
 
-If the fetch fails (network error, page unavailable), proceed with the current
-anti-pattern file as-is — it is self-contained and does not depend on the Wikipedia check.
+Proceed immediately to Step 4.
 
-### Reference files
+## Step 4 — Read the Reference Files
 
 Read these reference files in order:
 
@@ -82,20 +89,25 @@ Read these reference files in order:
    tone, rhetorical devices, and voice-specific examples.
 2. `persona/framework.md` — (If it exists and has content) Post-level architecture: opening
    modes, argument shape by post type, density philosophy, first-person rules, closing modes,
-   and off-voice moves. **When this file exists and has content, it overrides the "Blog
-   Anatomy" section below and the narrative-density doctrine in `references/tone-guide.md`.**
-   Read it immediately after `persona/voice.md`, before any other reference file.
+   and off-voice moves. **When this file exists and has content, it overrides
+   `references/blog-anatomy.md` and the narrative-density doctrine in
+   `references/tone-guide.md`.** Read it immediately after `persona/voice.md`, before any
+   other reference file.
 3. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
 4. `references/ai-anti-patterns.md` — 38 named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
 5. `references/process.md` — The workflow from transcript to published draft.
-6. `persona/product.md` — (If it exists and has content) Index of product docs and
+6. `references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
+   series handling. Fallback only — `persona/framework.md` overrides it when present.
+7. `persona/product.md` — (If it exists and has content) Index of product docs and
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
    fetch only the specific pages relevant to the post's topic during Phase 0.
 
-## Workflow Overview
+Proceed immediately to Step 5.
+
+## Step 5 — Run the Phase Workflow
 
 The full process is in `references/process.md`. Here are the phases and their gates:
 
@@ -109,25 +121,19 @@ The full process is in `references/process.md`. Here are the phases and their ga
 
 Do not skip phases. Do not write prose before Phase 3.
 
-## Persona Adherence
+Two rules bind every phase of this step:
 
-**Rule:** Re-read `persona/voice.md` before every writing action — before the Phase 3 first
-draft, before every Phase 4 revision, and before the anti-pattern rewrite voice check.
+**Persona adherence.** Re-read `persona/voice.md` before every writing action — before the
+Phase 3 first draft, before every Phase 4 revision, and before the anti-pattern rewrite
+voice check. At the start of Phase 3 and Phase 4, confirm you can name at least 3
+rhetorical devices from the profile; if you can't, read it again.
 
-At the start of Phase 3 and Phase 4, confirm you can name at least 3 rhetorical devices
-from the profile; if you can't, read it again.
-
-> **General rule — if you can't find a required file, ask the author. Don't claim it
-> doesn't exist, don't assume its contents, don't skip the step.**
-
-## Anti-Pattern Check Adherence
-
-The anti-pattern check is a **defined procedure**, not a vibe check.
+**Anti-pattern check adherence.** The anti-pattern check is a defined procedure, not a vibe
+check.
 
 1. **Always re-read `references/ai-anti-patterns.md` before running the check.** Use the
    file's definitions — specific patterns, symptoms, examples, structural variants, and
    alternatives — not your general knowledge of AI writing patterns.
-
 2. **Follow the three-pass procedure exactly as written in `references/process.md`.** Pass 1
    is the surface scan against all 38 patterns. Pass 2 is the skeleton scan on adjacent
    sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
@@ -135,64 +141,17 @@ The anti-pattern check is a **defined procedure**, not a vibe check.
    check. Then the proportionality check — was the amount of rewriting proportional to the
    slop found, and would the author still recognize the draft as their own voice. In that
    order. Do not skip passes, do not merge them, do not substitute your own method.
-
 3. **Do not invent patterns that aren't in the file.** If something feels "AI-ish" but
    doesn't match any of the 38 defined patterns or their structural variants, leave it
    alone. False positives from improvised rules damage the author's voice more than the
    pattern they're trying to fix.
 
-## Quick Reference: Blog Anatomy
+> **General rule — if you can't find a required file, ask the author. Don't claim it
+> doesn't exist, don't assume its contents, don't skip the step.**
 
-> **Fallback only.** If `persona/framework.md` exists and has content, that file governs
-> post-level architecture (opening modes, argument shape, density philosophy, closing modes)
-> and overrides this entire section. Read it instead.
+Run Step 6 during the Phase 3 draft, before delivering it to the author.
 
-Posts are stories about real problems that happen to involve a technology (and optionally a
-product). The reader should learn something even if they never touch the author's stack.
-
-A typical post runs 1,500-2,000 words. 2,000 is a target, not a cliff — a tight 2,200
-that earns every sentence is better than a padded 1,800. The post follows this general
-shape:
-
-**TLDR** — 2-4 bullet points. Sells the "so what" without spoiling the journey. Bullets,
-not prose. Each bullet should make the reader think "wait, really?" not "yeah, obvious."
-Written last, placed first.
-
-**Opening hook** — A personal story, a public embarrassment, a confession. Never a thesis
-statement. Never "In this post, we'll explore..."
-
-**The problem, demonstrated** — Show the failure. Screenshots, code, terminal output. Let the
-reader feel the pain before offering the fix.
-
-**The pivot** — What changed. What we tried differently. Why it matters.
-
-**The technical meat** — How it actually works. Code blocks, architecture, real output. This
-section earns the reader's trust.
-
-**The broader point** — Zoom out. What does this mean for how we build software? Cultural
-references, analogies, and dry observations live here.
-
-**CTA** — Practical, specific, low-friction. Usually: install something, try something, read
-the next post. If the author has product context configured, suggest a product-related CTA
-and confirm.
-
-**Author bio** — Fixed schema, rotating kicker. The kicker is a dry joke that connects
-to the post's content. See the bio format in `persona/bio.md`.
-
-## Series Support
-
-Blog posts often belong to a series. Series state (episode numbers, callbacks, open
-threads) is tracked in `_blog-skill/series-tracker.md` in the Blog Home Directory.
-Read it at the start of every session; update it when a post is published.
-
-- Maintain consistent title patterns
-- Reference previous posts naturally in the opening
-- Keep recurring characters consistent (personality, running jokes, callbacks) — see
-  `persona/voice.md` for any established characters
-- Each post must stand alone — a reader hitting part 2 first should not be lost
-- End with a teaser for the next installment when applicable
-
-## Screenshot, Code, and Diagram Handling
+## Step 6 — Insert and Confirm Placeholders
 
 The author's video transcript will reference things visible on screen that Claude cannot see.
 After reconstructing the narrative:
@@ -220,3 +179,6 @@ After reconstructing the narrative:
    (multi-step flows, component relationships, state transitions). If a single screenshot
    of the real system would be more honest and more specific, use a screenshot instead.
 6. Ask the author to confirm or replace all placeholders before finalizing
+
+Return to the Step 5 phase workflow and finish the remaining phases. Finish here when the
+author declares the post done.
