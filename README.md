@@ -46,9 +46,11 @@ in three passes:
 
 Every rewrite is re-audited against all 38 patterns before it's considered fixed.
 
-The anti-pattern list auto-updates from
+At the start of each session the skill fetches
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
-at the start of each session to stay current as LLM writing patterns evolve.
+and compares it against the anti-pattern list, adding anything the list doesn't already
+cover. The refresh is a step the agent runs, not a background process — the file changes
+only when a session finds something new in the article.
 
 ## Persona system
 
