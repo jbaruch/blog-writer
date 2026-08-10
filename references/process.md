@@ -348,11 +348,24 @@ the draft:
 the forms described in the examples and structural variants. For the following patterns,
 do a dedicated mechanical sweep instead of relying on contextual reading alone:
 
+- **Contrastive negation (#1):** Do a literal, case-insensitive search for "rather than".
+  Every hit that joins two candidates for the same slot is pattern #1 wearing a
+  comparative — the negation-then-affirmation is intact, with "rather than" doing the work
+  of "not". Case matters: "Rather than X, Y" fronts the construction at the start of a
+  sentence, and a case-sensitive search silently misses every one of them. The "Not X. Y."
+  form announces itself on a contextual read; this one doesn't, which is exactly why it
+  needs the literal search.
 - **Fragments (#3, #4):** Find every sentence under six words in the draft and check
   whether 3+ appear consecutively. Surrounding sentences can make fragments feel embedded
   when they're actually standalone. Count periods, not vibes.
+- **Parenthetical em-dashes (#7):** Find every paired em-dash (` — X — `) in the draft.
+  Each occurrence is a flag regardless of count. Convert to parentheses, restructure the
+  sentence, or promote the aside to its own clause. This is a usage check, not a density
+  check — a single pair is still a hit, so don't let a passing #8 count clear it.
 - **Em-dashes (#8):** Count em-dashes per section. More than two in a section is a flag.
-  Don't judge whether each em-dash is "justified" — just count them first.
+  Don't judge whether each em-dash is "justified" — just count them first. This is the
+  density check only; individual paired em-dashes are #7's job above, and a section that
+  passes the count can still carry a #7 violation.
 - **AI vocabulary (#12):** Scan the draft for the watchlist words (delve, leverage, tapestry,
   landscape, pivotal, crucial, seamless, etc.). One in a post is fine. Two or more is a
   contamination event. Do a literal word search, not a vibe read — these words hide in
