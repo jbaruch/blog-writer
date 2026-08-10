@@ -6,6 +6,9 @@
 
 ### Fixed
 
+- **Pattern #1 missed the "X rather than Y" variant** (#22) — the reference covered "Not X, but Y" and "Not just X, but also Y" but not the comparative form, which does identical structural work (negation plus affirmation competing for one slot) while reading as measured prose. It is the hardest of the three to catch by eye, because it does not sound like a mic drop. Added the variant to pattern #1 and a literal "rather than" sweep to the Pass 1 mechanical checks.
+- **Pass 1 had no mechanical check for pattern #7** (#5) — only #8's em-dash density count existed, so paired em-dashes collapsed into "too many em-dashes" and individual occurrences survived all three passes. Added a #7 sweep that flags every ` — X — ` pair regardless of count, and made #8's entry state that it is the density check only, so a passing count no longer reads as clearing #7.
+
 - **Eval scenario-2 (voice-profile onboarding) was scoring 0/0** — its output spec and all 11 criteria targeted the absolute `~/.claude/blog-writer-persona/` path, which the eval grader (working-directory only) cannot see, so every criterion failed in both baseline and with-context. Redirected outputs to the working directory; the scenario now grades real output (baseline 91 → with-context 100).
 
 ### Removed
