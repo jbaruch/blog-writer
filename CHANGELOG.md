@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+### Changed
+
+- **Migrated the plugin manifest from `tile.json` to `.tessl-plugin/plugin.json`** — the legacy `tile.json` form is retired; `summary` becomes `description` and the `skills` map becomes an array. Reconciled the residual "tile" wording to "plugin" across the publish workflow's display name, `references/ai-anti-patterns.md` examples, and `evals/scenario-7/criteria.json`. The `docs.tessl.io` page references in `example-persona/product.md` keep "tiles" — those are live external URLs and page titles. Also dropped the forbidden `## Unreleased` heading so the publish pipeline's stamp step heads these entries with the published version.
+- **Wired the CHANGELOG stamp step into the publish pipeline** — `publish.yml` now passes `stamp-changelog: true` to the reusable workflow, whose input defaults to `false`. The step had been silently skipping on every publish, which is why entries accumulated under an `## Unreleased` heading that `context-artifacts.md` forbids: with auto-bump assigning the version at publish time, a PR author cannot write the heading, and un-headed blocks are illegal when nothing stamps them. The stamp action mirrors `tesslio/patch-version-publish`'s version computation, so the heading it writes matches the version actually published.
 
 ### Fixed
 
@@ -10,7 +13,7 @@
 
 ### Removed
 
-- **Retired four no-lift eval scenarios** per `jbaruch/coding-policy: plugin-evals` ("lift, not attainment"), confirmed across two runs: the `blog-writer-framework-override` scenario (contrived, near-zero lift), and scenario-1 / scenario-5 / scenario-6 (anti-pattern cleanup, soul check, tightening) whose baselines run 94–99% — coincidence with universal competence, no headroom for the tile to show lift. Kept scenarios (0, 2, 3, 4, 7, 8) all contribute positive lift.
+- **Retired four no-lift eval scenarios** per `jbaruch/coding-policy: plugin-evals` ("lift, not attainment"), confirmed across two runs: the `blog-writer-framework-override` scenario (contrived, near-zero lift), and scenario-1 / scenario-5 / scenario-6 (anti-pattern cleanup, soul check, tightening) whose baselines run 94–99% — coincidence with universal competence, no headroom for the plugin to show lift. Kept scenarios (0, 2, 3, 4, 7, 8) all contribute positive lift.
 
 ### Added
 

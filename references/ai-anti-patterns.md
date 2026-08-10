@@ -42,7 +42,7 @@ The negation doesn't have to lead the sentence or use the word "Not."
   using symmetrical negation instead of negation-then-affirmation.
 - "No monitoring, no alerting, no idea what's happening in production." — Extended
   negative parallelism building to a kicker. Overlaps with pattern #3 (tricolon).
-- "I wasn't measuring the tile. I was measuring the judge's reading comprehension." —
+- "I wasn't measuring the plugin. I was measuring the judge's reading comprehension." —
   Confession-as-negation. The most dangerous variant because it disguises contrastive
   negation as self-deprecating narration. "I wasn't doing X. I was doing Y." feels like
   a genuine admission, which makes it pattern-match to the voice profile's
@@ -602,7 +602,7 @@ across consecutive paragraphs — all referring to the exact same thing.
 **Examples:**
 - ❌ "The CLI scaffolds the project. Once the tool finishes, review the output.
   The interface will prompt you for confirmation."
-- ❌ "Developers can install the tile. Engineers who need customization can fork it.
+- ❌ "Developers can install the plugin. Engineers who need customization can fork it.
   Practitioners in larger teams should use the workspace feature."
 
 **Structural variants:**
@@ -980,7 +980,7 @@ is a study guide or a sales page highlighting features.
 - ❌ "The **spec-driven approach** ensures that the **agent** operates within **guardrails**,
   producing **deterministic output** that matches the **developer's intent**."
 - ❌ "We used **Tessl** to define the **skill**, added **rules** for the **context window**,
-  and deployed the **tile** to production."
+  and deployed the **plugin** to production."
 
 **Structural variants:**
 - Italics used the same way — `*every concept*` gets emphasized on first appearance.

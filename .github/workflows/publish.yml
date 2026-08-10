@@ -1,9 +1,10 @@
-name: Review & Publish Tile
+name: Review & Publish Plugin
 
 # Thin caller for the canonical fleet publish pipeline
 # (jbaruch/coding-policy#206). All steps live in the reusable workflow;
-# this file carries only the triggers and this repo's inputs. The display
-# name is unchanged so tooling that watches this run by name keeps working.
+# this file carries only the triggers and this repo's inputs. The release
+# tooling resolves this run by workflow filename (`publish.yml`), not by
+# display name, so the display name is free to track current terminology.
 
 on:
   push:
@@ -25,3 +26,11 @@ jobs:
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
     with:
       skill-review-credit-outage: skip
+      # Every merge publishes, and the version is assigned by the auto-bump at
+      # publish time, so a PR author cannot write the heading themselves. The
+      # stamp step computes the same version and heads the top un-headed `### `
+      # blocks with `## <version> — <date>` immediately before publish. Without
+      # it, context-artifacts "CHANGELOG Hygiene" leaves no legal option: the
+      # `## Unreleased` heading is forbidden, and un-headed blocks are forbidden
+      # when nothing stamps them.
+      stamp-changelog: true
