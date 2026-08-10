@@ -1,0 +1,30 @@
+# Excluded from the published plugin, per `jbaruch/coding-policy: context-artifacts`
+# Plugin Structure ("use .tesslignore to exclude build artifacts and CI files
+# from the published plugin").
+#
+# The published surface is what a consumer's agent loads at runtime: SKILL.md,
+# references/, example-persona/, and the fetch script the skill invokes. Anything
+# that only serves development stays out.
+#
+# Verify a change here with `tessl plugin pack --output /tmp/p.tgz . && tar tzf /tmp/p.tgz`.
+
+# Test suites — CI artifacts, never invoked by the skill at runtime
+skills/**/tests/
+
+# CI configuration and the gate scripts the workflows run
+.github/
+
+# Eval harness — development-time measurement, not runtime surface
+evals/
+
+# Local agent and tooling state
+.tessl/
+.agents/
+.claude/
+.codex/
+.gemini/
+.vscode/
+.mcp.json
+
+# The author's own persona lives outside the package; example-persona/ ships instead
+persona/
