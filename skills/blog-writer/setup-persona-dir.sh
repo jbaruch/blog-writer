@@ -86,6 +86,15 @@ emit() {
     '{ok: true, path: $path, exists: $exists, kind: $kind, target: $target, voice_ready: $voice_ready, action: $action}'
 }
 
+# `probed` under --probe, `unchanged` under a setup run that found the persona
+# already in place. Both describe "nothing was written", but the caller routes on
+# them differently, so they stay distinct.
+if [ "$probe_only" -eq 1 ]; then
+  found_action=probed
+else
+  found_action=unchanged
+fi
+
 # An existing persona is authoritative. Re-pointing it on a re-run would orphan
 # the author's voice profile, so the only job here is to confirm it is usable.
 if [ -L "$CANONICAL" ]; then
@@ -94,13 +103,13 @@ if [ -L "$CANONICAL" ]; then
     exit 1
   fi
   resolved=$(cd "$CANONICAL" && pwd -P)
-  emit true symlink "$resolved" "$(voice_ready)" unchanged
+  emit true symlink "$resolved" "$(voice_ready)" "$found_action"
   exit 0
 fi
 
 if [ -d "$CANONICAL" ]; then
   resolved=$(cd "$CANONICAL" && pwd -P)
-  emit true directory "$resolved" "$(voice_ready)" unchanged
+  emit true directory "$resolved" "$(voice_ready)" "$found_action"
   exit 0
 fi
 

@@ -227,10 +227,14 @@ if run_case "probe: voice_ready is false until voice.md has content" 0; then
   rerun_in_case --probe
   assert_json '.exists' true "exists with empty voice.md"
   assert_json '.voice_ready' false "voice_ready with empty voice.md"
+  # A probe over an existing persona still reports `probed`, not `unchanged` —
+  # the header promises the action names how the script was invoked.
+  assert_json '.action' probed "action probing an existing directory"
 
   printf 'the author voice profile' > "${CASE_HOME}/.claude/blog-writer-persona/voice.md"
   rerun_in_case --probe
   assert_json '.voice_ready' true "voice_ready with populated voice.md"
+  assert_json '.action' probed "action probing a populated persona"
 fi
 rm -rf "${CASE_HOME:?}"
 
@@ -243,6 +247,20 @@ if run_case "probe: refuses a target path" 2 --probe /tmp/somewhere; then
   fi
 fi
 rm -rf "${CASE_HOME:?}"
+
+# 7d. Probe over a symlinked persona reports `probed`, while a setup re-run over
+# the same persona reports `unchanged` — the two invocations stay distinguishable.
+symlink_root=$(mktemp -d)
+symlink_target="${symlink_root}/persona"
+if run_case "probe: a symlinked persona reports probed, setup reports unchanged" 0 "$symlink_target"; then
+  rerun_in_case --probe
+  assert_json '.kind' symlink "kind on probe"
+  assert_json '.action' probed "action probing a symlinked persona"
+
+  rerun_in_case
+  assert_json '.action' unchanged "action on a setup re-run"
+fi
+rm -rf "${CASE_HOME:?}" "${symlink_root:?}"
 
 # 8. Arg-count validation
 if run_case "usage: two arguments exit 2" 2 one two; then
