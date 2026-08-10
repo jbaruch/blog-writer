@@ -149,9 +149,9 @@ check.
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
 
-Run Step 6 during the Phase 3 draft, before delivering it to the author.
+Run Steps 6 and 7 during the Phase 3 draft, before delivering it to the author.
 
-## Step 6 — Insert and Confirm Placeholders
+## Step 6 — Insert Placeholders
 
 The author's video transcript will reference things visible on screen that Claude cannot see.
 After reconstructing the narrative:
@@ -178,7 +178,15 @@ After reconstructing the narrative:
    Diagrams earn their place when they clarify complexity that prose can't convey
    (multi-step flows, component relationships, state transitions). If a single screenshot
    of the real system would be more honest and more specific, use a screenshot instead.
-6. Ask the author to confirm or replace all placeholders before finalizing
+
+Proceed immediately to Step 7.
+
+## Step 7 — Confirm Placeholders With the Author
+
+Ask the author to confirm or replace every placeholder inserted in Step 6 before the draft
+is finalized. Cover all five types — Screenshot, Code, Link, Fact, Diagram — and treat the
+`VERIFY` comments on reconstructed code and diagrams as open questions rather than
+resolved content.
 
 Return to the Step 5 phase workflow and finish the remaining phases. Finish here when the
 author declares the post done.

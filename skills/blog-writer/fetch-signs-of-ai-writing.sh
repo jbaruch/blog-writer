@@ -40,6 +40,14 @@ if ! command -v curl >/dev/null; then
   exit 2
 fi
 
+# The success line is JSON, and the path is caller-supplied, so it goes through a
+# real encoder. A path holding a quote, backslash, or newline would otherwise
+# produce output that parses as something else, or not at all.
+if ! command -v jq >/dev/null; then
+  echo '{"ok": false, "reason": "jq not found on PATH — required to emit the result as JSON"}' >&2
+  exit 2
+fi
+
 if [ "$#" -gt 1 ]; then
   echo "error: expected at most one argument (output path), got $# — usage: fetch-signs-of-ai-writing.sh [output-path]" >&2
   exit 2
@@ -86,4 +94,4 @@ if [ "$bytes" -lt "$MIN_BYTES" ]; then
   exit 1
 fi
 
-printf '{"ok": true, "path": "%s", "bytes": %s}\n' "$out_path" "$bytes"
+jq -n --arg path "$out_path" --argjson bytes "$bytes" '{ok: true, path: $path, bytes: $bytes}'
