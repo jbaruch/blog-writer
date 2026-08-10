@@ -33,8 +33,10 @@ The negation doesn't have to lead the sentence or use the word "Not."
   developer's permissions rather than the automation account's." Reads as measured prose,
   but it is still negation-then-affirmation with "rather than" doing the work of "not."
   The hardest of the three to catch by eye: "Not X. Y." announces itself, while this one
-  survives a read precisely because it does not sound like a mic drop. Catch it
-  mechanically: any "rather than" joining two candidates for the same slot.
+  survives a read precisely because it does not sound like a mic drop. It also fronts:
+  "Rather than the automation account's, the agent inherits the developer's permissions."
+  Catch it mechanically: any "rather than" joining two candidates for the same slot,
+  searched case-insensitively so the sentence-initial form doesn't slip through.
 - "No tests, no guardrails." / "No spec, no safety net." — Negative parallelism. Two
   "no [noun]" phrases mirrored for dramatic effect. Same mechanism as "Not X. Y." but
   using symmetrical negation instead of negation-then-affirmation.

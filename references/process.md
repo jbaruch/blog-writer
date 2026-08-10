@@ -348,11 +348,13 @@ the draft:
 the forms described in the examples and structural variants. For the following patterns,
 do a dedicated mechanical sweep instead of relying on contextual reading alone:
 
-- **Contrastive negation (#1):** Do a literal search for "rather than". Every hit that
-  joins two candidates for the same slot is pattern #1 wearing a comparative — the
-  negation-then-affirmation is intact, with "rather than" doing the work of "not". The
-  "Not X. Y." form announces itself on a contextual read; this one doesn't, which is
-  exactly why it needs the literal search.
+- **Contrastive negation (#1):** Do a literal, case-insensitive search for "rather than".
+  Every hit that joins two candidates for the same slot is pattern #1 wearing a
+  comparative — the negation-then-affirmation is intact, with "rather than" doing the work
+  of "not". Case matters: "Rather than X, Y" fronts the construction at the start of a
+  sentence, and a case-sensitive search silently misses every one of them. The "Not X. Y."
+  form announces itself on a contextual read; this one doesn't, which is exactly why it
+  needs the literal search.
 - **Fragments (#3, #4):** Find every sentence under six words in the draft and check
   whether 3+ appear consecutively. Surrounding sentences can make fragments feel embedded
   when they're actually standalone. Count periods, not vibes.
