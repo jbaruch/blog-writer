@@ -8,24 +8,33 @@
 # canonical path, so the symlink is what makes a custom location work.
 #
 # Usage:
-#   setup-persona-dir.sh [target-path]
+#   setup-persona-dir.sh --probe          report the persona state, change nothing
+#   setup-persona-dir.sh [target-path]    establish the persona directory
 #
 # Input:
-#   $1  optional path to hold the persona files. When given, it is created if
-#       missing and the canonical path becomes a symlink to it. When omitted,
-#       the canonical path is created as a real directory.
+#   --probe  read-only. Reports whether the persona exists and whether the voice
+#            profile has content, so the caller routes on this result instead of
+#            performing its own filesystem checks.
+#   $1       optional path to hold the persona files. When given, it is created
+#            if missing and the canonical path becomes a symlink to it. When
+#            omitted, the canonical path is created as a real directory.
 #
 # Output (stdout), a single JSON object:
-#   {"ok": true, "path": "<canonical>", "kind": "directory|symlink",
-#    "target": "<resolved target>", "action": "created|linked|unchanged"}
+#   {"ok": true, "path": "<canonical>", "exists": bool, "kind": "directory|symlink|none",
+#    "target": "<resolved target>", "voice_ready": bool,
+#    "action": "created|linked|unchanged|probed"}
 #
-#   action is `unchanged` when the canonical path already existed, which makes
-#   re-running safe: an established persona is never relinked or replaced.
+#   exists       the canonical path is present and usable
+#   voice_ready  voice.md is present and non-empty — the caller's signal that
+#                onboarding has already been completed
+#   action       `unchanged` when the canonical path already existed, which makes
+#                re-running safe: an established persona is never relinked or
+#                replaced. `probed` under --probe, which never writes.
 #
 # Exit codes:
-#   0  the canonical path exists and is usable
-#   1  it exists but is unusable (a regular file, or a symlink that dangles)
-#   2  tool or usage error (jq missing, too many arguments, mkdir/ln failed)
+#   0  the reported state is authoritative (under --probe, even when nothing exists)
+#   1  the canonical path exists but is unusable (a regular file, or a dangling symlink)
+#   2  tool or usage error (jq missing, bad arguments, mkdir/ln failed)
 #
 # Idempotent: a second run with the same arguments reports `unchanged` and
 # touches nothing.
@@ -39,18 +48,42 @@ if ! command -v jq >/dev/null; then
   exit 2
 fi
 
+probe_only=0
+if [ "${1:-}" = "--probe" ]; then
+  probe_only=1
+  shift
+fi
+
 if [ "$#" -gt 1 ]; then
-  echo "error: expected at most one argument (target path), got $# — usage: setup-persona-dir.sh [target-path]" >&2
+  echo "error: expected at most one argument (target path), got $# — usage: setup-persona-dir.sh [--probe] [target-path]" >&2
   exit 2
 fi
+
+if [ "$probe_only" -eq 1 ] && [ "$#" -eq 1 ]; then
+  echo "error: --probe takes no target path — it reports state and changes nothing" >&2
+  exit 2
+fi
+
+# voice.md carries the author's voice profile. Present-and-non-empty is what
+# distinguishes a finished onboarding from a directory that merely exists, and
+# deciding it here keeps the caller out of the filesystem.
+voice_ready() {
+  if [ -s "${CANONICAL}/voice.md" ]; then
+    echo true
+  else
+    echo false
+  fi
+}
 
 emit() {
   jq -n \
     --arg path "$CANONICAL" \
-    --arg kind "$1" \
-    --arg target "$2" \
-    --arg action "$3" \
-    '{ok: true, path: $path, kind: $kind, target: $target, action: $action}'
+    --argjson exists "$1" \
+    --arg kind "$2" \
+    --arg target "$3" \
+    --argjson voice_ready "$4" \
+    --arg action "$5" \
+    '{ok: true, path: $path, exists: $exists, kind: $kind, target: $target, voice_ready: $voice_ready, action: $action}'
 }
 
 # An existing persona is authoritative. Re-pointing it on a re-run would orphan
@@ -61,19 +94,25 @@ if [ -L "$CANONICAL" ]; then
     exit 1
   fi
   resolved=$(cd "$CANONICAL" && pwd -P)
-  emit symlink "$resolved" unchanged
+  emit true symlink "$resolved" "$(voice_ready)" unchanged
   exit 0
 fi
 
 if [ -d "$CANONICAL" ]; then
   resolved=$(cd "$CANONICAL" && pwd -P)
-  emit directory "$resolved" unchanged
+  emit true directory "$resolved" "$(voice_ready)" unchanged
   exit 0
 fi
 
 if [ -e "$CANONICAL" ]; then
   echo "error: ${CANONICAL} exists but is not a directory or symlink — move it aside and re-run" >&2
   exit 1
+fi
+
+# Nothing is there. A probe reports that and stops; only a setup run creates.
+if [ "$probe_only" -eq 1 ]; then
+  emit false none "" false probed
+  exit 0
 fi
 
 parent=$(dirname "$CANONICAL")
@@ -93,7 +132,7 @@ if [ "$#" -eq 1 ]; then
     echo "error: could not link ${CANONICAL} to ${resolved}" >&2
     exit 2
   fi
-  emit symlink "$resolved" linked
+  emit true symlink "$resolved" "$(voice_ready)" linked
   exit 0
 fi
 
@@ -102,4 +141,4 @@ if ! mkdir -p "$CANONICAL"; then
   exit 2
 fi
 resolved=$(cd "$CANONICAL" && pwd -P)
-emit directory "$resolved" created
+emit true directory "$resolved" "$(voice_ready)" created

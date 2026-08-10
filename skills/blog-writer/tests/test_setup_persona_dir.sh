@@ -12,7 +12,9 @@
 #   5. Dangling symlink — a canonical path pointing nowhere exits 1 rather than
 #      silently replacing the author's link.
 #   6. Occupied by a file — a regular file at the canonical path exits 1.
-#   7. Arg-count validation — more than one argument exits 2 with usage.
+#   7. Probe — --probe reports state, creates nothing, and tracks voice_ready
+#      against voice.md's contents; it rejects a target path.
+#   8. Arg-count validation — more than one argument exits 2 with usage.
 #
 # Approach: each case runs with HOME pointed at a fresh temp directory, so the
 # canonical path is real but disposable and no test can touch the developer's
@@ -96,7 +98,8 @@ fi
 rm -rf "${CASE_HOME:?}"
 
 # 2. Custom target — symlink
-custom_target=$(mktemp -d)/persona
+custom_root=$(mktemp -d)
+custom_target="${custom_root}/persona"
 if run_case "custom target: links the canonical path to it" 0 "$custom_target"; then
   assert_json '.kind' symlink "kind"
   assert_json '.action' linked "action"
@@ -118,7 +121,7 @@ if run_case "custom target: links the canonical path to it" 0 "$custom_target"; 
     ok
   fi
 fi
-rm -rf "${CASE_HOME:?}" "$custom_target"
+rm -rf "${CASE_HOME:?}" "${custom_root:?}"
 
 # 3. Idempotence over a real directory
 if run_case "idempotent: a second default run reports unchanged" 0; then
@@ -134,8 +137,10 @@ fi
 rm -rf "${CASE_HOME:?}"
 
 # 4. Idempotence over a symlink — an established persona is never repointed
-first_target=$(mktemp -d)/first
-second_target=$(mktemp -d)/second
+first_root=$(mktemp -d)
+first_target="${first_root}/first"
+second_root=$(mktemp -d)
+second_target="${second_root}/second"
 if run_case "idempotent: an established symlink is not repointed" 0 "$first_target"; then
   rerun_in_case "$second_target"
   if [ "$CASE_RC" -ne 0 ]; then
@@ -156,7 +161,7 @@ if run_case "idempotent: an established symlink is not repointed" 0 "$first_targ
     ok
   fi
 fi
-rm -rf "${CASE_HOME:?}" "$first_target" "$second_target"
+rm -rf "${CASE_HOME:?}" "${first_root:?}" "${second_root:?}"
 
 # 5. Dangling symlink
 dangling_home=$(mktemp -d)
@@ -203,7 +208,43 @@ else
 fi
 rm -rf "$file_home" "$file_err"
 
-# 7. Arg-count validation
+# 7. Probe — reports state without creating anything
+if run_case "probe: reports a missing persona without creating it" 0 --probe; then
+  assert_json '.exists' false "exists"
+  assert_json '.action' probed "action"
+  assert_json '.voice_ready' false "voice_ready"
+  if [ -e "${CASE_HOME}/.claude/blog-writer-persona" ]; then
+    fail "probe created the canonical path"
+  else
+    ok
+  fi
+fi
+rm -rf "${CASE_HOME:?}"
+
+# 7b. Probe — voice_ready tracks whether onboarding actually produced a profile
+if run_case "probe: voice_ready is false until voice.md has content" 0; then
+  : > "${CASE_HOME}/.claude/blog-writer-persona/voice.md"
+  rerun_in_case --probe
+  assert_json '.exists' true "exists with empty voice.md"
+  assert_json '.voice_ready' false "voice_ready with empty voice.md"
+
+  printf 'the author voice profile' > "${CASE_HOME}/.claude/blog-writer-persona/voice.md"
+  rerun_in_case --probe
+  assert_json '.voice_ready' true "voice_ready with populated voice.md"
+fi
+rm -rf "${CASE_HOME:?}"
+
+# 7c. Probe rejects a target path rather than silently ignoring it
+if run_case "probe: refuses a target path" 2 --probe /tmp/somewhere; then
+  if ! grep -q "changes nothing" <<<"$CASE_ERR"; then
+    fail "stderr does not explain that --probe is read-only, got: ${CASE_ERR}"
+  else
+    ok
+  fi
+fi
+rm -rf "${CASE_HOME:?}"
+
+# 8. Arg-count validation
 if run_case "usage: two arguments exit 2" 2 one two; then
   if ! grep -q "usage" <<<"$CASE_ERR"; then
     fail "stderr does not carry usage text, got: ${CASE_ERR}"

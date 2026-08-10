@@ -29,42 +29,59 @@ when reading or writing files.
 
 Proceed immediately to Step 2.
 
-## Step 2 — Bootstrap the Persona Directory
+## Step 2 — Probe the Persona State
 
-Check if `~/.claude/blog-writer-persona/` exists (as a real directory or a symlink).
+Ask the script what state the persona is in. Do not inspect the filesystem yourself — the
+script decides whether the directory exists and whether the voice profile has content:
 
-| State | Action |
-|-------|--------|
-| Exists and `persona/voice.md` has content | Persona ready — proceed to Step 3 |
-| Exists but `persona/voice.md` is empty or missing | Read `references/setup.md` and run onboarding; do not proceed until complete |
-| Directory doesn't exist | First-time setup — see below |
+```bash
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh --probe
+```
 
-**First-time setup:** Ask the author where to store persona files:
+It changes nothing and prints
+`{"ok": true, "path": ..., "exists": bool, "kind": ..., "target": ..., "voice_ready": bool, "action": "probed"}`.
+
+Route on the result:
+
+| Result | Where to go |
+|--------|-------------|
+| `exists: true`, `voice_ready: true` | Persona is ready — skip to Step 5 |
+| `exists: true`, `voice_ready: false` | Onboarding is incomplete — skip to Step 4 |
+| `exists: false` | First-time setup — proceed to Step 3 |
+
+On **exit 1** the canonical path is occupied by a regular file, or is a symlink whose
+target is missing. Report the script's stderr diagnostic and ask the author how to resolve
+it; do not remove or replace what is there. On **exit 2** report the diagnostic and stop.
+
+## Step 3 — Establish the Persona Directory
+
+Ask the author where to store persona files:
 
 > 1. `~/.claude/blog-writer-persona/` ← **default** (recommended)
 > 2. A custom path — I'll create a symlink so the skill always finds them
 
-Then establish the directory. Pass the author's chosen path for option 2, and no argument
-for option 1:
+Then run the same script to establish it. Pass the author's chosen path for option 2, and
+no argument for option 1:
 
 ```bash
 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh [target-path]
 ```
 
-The script prints `{"ok": true, "path": ..., "kind": ..., "target": ..., "action": ...}`.
+An `action` of `created` or `linked` means the directory is now in place. An `action` of
+`unchanged` means one was already established and the script left it alone rather than
+repointing it. The exit-1 and exit-2 handling is the same as Step 2.
 
-- **Exit 0** — the persona directory is usable. An `action` of `unchanged` means one was
-  already established, and the script left it alone rather than repointing it.
-- **Exit 1** — the canonical path is occupied by a regular file, or is a symlink whose
-  target is missing. Report the script's stderr diagnostic and ask the author how to
-  resolve it; do not remove or replace what is there.
-- **Exit 2** — a tool or usage error. Report the diagnostic and stop.
+Proceed immediately to Step 4.
 
-Then read `references/setup.md` and run the interactive onboarding flow.
+## Step 4 — Run the Onboarding Flow
 
-Proceed immediately to Step 3 once the persona is ready.
+Read `references/setup.md` and run the interactive onboarding that produces the author's
+voice profile. Do not proceed until it is complete — the rest of the skill reads
+`persona/voice.md` on every writing action.
 
-## Step 3 — Refresh the Anti-Pattern File
+Proceed immediately to Step 5.
+
+## Step 5 — Refresh the Anti-Pattern File
 
 Fetch Wikipedia's "Signs of AI writing" article and compare it against
 `references/ai-anti-patterns.md`. Wikipedia's list is community-maintained and evolves as
@@ -89,9 +106,9 @@ covered in the anti-patterns file, update the file to incorporate them. Keep the
 format: pattern number, the tell, symptoms, examples, structural variants (where
 applicable), why it's a tell, and instead.
 
-Proceed immediately to Step 4.
+Proceed immediately to Step 6.
 
-## Step 4 — Read the Reference Files
+## Step 6 — Read the Reference Files
 
 Read these reference files in order:
 
@@ -115,9 +132,9 @@ Read these reference files in order:
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
    fetch only the specific pages relevant to the post's topic during Phase 0.
 
-Proceed immediately to Step 5.
+Proceed immediately to Step 7.
 
-## Step 5 — Run Phase 0: Intake
+## Step 7 — Run Phase 0: Intake
 
 Read the source material and build the narrative model: who is involved, what was built,
 what went wrong, what went right, what was shown on screen, and the jokes and references
@@ -127,9 +144,9 @@ is configured. `references/process.md` Phase 0 has the full procedure.
 Gate: the gaps in your understanding are identified. Do not summarize, and do not start
 writing.
 
-Proceed immediately to Step 6.
+Proceed immediately to Step 8.
 
-## Step 6 — Run Phase 1: Clarification
+## Step 8 — Run Phase 1: Clarification
 
 Ask the author one question at a time, each with 1-4 concrete options plus an open answer,
 your best guess marked. Group questions by narrative, technical, visual, and context gaps.
@@ -138,28 +155,28 @@ your best guess marked. Group questions by narrative, technical, visual, and con
 Gate: the author confirms the narrative reconstruction is accurate and no ambiguity
 remains.
 
-Proceed immediately to Step 7.
+Proceed immediately to Step 9.
 
-## Step 7 — Run Phase 2: Editorial Planning
+## Step 9 — Run Phase 2: Editorial Planning
 
 Lock the main idea, the CTA, and the section outline. `references/process.md` Phase 2 has
 the main-idea template and the outline requirements.
 
 Gate: the author approves the plan.
 
-Proceed immediately to Step 8.
+Proceed immediately to Step 10.
 
-## Step 8 — Run Phase 3: First Draft
+## Step 10 — Run Phase 3: First Draft
 
 Write the draft to `blog-draft-[slug].md`, insert and confirm placeholders, then run the
 anti-pattern, accuracy, and tightening checks. `references/process.md` Phase 3 has the
 writing rules, the placeholder conventions, and the check procedure.
 
-Two rules bind this step and Step 9:
+Two rules bind this step and Step 11:
 
 **Persona adherence.** Re-read `persona/voice.md` before every writing action — before this
-draft, before every Step 9 revision, and before the anti-pattern rewrite voice check. At
-the start of this step and Step 9, confirm you can name at least 3 rhetorical devices from
+draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. At
+the start of this step and Step 11, confirm you can name at least 3 rhetorical devices from
 the profile; if you can't, read it again.
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
@@ -171,11 +188,11 @@ procedure in order, and never invent a pattern the file does not define.
 
 Gate: the draft is delivered to the author.
 
-Proceed immediately to Step 9.
+Proceed immediately to Step 11.
 
-## Step 9 — Run Phase 4: Revision
+## Step 11 — Run Phase 4: Revision
 
-Edit the draft file on the author's feedback, and re-run the Step 8 checks after every
+Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
 change. `references/process.md` Phase 4 has the revision procedure.
 
 Finish here when the author declares the post done.

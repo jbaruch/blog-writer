@@ -27,8 +27,13 @@ jobs:
       # gates must not depend on whatever a runner image happens to ship.
       # ShellCheck comes from its upstream release at a pinned version so the
       # diagnostics gate is reproducible; a distro package would drift with the
-      # image. Renewal: bump SHELLCHECK_VERSION when upstream releases, verified
-      # by this workflow's own run.
+      # image.
+      #
+      # Renewal cadence for SHELLCHECK_VERSION: reviewed on the first Monday of
+      # each quarter against https://github.com/koalaman/shellcheck/releases.
+      # No scanner tracks a version embedded in a workflow step, so this cadence
+      # is the renewal mechanism dependency-management Freshness requires. Bump
+      # the value and let this workflow's own run verify the new pin.
       - name: Install shell gate tooling
         env:
           SHELLCHECK_VERSION: v0.11.0
