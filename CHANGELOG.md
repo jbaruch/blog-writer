@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.24 — 2026-08-10
+
 ### Changed
 
 - **Migrated the plugin manifest from `tile.json` to `.tessl-plugin/plugin.json`** — `summary` becomes `description`, the `skills` map becomes an array, and the manifest declares `private: false` explicitly rather than relying on a default that would make a published plugin private. Residual "tile" wording is reconciled to "plugin" across the publish workflow name, the anti-pattern examples, and `evals/scenario-7/criteria.json`; the `docs.tessl.io` references in `example-persona/product.md` keep "tiles" because those are live external URLs and page titles. `tessl.json` moves `jbaruch/coding-policy` to the `latest` specifier the consumer-manifest carve-out requires.
