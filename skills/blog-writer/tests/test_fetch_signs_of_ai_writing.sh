@@ -74,7 +74,9 @@ STUB
 
 long_body() {
   # Deterministic filler comfortably above the script's 1000-byte floor.
-  printf 'signs of ai writing %.0s' $(seq 1 200)
+  # Brace expansion rather than $(seq ...) — bash-native, one less external
+  # command, and portable to systems without seq.
+  printf 'signs of ai writing %.0s' {1..200}
 }
 
 run_case() {
