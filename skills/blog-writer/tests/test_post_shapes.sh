@@ -25,9 +25,11 @@
 #      authoritative verdict from state that does not match its schema.
 #  12. Below-minimum schema — a record older than the documented schema has no
 #      migration path and exits 1.
-#  13. Dangling symlink — an existing-but-broken link exits 1 rather than
+#  13. Duplicate slugs — two records for one post make the history ambiguous and
+#      contradict the idempotent-by-slug contract, so it exits 1.
+#  14. Dangling symlink — an existing-but-broken link exits 1 rather than
 #      collapsing into the absent case.
-#  14. Argument validation — wrong count exits 2.
+#  15. Argument validation — wrong count exits 2.
 #
 # record-post-shape.sh
 #  14. Creates a history that does not exist yet.
@@ -291,6 +293,16 @@ new_dir
 printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2025-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
 run_case "a record with a mistyped field is rejected" 1 \
   bash "$CHECK" "${CASE_DIR}/badtype.json" o a c
+
+new_dir
+jq -n '{posts: [
+   {schema_version: 1, slug: "same", date: "2025-01-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
+   {schema_version: 1, slug: "same", date: "2025-02-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []}
+ ]}' >"${CASE_DIR}/dupe.json"
+if run_case "a history with duplicate slugs is ambiguous and rejected" 1 \
+    bash "$CHECK" "${CASE_DIR}/dupe.json" o a c; then
+  assert_contains "duplicate slugs" "$CASE_ERR" "more than one record for slug"
+fi
 
 new_dir
 printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[7]}]}' >"${CASE_DIR}/badiv.json"

@@ -252,8 +252,9 @@ script's decision contract — see its header. Route on the exit code:
 
 - **Exit 0** — the result is authoritative. When `can_fire` is false there is not enough
   history for a verdict; say so and continue. This is normal for a new author and never
-  blocks planning. When `converged` is true, change one of the reported `converged_axes` and
-  note why in the plan.
+  blocks planning. When `converged` is true, change the reported `converged_axes`, re-run the
+  script on the revised plan, and keep going until it reports no convergence. Note in the
+  plan which axis changed and why.
 - **Exit 1** — the history exists but cannot be used. Report the script's stderr diagnostic
   to the author and continue planning without audit 6. Do not delete or overwrite the file.
 - **Exit 2** — a tool or usage error. Report the diagnostic and stop.

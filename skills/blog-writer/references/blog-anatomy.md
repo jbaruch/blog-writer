@@ -56,7 +56,8 @@ to the post's content. See the bio format in `persona/bio.md`.
 
 Audit 6 compares a planned post against recent ones and reports which axes have converged.
 Run `skills/blog-writer/check-shape-convergence.sh` and route on its verdict; how far back it
-reaches is the script's contract. Vary at least one of the axes it reports.
+reaches is the script's contract. Vary the axes it reports, then re-run it until it reports
+no convergence.
 
 **Opening modes** — public embarrassment or confession; cold open mid-incident; outcome
 first, then rewind; the delayed reveal that withholds the central number; a named artifact
@@ -67,8 +68,9 @@ named and left unanswered; genuine ambivalence with both feelings intact; end ho
 spike rather than a quiet coda; the recontextualized callback that changes an earlier
 detail's meaning.
 
-Changing one axis is enough. Changing every axis on every post rebuilds the same problem
-with different defaults — see the convergence trap in `references/structural-audits.md`.
+Change what the verdict asks for and no more. Rewriting every axis on every post rebuilds
+the same problem with different defaults — see the convergence trap in
+`references/structural-audits.md`.
 
 ## Series Support
 

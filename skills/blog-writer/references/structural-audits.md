@@ -194,9 +194,13 @@ the post wins.
 converge with. An unusable history is reported differently from an absent one, and the two
 must never be collapsed.
 
-**The fix:** change one axis — whichever ones the script reports in `converged_axes`. If it
-reports `opening_mode`, open this one somewhere else. Changing one axis is enough; changing
-all of them is the convergence trap in a new costume.
+**The fix:** change the axes the script reports in `converged_axes`. If it reports
+`opening_mode`, open this one somewhere else. Then re-run the script on the revised plan and
+keep adjusting until it reports no convergence — how many axes must differ is its contract,
+not a number to carry in your head.
+
+Change what the verdict asks for and no more. Rewriting every axis on every post rebuilds
+the same problem with different defaults, which is the convergence trap in a new costume.
 
 ---
 

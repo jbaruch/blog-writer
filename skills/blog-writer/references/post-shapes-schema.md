@@ -64,6 +64,10 @@ want fixed fields. The two artifacts coexist: the tracker carries narrative cont
 `schema_version` is per record rather than per file: a migration that upgrades some records
 and is interrupted leaves a history that still describes itself accurately.
 
+Slugs are unique across the history. Recording is idempotent by slug, so two records
+sharing one make the history ambiguous — the window could count one post twice — and both
+scripts refuse it.
+
 Every field above is required and type-checked. A record missing `schema_version`, carrying
 a `date` that is not `YYYY-MM-DD`, or holding a mistyped field is **malformed**, not merely
 old — both scripts refuse a history containing one rather than guessing at its meaning. A

@@ -24,6 +24,9 @@
 # A record is well-formed when every required field is present with the type
 # `references/post-shapes-schema.md` documents. Version range is checked
 # separately, so "written by a newer plugin" stays distinguishable from "corrupt".
+#
+# Slugs are additionally checked for uniqueness across the history: recording is
+# idempotent by slug, so two records sharing one make the history ambiguous.
 
 readonly POST_SHAPES_MIN_SCHEMA=1
 readonly POST_SHAPES_MAX_SCHEMA=1
@@ -62,6 +65,16 @@ post_shapes_load() {
 
   if [ "$(jq 'length' <<<"$malformed")" -gt 0 ]; then
     echo "error: ${file} holds malformed record(s) at index ${malformed} — every record needs an integer schema_version, a non-empty slug, a YYYY-MM-DD date, string opening_mode/arc/closing_mode, and a string array of interventions. See references/post-shapes-schema.md and repair or remove them; refusing to act on a history that does not match its schema" >&2
+    return 1
+  fi
+
+  # Recording is idempotent by slug, so a slug identifies exactly one post. Two
+  # records sharing one means the history is ambiguous: the window could count a
+  # single post twice, and an upsert could not say which record it replaced.
+  local dupes
+  dupes=$(jq -c '[.posts | group_by(.slug)[] | select(length > 1) | .[0].slug]' "$file")
+  if [ "$(jq 'length' <<<"$dupes")" -gt 0 ]; then
+    echo "error: ${file} holds more than one record for slug(s) ${dupes} — a slug identifies one post, so keep the record that matches the published post and remove the rest; see references/post-shapes-schema.md" >&2
     return 1
   fi
 
