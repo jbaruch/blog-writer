@@ -36,9 +36,14 @@
 #  19. Malformed history is refused and left byte-identical.
 #  20. A history whose records lack schema_version is refused, not extended.
 #  21. A history holding a malformed record is refused and left byte-identical.
-#  22. Date format is validated.
-#  23. Empty slug is rejected.
-#  24. Argument count is validated.
+#  22. Re-recording the same slug replaces its record rather than duplicating it,
+#      so re-running the recording step cannot skew the convergence window.
+#  23. An unwritable destination directory exits 2 (environment) rather than 1
+#      (history unusable). Skipped with a visible note when the process can write
+#      to a chmod a-w directory, which is the case as root.
+#  24. Date format is validated.
+#  25. Empty slug is rejected.
+#  26. Argument count is validated.
 #
 # Approach: every case runs in a fresh temp directory, so no test touches a real
 # history file. Dates are literals passed as arguments — the scripts never read
@@ -324,6 +329,31 @@ before=$(cat "${CASE_DIR}/bad.json")
 run_case "refuses to write over a malformed history" 1 \
   bash "$RECORD" "${CASE_DIR}/bad.json" s 2026-08-11 a b c
 if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
+
+new_dir
+run_case "recording the same slug twice updates rather than duplicates" 0 \
+  bash "$RECORD" "${CASE_DIR}/idem.json" same 2026-05-01 first-open first-arc first-close
+if run_case "re-recording the same post reports updated" 0 \
+    bash "$RECORD" "${CASE_DIR}/idem.json" same 2026-05-01 second-open second-arc second-close; then
+  assert_json "idempotent" '.action' "updated"
+  assert_json "idempotent" '.count' "1"
+fi
+kept=$(jq -r '.posts[0].opening_mode' "${CASE_DIR}/idem.json")
+if [ "$kept" = "second-open" ]; then ok; else fail "idempotent: expected the re-run to replace the record, got opening_mode '${kept}'"; fi
+total=$(jq '.posts | length' "${CASE_DIR}/idem.json")
+if [ "$total" = "1" ]; then ok; else fail "idempotent: expected 1 record after a re-run, got ${total}"; fi
+
+new_dir
+mkdir -p "${CASE_DIR}/ro"
+printf '{"posts":[]}' >"${CASE_DIR}/ro/s.json"
+chmod a-w "${CASE_DIR}/ro"
+if [ -w "${CASE_DIR}/ro" ]; then
+  echo "    NOTE: running with write access to a chmod a-w directory (root?); skipping the unwritable-directory case" >&2
+else
+  run_case "an unwritable destination directory exits 2, not 1" 2 \
+    bash "$RECORD" "${CASE_DIR}/ro/s.json" s 2026-08-11 a b c
+fi
+chmod u+w "${CASE_DIR}/ro"
 
 new_dir
 run_case "a backfilled earlier post lands in date order, not at the end" 0 \

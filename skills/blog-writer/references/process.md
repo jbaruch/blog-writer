@@ -650,27 +650,9 @@ conversation — edit the file surgically.
 
 **The post is done when the author says it's done. Not before.**
 
-**Record the post's shape.** Once the author declares it done, run:
-
-```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \
-  <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
-  "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
-```
-
-It stamps the record, appends newest-last, and writes atomically. Exit 1 means the history
-was refused and left untouched — report the diagnostic rather than deleting the file. The
-field meanings are in `references/post-shapes-schema.md`.
-
-Two rules the script cannot check, so they are yours:
-
-- Record the post **as it ended up**, not as it was first drafted.
-- Reuse an existing `opening_mode` / `arc` / `closing_mode` string verbatim when the shape
-  is the same. The comparison is by equality, so a synonym reads as a different shape and
-  hides the convergence audit 6 exists to catch.
-
-**When a post is finished and added to `persona/examples.md`:** The persona has been updated
-with new writing. Ask the global voice preference question from `references/setup.md` Step 10.
+**Recording the post's shape** is Step 12 of the skill, not part of this phase. Once the
+author declares the post done, that step runs the writer and owns the routing contract.
+Do not record it here — invoking the writer from both places would file the post twice.
 
 ---
 

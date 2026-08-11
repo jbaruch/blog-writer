@@ -32,15 +32,24 @@
 # corrupt file is never made larger.
 #
 # Output (stdout), a single JSON object:
-#   {"ok": true, "action": "created|appended", "count": N, "schema_version": N,
-#    "path": "<shapes-file>"}
+#   {"ok": true, "action": "created|appended|updated", "count": N,
+#    "schema_version": N, "path": "<shapes-file>"}
+#
+#   action  `updated` when a record for this slug already existed. Recording is
+#           idempotent by slug: a re-run replaces that post's record rather than
+#           adding a second one, so re-running Step 12 after a late revision
+#           corrects the history instead of corrupting the convergence window.
 #
 # Exit codes:
 #   0  the record was written
 #   1  the history file exists but cannot be used (unreadable, not valid JSON,
 #      not the documented shape, or holds a record from a newer skill version).
 #      Nothing is written in this case — a newer history is never clobbered.
-#   2  tool or usage error (jq missing, too few arguments, malformed date)
+#   2  tool or usage error (jq missing, too few arguments, malformed date,
+#      destination directory missing or not writable)
+#
+# Idempotent by slug: re-recording the same post replaces its record rather than
+# appending a duplicate, so a re-run cannot skew the convergence window.
 #
 # Keeps the history sorted by `date`, so the "newest last" invariant the reader
 # depends on holds even when a post finished earlier is recorded after a later
@@ -108,7 +117,11 @@ if [ -e "$SHAPES_FILE" ]; then
   fi
 
   existing=$(cat "$SHAPES_FILE")
-  action=appended
+  if [ "$(jq --arg slug "$SLUG" '[.posts[] | select(.slug == $slug)] | length' "$SHAPES_FILE")" -gt 0 ]; then
+    action=updated
+  else
+    action=appended
+  fi
 fi
 
 staging="${SHAPES_FILE}.staging.$$"
@@ -124,6 +137,14 @@ if [ ! -d "$destination_dir" ]; then
   exit 2
 fi
 
+# Checked before staging rather than discovered at `mv`, so an unwritable
+# directory reports as the environment problem it is (exit 2) instead of
+# surfacing mv's status as though the history itself were unusable (exit 1).
+if [ ! -w "$destination_dir" ]; then
+  echo "error: directory ${destination_dir} is not writable — fix its permissions (chmod u+w) before recording a post's shape" >&2
+  exit 2
+fi
+
 if ! jq -n \
   --argjson existing "$existing" \
   --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
@@ -134,7 +155,7 @@ if ! jq -n \
   --arg closing "$CLOSING" \
   --args \
   '$existing
-   | .posts += [{
+   | .posts = ((.posts | map(select(.slug != $slug))) + [{
        schema_version: $schema,
        slug: $slug,
        date: $date,
@@ -142,13 +163,16 @@ if ! jq -n \
        arc: $arc,
        closing_mode: $closing,
        interventions: $ARGS.positional
-     }]
+     }])
    | .posts |= sort_by(.date)' "${interventions[@]+"${interventions[@]}"}" >"$staging"; then
   echo "error: failed to build the updated shape history for ${SHAPES_FILE} — the existing file was left untouched" >&2
   exit 1
 fi
 
-mv "$staging" "$SHAPES_FILE"
+if ! mv "$staging" "$SHAPES_FILE"; then
+  echo "error: could not move the staged history into place at ${SHAPES_FILE} — the existing file was left untouched" >&2
+  exit 2
+fi
 
 count=$(jq '.posts | length' "$SHAPES_FILE")
 jq -n \

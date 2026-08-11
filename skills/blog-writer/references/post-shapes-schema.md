@@ -101,11 +101,16 @@ disagrees with the actual published post, the post wins — correct the record.
 
 ## Writer contract — Phase 4
 
-Run `record-post-shape.sh` once the author declares the post done. It stamps
-`schema_version`, keeps the history sorted by `date` so the reader's "newest last" window
-stays correct even when a post finished earlier is recorded after a later one, and writes
-atomically through a staging file so an interrupted run cannot truncate an author's
-history.
+Run `record-post-shape.sh` once the author declares the post done — from Step 12 of the
+skill, which is the only place that invokes it. It stamps `schema_version`, keeps the
+history sorted by `date` so the reader's "newest last" window stays correct even when a post
+finished earlier is recorded after a later one, and writes atomically through a staging file
+so an interrupted run cannot truncate an author's history.
+
+**Recording is idempotent by slug.** A second run for the same post replaces that post's
+record rather than adding a duplicate, and reports `"action": "updated"`. So re-running the
+step after a late revision corrects the history instead of skewing the convergence window
+with two records for one post.
 
 Two rules the caller owns, because no script can check them:
 
@@ -115,6 +120,8 @@ Two rules the caller owns, because no script can check them:
 
 Exit 1 means the history was refused and left untouched — a newer-schema or malformed file
 is never overwritten. Report the diagnostic; do not work around it by deleting the file.
+Exit 2 is an environment or usage problem — a missing or unwritable destination directory,
+a malformed date — and is reported the same way.
 
 ## Migration policy
 
