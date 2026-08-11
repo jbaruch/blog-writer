@@ -43,9 +43,9 @@
 #  21. A history holding a malformed record is refused and left byte-identical.
 #  22. Re-recording the same slug replaces its record rather than duplicating it,
 #      so re-running the recording step cannot skew the convergence window.
-#  23. An unwritable destination directory exits 2 (environment) rather than 1
-#      (history unusable). Skipped with a visible note when the process can write
-#      to a chmod a-w directory, which is the case as root.
+#  23. A staging file that cannot be created exits 2 (environment) rather than 1
+#      (history unusable). Uses an over-long path rather than chmod, so the case
+#      runs identically for every user including root.
 #  24. A dangling symlink is refused rather than written through.
 #  25. A valid symlink destination is written through to its target, leaving the
 #      link intact and no staging file behind.
@@ -387,17 +387,14 @@ if [ "$kept" = "second-open" ]; then ok; else fail "idempotent: expected the re-
 total=$(jq '.posts | length' "${CASE_DIR}/idem.json")
 if [ "$total" = "1" ]; then ok; else fail "idempotent: expected 1 record after a re-run, got ${total}"; fi
 
+# A staging file that cannot be created is an environment problem (exit 2), not a
+# corrupt history (exit 1). Triggered with an over-long name rather than chmod:
+# permission bits do not stop root, so a chmod-based case could not run on every
+# runner, while ENAMETOOLONG stops every user identically.
 new_dir
-mkdir -p "${CASE_DIR}/ro"
-printf '{"posts":[]}' >"${CASE_DIR}/ro/s.json"
-chmod a-w "${CASE_DIR}/ro"
-if [ -w "${CASE_DIR}/ro" ]; then
-  echo "    NOTE: running with write access to a chmod a-w directory (root?); skipping the unwritable-directory case" >&2
-else
-  run_case "an unwritable destination directory exits 2, not 1" 2 \
-    bash "$RECORD" "${CASE_DIR}/ro/s.json" s 2025-06-01 a b c
-fi
-chmod u+w "${CASE_DIR}/ro"
+long_name=$(printf 'n%.0s' {1..250})
+run_case "a staging file that cannot be created exits 2, not 1" 2 \
+  bash "$RECORD" "${CASE_DIR}/${long_name}.json" s 2025-06-01 a b c
 
 new_dir
 run_case "a backfilled earlier post lands in date order, not at the end" 0 \

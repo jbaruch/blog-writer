@@ -227,8 +227,7 @@ Proceed immediately to Step 12.
 ## Step 12 — Record the Post's Shape
 
 Append the finished post's skeleton to the shape history so the next post's audit 6 has
-something to compare against. Do not write the file yourself — the script owns the record
-format, the schema stamp, and the refusal cases:
+something to compare against. Do not write the file yourself. Run:
 
 ```bash
 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \

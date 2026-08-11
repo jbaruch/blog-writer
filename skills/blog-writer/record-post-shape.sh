@@ -46,7 +46,8 @@
 #      not the documented shape, or holds a record from a newer skill version).
 #      Nothing is written in this case — a newer history is never clobbered.
 #   2  tool or usage error (jq missing, too few arguments, malformed date,
-#      destination directory missing or not writable)
+#      destination directory missing, or the staged file cannot be created —
+#      unwritable directory, path too long, filesystem full)
 #
 # Idempotent by slug: re-recording the same post replaces its record rather than
 # appending a duplicate, so a re-run cannot skew the convergence window.
@@ -145,8 +146,14 @@ if [ -L "$SHAPES_FILE" ]; then
 fi
 
 staging="${write_target}.staging.$$"
+# Guarded rather than relying on `rm -f` to be harmless: when the staging path is
+# itself unusable (too long for the filesystem), `rm` fails, and under `set -e`
+# that aborts the trap before `return 0` — so the trap would rewrite the script's
+# exit status with rm's, which is exactly what `return 0` is here to prevent.
 cleanup() {
-  rm -f "$staging"
+  if [ -e "$staging" ]; then
+    rm -f "$staging"
+  fi
   return 0
 }
 trap cleanup EXIT
@@ -157,11 +164,12 @@ if [ ! -d "$destination_dir" ]; then
   exit 2
 fi
 
-# Checked before staging rather than discovered at `mv`, so an unwritable
-# directory reports as the environment problem it is (exit 2) instead of
-# surfacing mv's status as though the history itself were unusable (exit 1).
-if [ ! -w "$destination_dir" ]; then
-  echo "error: directory ${destination_dir} is not writable — fix its permissions (chmod u+w) before recording a post's shape" >&2
+# Attempted rather than pre-checked with `-w`: `-w` is always true for root, so a
+# pre-check cannot be exercised by a test that runs on every runner, and it would
+# still miss the non-permission ways creation fails (path too long, filesystem
+# full). Creating the staging file is the real question, so ask it directly.
+if ! : >"$staging"; then
+  echo "error: cannot create a staging file at ${staging} — check that ${destination_dir} is writable (chmod u+w) and that the path length is within the filesystem's limit" >&2
   exit 2
 fi
 
