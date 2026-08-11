@@ -29,14 +29,22 @@ jobs:
       # diagnostics gate is reproducible; a distro package would drift with the
       # image.
       #
+      # SHELLCHECK_SHA256 is the SHA-256 of the linux.x86_64.tar.xz asset for
+      # SHELLCHECK_VERSION, checked before the archive is unpacked. The version
+      # pin says which release is fetched; the checksum says the bytes that
+      # arrived are the bytes upstream published. --fail only catches HTTP
+      # errors, and this binary runs against every script in the repo.
+      #
       # Renewal cadence for SHELLCHECK_VERSION: reviewed on the first Monday of
       # each quarter against https://github.com/koalaman/shellcheck/releases.
       # No scanner tracks a version embedded in a workflow step, so this cadence
       # is the renewal mechanism dependency-management Freshness requires. Bump
-      # the value and let this workflow's own run verify the new pin.
+      # both values together — the checksum renews with the version and adds no
+      # separate cadence — and let this workflow's own run verify the new pin.
       - name: Install shell gate tooling
         env:
           SHELLCHECK_VERSION: v0.11.0
+          SHELLCHECK_SHA256: 8c3be12b05d5c177a04c29e3c78ce89ac86f1595681cab149b65b97c4e227198
         run: |
           set -euo pipefail
           sudo apt-get update
@@ -44,6 +52,10 @@ jobs:
           curl --silent --show-error --location --fail \
             "https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" \
             --output /tmp/shellcheck.tar.xz
+          if ! echo "${SHELLCHECK_SHA256}  /tmp/shellcheck.tar.xz" | sha256sum --check --strict; then
+            echo "error: the downloaded ShellCheck archive does not match SHELLCHECK_SHA256 — if you just bumped SHELLCHECK_VERSION, update SHELLCHECK_SHA256 to the sha256 of shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz from the release page; otherwise treat the artifact as untrusted and do not re-run until the mismatch is explained" >&2
+            exit 1
+          fi
           tar -x -J -f /tmp/shellcheck.tar.xz -C /tmp
           sudo install -m 0755 "/tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
 
