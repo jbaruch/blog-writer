@@ -176,8 +176,9 @@ check only.
 audit with no sentence-level equivalent and the one most relevant to a blog that publishes
 repeatedly, because it is the only one that can only be seen across posts.
 
-**The question:** does this post have the same skeleton as the last two or three? Same
-opening move, same arc, same closing move?
+**The question:** does this post have the same skeleton as the recent ones? Same opening
+move, same arc, same closing move? How far back the comparison reaches is the script's, not
+yours.
 
 **Where the history lives:** `_blog-skill/post-shapes.json` in the Blog Home Directory
 records the shape of each published post. Do not read or compare it yourself — run
@@ -193,9 +194,9 @@ the post wins.
 converge with. An unusable history is reported differently from an absent one, and the two
 must never be collapsed.
 
-**The fix:** change one axis. If the last three all opened with a public embarrassment,
-open this one somewhere else. Changing an axis is enough; changing all of them is the
-convergence trap in a new costume.
+**The fix:** change one axis — whichever ones the script reports in `converged_axes`. If it
+reports `opening_mode`, open this one somewhere else. Changing one axis is enough; changing
+all of them is the convergence trap in a new costume.
 
 ---
 

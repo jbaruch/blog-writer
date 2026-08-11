@@ -664,4 +664,5 @@ Do not record it here — invoking the writer from both places would file the po
 | 1: Clarification | All gaps resolved | Author confirms |
 | 2: Editorial Planning | Main idea + CTA + outline approved, outline audited | Author approves |
 | 3: First Draft | Draft written, anti-patterns and structure checked | Delivered to author |
-| 4: Revision | Post meets author's standards, shape recorded | Author declares done |
+| 4: Revision | Post meets author's standards | Author declares done |
+| Step 12: Record shape | Finished post's skeleton appended to the shape history | Automatic |

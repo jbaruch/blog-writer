@@ -150,8 +150,10 @@ if [ ! -w "$destination_dir" ]; then
   exit 2
 fi
 
-if ! jq -n \
-  --argjson existing "$existing" \
+# The existing history goes through stdin, not --argjson: as it grows, passing it
+# as a command-line argument would eventually exceed the argv size limit and fail
+# on a file that is perfectly valid.
+if ! printf '%s' "$existing" | jq \
   --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
   --arg slug "$SLUG" \
   --arg date "$DATE" \
@@ -159,8 +161,7 @@ if ! jq -n \
   --arg arc "$ARC" \
   --arg closing "$CLOSING" \
   --args \
-  '$existing
-   | .posts = ((.posts | map(select(.slug != $slug))) + [{
+  '.posts = ((.posts | map(select(.slug != $slug))) + [{
        schema_version: $schema,
        slug: $slug,
        date: $date,

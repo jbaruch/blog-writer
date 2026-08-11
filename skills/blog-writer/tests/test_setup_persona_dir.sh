@@ -27,7 +27,10 @@ set -uo pipefail
 # Every case directory is created inside one suite-owned root, so a single EXIT
 # trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
 # status (`jbaruch/coding-policy: error-handling`).
-SUITE_TMP=$(mktemp -d)
+if ! SUITE_TMP=$(mktemp -d); then
+  echo "error: could not create the suite temp directory — check TMPDIR is writable" >&2
+  exit 1
+fi
 cleanup_suite_tmp() {
   rm -rf "$SUITE_TMP"
   return 0
