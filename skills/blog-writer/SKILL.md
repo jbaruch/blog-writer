@@ -122,10 +122,14 @@ Read these reference files in order:
 4. `skills/blog-writer/references/ai-anti-patterns.md` — 39 named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
-5. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
-6. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
+5. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
+   sentence: theme explicitness, structural tidiness, emotion mode, reference specificity,
+   reader engagement, and shape convergence. Audits 1, 2, and 6 run on the outline in Phase 2;
+   audits 3, 4, and 5 run on the prose in Phase 3 and 4.
+6. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
+7. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
    series handling. Fallback only — `persona/framework.md` overrides it when present.
-7. `persona/product.md` — (If it exists and has content) Index of product docs and
+8. `persona/product.md` — (If it exists and has content) Index of product docs and
    terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
    fetch only the specific pages relevant to the post's topic during Phase 0.
 
@@ -159,6 +163,13 @@ Proceed immediately to Step 9.
 Lock the main idea, the CTA, and the section outline. `skills/blog-writer/references/process.md` Phase 2 has
 the main-idea template and the outline requirements.
 
+Before locking, audit the outline against `skills/blog-writer/references/structural-audits.md` audits 1, 2,
+and 6 — theme explicitness, structural tidiness, shape convergence — one audit at a time.
+Structure is cheap to change in an outline and expensive to change in a finished draft, and
+the audits work on the skeleton rather than the prose. If an audit finds nothing, say so and
+move on. If shape history is missing or holds fewer than two posts, audit 6 cannot fire —
+report that and continue.
+
 Gate: the author approves the plan.
 
 Proceed immediately to Step 10.
@@ -166,10 +177,11 @@ Proceed immediately to Step 10.
 ## Step 10 — Run Phase 3: First Draft
 
 Write the draft to `blog-draft-[slug].md`, insert and confirm placeholders, then run the
-anti-pattern, accuracy, and tightening checks. `skills/blog-writer/references/process.md` Phase 3 has the
-writing rules, the placeholder conventions, and the check procedure.
+anti-pattern, structural, accuracy, and tightening checks.
+`skills/blog-writer/references/process.md` Phase 3 has the writing rules, the placeholder
+conventions, and the check procedure.
 
-Two rules bind this step and Step 11:
+Three rules bind this step and Step 11:
 
 **Persona adherence.** Re-read `persona/voice.md` before every writing action — before this
 draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. At
@@ -179,6 +191,13 @@ the profile; if you can't, read it again.
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
 procedure in order, and never invent a pattern the file does not define.
+
+**Structural check adherence.** Run audits 3, 4, and 5 from
+`skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern
+passes. Read `persona/voice.md` first — where the profile already prescribes the human-side
+behavior, the audit is a drift check rather than a new rule. Never apply more than two
+interventions from the menu to one post; uniform application is the convergence trap the
+file opens with.
 
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
@@ -192,4 +211,9 @@ Proceed immediately to Step 11.
 Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
 change. `skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
 
-Finish here when the author declares the post done.
+When the author declares the post done, append its shape to `_blog-skill/post-shapes.json`
+so the next post's audit 6 has something to compare against. The record shape, the field
+meanings, and the writer contract are in `skills/blog-writer/references/post-shapes-schema.md`.
+Record the post as it ended up, not as it was first drafted.
+
+Finish here when the shape is recorded.

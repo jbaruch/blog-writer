@@ -13,8 +13,15 @@ Posts are stories about real problems that happen to involve a technology (and o
 product). The reader should learn something even if they never touch the author's stack.
 
 A typical post runs 1,500-2,000 words. 2,000 is a target, not a cliff — a tight 2,200
-that earns every sentence is better than a padded 1,800. The post follows this general
-shape:
+that earns every sentence is better than a padded 1,800.
+
+**This shape is a starting point, not a template to fill.** Two of its parts are fixed
+schema — the TLDR and the author bio. Everything between them is one arrangement among
+several, and running the same arrangement every time is exactly the convergence audit 6 in
+`references/structural-audits.md` exists to catch. Vary the opening and closing moves across
+posts, and record which ones a post used (see `references/post-shapes-schema.md`).
+
+The default arrangement:
 
 **TLDR** — 2-4 bullet points. Sells the "so what" without spoiling the journey. Bullets,
 not prose. Each bullet should make the reader think "wait, really?" not "yeah, obvious."
@@ -32,7 +39,11 @@ reader feel the pain before offering the fix.
 section earns the reader's trust.
 
 **The broader point** — Zoom out. What does this mean for how we build software? Cultural
-references, analogies, and dry observations live here.
+references, analogies, and dry observations live here. **Optional, and the first thing to
+cut.** A zoom-out section placed after the story already landed is the epilogue habit — the
+most distinctive fingerprint of the model doing the drafting (see `references/structural-audits.md`,
+"Know what drafted the text"). Some posts should skip it. Some should open with it instead.
+A post that ends on its strongest concrete moment does not need one.
 
 **CTA** — Practical, specific, low-friction. Usually: install something, try something, read
 the next post. If the author has product context configured, suggest a product-related CTA
@@ -40,6 +51,22 @@ and confirm.
 
 **Author bio** — Fixed schema, rotating kicker. The kicker is a dry joke that connects
 to the post's content. See the bio format in `persona/bio.md`.
+
+## Varying the Shape
+
+Audit 6 compares a planned post against the last three on three axes. Vary at least one.
+
+**Opening modes** — public embarrassment or confession; cold open mid-incident; outcome
+first, then rewind; the delayed reveal that withholds the central number; a named artifact
+(the error message, the bill, the diff) before any framing.
+
+**Closing modes** — stop on the strongest concrete sentence; the open thread, a question
+named and left unanswered; genuine ambivalence with both feelings intact; end hot on the
+spike rather than a quiet coda; the recontextualized callback that changes an earlier
+detail's meaning.
+
+Changing one axis is enough. Changing every axis on every post rebuilds the same problem
+with different defaults — see the convergence trap in `references/structural-audits.md`.
 
 ## Series Support
 
