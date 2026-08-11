@@ -57,7 +57,9 @@
 #
 # Writes atomically: the new history is staged beside the destination and moved
 # into place only after jq succeeds, so an interrupted run cannot truncate an
-# author's history.
+# author's history. When the destination is a symlink, the staging and the move
+# happen at its target, so the link survives the write rather than being replaced
+# by a regular file.
 
 set -euo pipefail
 
@@ -129,14 +131,27 @@ if [ -e "$SHAPES_FILE" ]; then
   fi
 fi
 
-staging="${SHAPES_FILE}.staging.$$"
+# A history kept on a synced drive is reachable through a symlink, the same shape
+# the persona directory uses. Staging beside the LINK and moving onto it would
+# replace the link with a regular file and orphan the real history, so resolve
+# the link first and write to the target it points at.
+write_target=$SHAPES_FILE
+if [ -L "$SHAPES_FILE" ]; then
+  link_target=$(readlink "$SHAPES_FILE")
+  case "$link_target" in
+    /*) write_target=$link_target ;;
+    *)  write_target="$(dirname "$SHAPES_FILE")/${link_target}" ;;
+  esac
+fi
+
+staging="${write_target}.staging.$$"
 cleanup() {
   rm -f "$staging"
   return 0
 }
 trap cleanup EXIT
 
-destination_dir=$(dirname "$SHAPES_FILE")
+destination_dir=$(dirname "$write_target")
 if [ ! -d "$destination_dir" ]; then
   echo "error: directory ${destination_dir} does not exist — create the Blog Home Directory before recording a post's shape" >&2
   exit 2
@@ -175,8 +190,8 @@ if ! printf '%s' "$existing" | jq \
   exit 1
 fi
 
-if ! mv "$staging" "$SHAPES_FILE"; then
-  echo "error: could not move the staged history into place at ${SHAPES_FILE} — the existing file was left untouched" >&2
+if ! mv "$staging" "$write_target"; then
+  echo "error: could not move the staged history into place at ${write_target} — the existing file was left untouched" >&2
   exit 2
 fi
 

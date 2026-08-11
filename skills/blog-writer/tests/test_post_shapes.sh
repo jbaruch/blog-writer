@@ -14,7 +14,8 @@
 #      case where "matches across all three" was previously unsatisfiable.
 #   6. Converged — enough axes matching every compared post reports converged.
 #   7. Not converged — a single matching axis does not trip the verdict.
-#   8. Window bound — records older than the window do not affect the verdict.
+#   8. Window bound — records older than the window do not affect the verdict,
+#      and the window is selected by date even when the file is out of order.
 #   9. Newer records disable the verdict for the whole history — including when
 #      enough older records remain readable, since those describe the wrong
 #      posts and a lagging reader has no usable prior state.
@@ -44,9 +45,11 @@
 #      (history unusable). Skipped with a visible note when the process can write
 #      to a chmod a-w directory, which is the case as root.
 #  24. A dangling symlink is refused rather than written through.
-#  25. Date format is validated.
-#  26. Empty slug is rejected.
-#  27. Argument count is validated.
+#  25. A valid symlink destination is written through to its target, leaving the
+#      link intact and no staging file behind.
+#  26. Date format is validated.
+#  27. Empty slug is rejected.
+#  28. Argument count is validated.
 #
 # Approach: every case runs in a fresh temp directory under one suite-owned root,
 # so no test touches a real history file and the EXIT trap removes everything.
@@ -216,6 +219,20 @@ write_history "${CASE_DIR}/vary.json" 1 "emb|p->m|stop" "cold|outcome|open" "nam
 if run_case "a single matching axis does not converge" 0 \
     bash "$CHECK" "${CASE_DIR}/vary.json" emb "brand-new" brand-new; then
   assert_json "not converged" '.converged' "false"
+fi
+
+# The writer keeps the file in date order, but a hand edit or a bad merge could
+# not. "Most recent" must mean by date, not by position.
+new_dir
+jq -n '{posts: [
+   {schema_version: 1, slug: "newest", date: "2025-09-01", opening_mode: "brand-new", arc: "brand-new", closing_mode: "brand-new", interventions: []},
+   {schema_version: 1, slug: "a", date: "2025-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+   {schema_version: 1, slug: "b", date: "2025-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []}
+ ]}' >"${CASE_DIR}/unsorted.json"
+if run_case "an out-of-order history still windows by date" 0 \
+    bash "$CHECK" "${CASE_DIR}/unsorted.json" emb "p->m" stop; then
+  assert_json "unsorted" '.compared' "3"
+  assert_json "unsorted" '.converged' "false"
 fi
 
 new_dir
@@ -396,6 +413,20 @@ new_dir
 ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
 run_case "refuses to write through a dangling symlink" 1 \
   bash "$RECORD" "${CASE_DIR}/dangling.json" s 2025-06-01 a b c
+
+# A history on a synced drive is reached through a symlink, the same shape the
+# persona directory uses. The write must land on the target, not replace the link.
+new_dir
+mkdir -p "${CASE_DIR}/real"
+printf '{"posts":[]}' >"${CASE_DIR}/real/history.json"
+ln -s "${CASE_DIR}/real/history.json" "${CASE_DIR}/link.json"
+run_case "writing through a valid symlink preserves the link" 0 \
+  bash "$RECORD" "${CASE_DIR}/link.json" s 2025-06-01 a b c
+if [ -L "${CASE_DIR}/link.json" ]; then ok; else fail "symlink: the link was replaced by a regular file"; fi
+landed=$(jq -r '.posts[0].slug' "${CASE_DIR}/real/history.json" 2>/dev/null || echo MISSING)
+if [ "$landed" = "s" ]; then ok; else fail "symlink: the record did not land on the target, got '${landed}'"; fi
+strays=$(find "${CASE_DIR}" -name '*.staging.*' | wc -l | tr -d ' ')
+if [ "$strays" = "0" ]; then ok; else fail "symlink: ${strays} staging file(s) stranded"; fi
 
 new_dir
 run_case "rejects a date that is not YYYY-MM-DD" 2 \

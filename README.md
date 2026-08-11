@@ -60,9 +60,9 @@ structural tidiness, emotion mode, reference specificity, reader engagement, and
 convergence.
 
 Three of them run on the outline during editorial planning, where structure is still cheap
-to change; the other three run on the prose alongside the anti-pattern check. Each audit
-reads the persona's voice profile first — where the profile already prescribes the
-human-side behavior, the audit is a drift check rather than a new rule.
+to change. The other three run on the prose alongside the anti-pattern check. Each audit
+reads the persona's voice profile first. Where the profile already prescribes the human-side
+behavior, the audit is a drift check rather than a new rule.
 
 They are grounded in [StoryScope](https://arxiv.org/abs/2604.03136) (Russell et al. 2026),
 which classified 61,608 stories using only discourse-level features at 93.2% macro-F1 and
@@ -71,9 +71,8 @@ reimplemented from the published findings, not ported.
 
 Shape convergence is the one audit that needs history, so finished posts get their skeleton
 recorded in `_blog-skill/post-shapes.json`. Two tested scripts own every operation on that
-file — the comparison is deterministic, so it belongs in a script rather than agent prose —
-and an absent history is reported differently from an unreadable one, so a corrupt file can
-never be read as "no history yet".
+file. An absent history is reported differently from an unreadable one, so a corrupt file is
+never read as "no history yet".
 
 The deliberate non-goal: applying every audit to every post trades one detectable shape for
 another, so the guidance is one or two changes per post, varied across posts.

@@ -18,7 +18,8 @@
 #   $4  the planned closing mode
 #
 # Decision contract (this script owns these; callers must not restate them):
-#   WINDOW            how many of the most recent usable records to compare against.
+#   WINDOW            how many of the most recent usable records to compare
+#                     against, selected by `date` rather than by file order.
 #   MIN_HISTORY       fewest usable records that permit a verdict. Below it the
 #                     audit cannot fire, which is the normal state for a new author.
 #   An axis counts as converged when the planned value matches that axis in
@@ -132,7 +133,10 @@ if [ "$usable_count" -lt "$MIN_HISTORY" ]; then
   exit 0
 fi
 
-window=$(jq --argjson n "$WINDOW" '.[-$n:]' <<<"$usable")
+# Sorted here rather than trusting file order: the writer keeps the history in
+# date order, but a hand edit, a bad merge, or an older tool could leave it out
+# of order, and the window must mean "most recent" whatever the file says.
+window=$(jq --argjson n "$WINDOW" 'sort_by(.date) | .[-$n:]' <<<"$usable")
 compared=$(jq 'length' <<<"$window")
 
 converged_axes=$(jq -c \

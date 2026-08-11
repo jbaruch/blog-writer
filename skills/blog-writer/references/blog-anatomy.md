@@ -54,7 +54,9 @@ to the post's content. See the bio format in `persona/bio.md`.
 
 ## Varying the Shape
 
-Audit 6 compares a planned post against the last three on three axes. Vary at least one.
+Audit 6 compares a planned post against recent ones and reports which axes have converged.
+Run `skills/blog-writer/check-shape-convergence.sh` and route on its verdict; how far back it
+reaches is the script's contract. Vary at least one of the axes it reports.
 
 **Opening modes** — public embarrassment or confession; cold open mid-incident; outcome
 first, then rewind; the delayed reveal that withholds the central number; a named artifact
