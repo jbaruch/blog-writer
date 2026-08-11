@@ -1,5 +1,9 @@
 # Changelog
 
+### Changed
+
+- **The ShellCheck tarball is verified before it is unpacked** (#28) — `.github/workflows/test.yml` pinned the release version but trusted the artifact on name alone: `--fail` catches HTTP errors and says nothing about integrity, and the resulting binary runs against every shell script in the repo before the tests, on every pull request. The step now carries `SHELLCHECK_SHA256` beside `SHELLCHECK_VERSION` and checks it with `sha256sum --check --strict`, with a message that distinguishes the two ways it can fail — a forgotten checksum bump after a version bump, versus an artifact that should not be trusted. The checksum renews with the version under the quarterly cadence already documented beside the pin, so it adds no new renewal duty. Raised by Copilot as an advisory on #24 and deferred there under `review-severity` rather than folded into an already-approved PR.
+
 ## 1.1.24 — 2026-08-10
 
 ### Changed
