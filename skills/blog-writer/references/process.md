@@ -238,15 +238,28 @@ The fix is at most one move: an oblique tangent, a question raised and openly un
 stopping before the resolution. A technical post still owes the reader the fix — the target
 is the tidy epilogue after the fix landed, never the fix itself.
 
-**Audit 6 — Shape convergence.** Read `_blog-skill/post-shapes.json` (schema and contract in
-`references/post-shapes-schema.md`). Compare the planned `opening_mode`, `arc`, and
-`closing_mode` against the last three records. Two or more axes matching across all three is
-convergence — change one axis and note why in the plan.
+**Audit 6 — Shape convergence.** Name the planned opening mode, arc, and closing mode, then
+ask the script for the verdict. Do not read or compare the history yourself:
 
-- **Missing file, unreadable file, or fewer than two records: the audit cannot fire.** Say
-  so and continue. This is the normal state for a new author and must never block planning.
-- **A `schema_version` newer than `references/post-shapes-schema.md` describes:** treat as no
-  usable prior state, skip the audit, and do not write to the file.
+```bash
+skills/blog-writer/check-shape-convergence.sh \
+  <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
+```
+
+It prints `{"ok": true, "can_fire": bool, "converged": bool, "converged_axes": [...], ...}`.
+How many prior posts it compares, how few are too few, and what counts as converged are the
+script's decision contract — see its header. Route on the exit code:
+
+- **Exit 0** — the result is authoritative. When `can_fire` is false there is not enough
+  history for a verdict; say so and continue. This is normal for a new author and never
+  blocks planning. When `converged` is true, change one of the reported `converged_axes` and
+  note why in the plan.
+- **Exit 1** — the history exists but cannot be used. Report the script's stderr diagnostic
+  to the author and continue planning without audit 6. Do not delete or overwrite the file.
+- **Exit 2** — a tool or usage error. Report the diagnostic and stop.
+
+An unreadable or malformed history is not the same as an absent one, and the script reports
+them differently on purpose. Do not re-collapse them into "no history yet."
 
 Report what each audit found, including "nothing." An audit that fires on every post is
 miscalibrated, and applying all three at once builds the new cluster the audits exist to
@@ -636,13 +649,24 @@ conversation — edit the file surgically.
 
 **The post is done when the author says it's done. Not before.**
 
-**Record the post's shape.** Once the author declares it done, append a record to
-`_blog-skill/post-shapes.json` so the next post's audit 6 has something to compare against.
-The field meanings and the writer contract are in `references/post-shapes-schema.md`. Two
-rules matter most: record the post **as it ended up**, not as it was first drafted, and
-reuse an existing `opening_mode` / `arc` / `closing_mode` string verbatim when the shape is
-the same — audit 6 compares by equality, so a synonym reads as a different shape and hides
-the convergence it exists to catch.
+**Record the post's shape.** Once the author declares it done, run:
+
+```bash
+skills/blog-writer/record-post-shape.sh \
+  <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
+  "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
+```
+
+It stamps the record, appends newest-last, and writes atomically. Exit 1 means the history
+was refused and left untouched — report the diagnostic rather than deleting the file. The
+field meanings are in `references/post-shapes-schema.md`.
+
+Two rules the script cannot check, so they are yours:
+
+- Record the post **as it ended up**, not as it was first drafted.
+- Reuse an existing `opening_mode` / `arc` / `closing_mode` string verbatim when the shape
+  is the same. The comparison is by equality, so a synonym reads as a different shape and
+  hides the convergence audit 6 exists to catch.
 
 **When a post is finished and added to `persona/examples.md`:** The persona has been updated
 with new writing. Ask the global voice preference question from `references/setup.md` Step 10.

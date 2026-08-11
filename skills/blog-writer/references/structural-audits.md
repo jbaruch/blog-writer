@@ -151,7 +151,7 @@ This audit is broader — it covers every unnamed thing, not just unnamed author
 **The fix:** name it. The version number, the price, the city, the date, the person. This
 is the cheapest human marker available and it costs nothing but accuracy.
 
-**Interaction with placeholders:** where the specific isn't known, that is a `FACT`
+**Interaction with placeholders:** where the specific isn't known, that is a `Fact`
 placeholder for the author to fill (see `references/process.md` Phase 3), not a licence to
 stay vague. A vague allusion is a placeholder nobody flagged.
 
@@ -180,12 +180,18 @@ repeatedly, because it is the only one that can only be seen across posts.
 opening move, same arc, same closing move?
 
 **Where the history lives:** `_blog-skill/post-shapes.json` in the Blog Home Directory
-records the shape of each published post. Read it during Phase 2. Its schema and the
-read/write contract are in `references/post-shapes-schema.md`. Treat it as a hint, not
-authority — if the recorded shape disagrees with the actual post, the post wins.
+records the shape of each published post. Do not read or compare it yourself — run
+`skills/blog-writer/check-shape-convergence.sh` and route on its result. How many prior
+posts it compares, how few are too few, and what counts as converged are the script's
+decision contract; see its header. Field meanings and both contracts are in
+`references/post-shapes-schema.md`.
 
-**When there is no history** — the file is missing, or holds fewer than two posts —
-this audit cannot fire. Say so and move on. A first post has nothing to converge with.
+Treat the history as a hint, not authority — if a record disagrees with the actual post,
+the post wins.
+
+**When the script reports it cannot fire**, say so and move on. A first post has nothing to
+converge with. An unusable history is reported differently from an absent one, and the two
+must never be collapsed.
 
 **The fix:** change one axis. If the last three all opened with a public embarrassment,
 open this one somewhere else. Changing an axis is enough; changing all of them is the

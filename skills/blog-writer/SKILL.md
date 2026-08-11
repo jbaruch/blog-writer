@@ -163,12 +163,22 @@ Proceed immediately to Step 9.
 Lock the main idea, the CTA, and the section outline. `skills/blog-writer/references/process.md` Phase 2 has
 the main-idea template and the outline requirements.
 
-Before locking, audit the outline against `skills/blog-writer/references/structural-audits.md` audits 1, 2,
-and 6 — theme explicitness, structural tidiness, shape convergence — one audit at a time.
-Structure is cheap to change in an outline and expensive to change in a finished draft, and
-the audits work on the skeleton rather than the prose. If an audit finds nothing, say so and
-move on. If shape history is missing or holds fewer than two posts, audit 6 cannot fire —
-report that and continue.
+Before locking, audit the outline against `skills/blog-writer/references/structural-audits.md`
+audits 1, 2, and 6 — theme explicitness, structural tidiness, shape convergence — one audit
+at a time. `skills/blog-writer/references/process.md` section 2f has the procedure.
+
+For audit 6, ask the script for the verdict rather than reading the shape history yourself:
+
+```bash
+skills/blog-writer/check-shape-convergence.sh \
+  <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
+```
+
+Exit 0 is authoritative, including a `can_fire` of false — report it and continue. Exit 1
+means the history exists but is unusable: report the script's diagnostic, continue without
+audit 6, and do not delete or overwrite the file. Exit 2 is a tool error — report and stop.
+
+If an audit finds nothing, say so and move on.
 
 Gate: the author approves the plan.
 
@@ -211,9 +221,28 @@ Proceed immediately to Step 11.
 Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
 change. `skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
 
-When the author declares the post done, append its shape to `_blog-skill/post-shapes.json`
-so the next post's audit 6 has something to compare against. The record shape, the field
-meanings, and the writer contract are in `skills/blog-writer/references/post-shapes-schema.md`.
-Record the post as it ended up, not as it was first drafted.
+Gate: the author declares the post done.
 
-Finish here when the shape is recorded.
+Proceed immediately to Step 12.
+
+## Step 12 — Record the Post's Shape
+
+Append the finished post's skeleton to the shape history so the next post's audit 6 has
+something to compare against. Do not write the file yourself — the script owns the record
+format, the schema stamp, and the refusal cases:
+
+```bash
+skills/blog-writer/record-post-shape.sh \
+  <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
+  "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
+```
+
+Record the post as it ended up, not as it was first drafted, and reuse an existing mode
+string verbatim when the shape is the same — the comparison is by equality.
+`skills/blog-writer/references/post-shapes-schema.md` has the field meanings.
+
+On **exit 1** the history was refused and left untouched — a newer-schema or malformed file
+is never overwritten. Report the script's stderr diagnostic to the author and do not work
+around it by deleting the file. On **exit 2** report the diagnostic and stop.
+
+Finish here.

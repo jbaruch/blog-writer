@@ -69,10 +69,14 @@ which classified 61,608 stories using only discourse-level features at 93.2% mac
 found that a professional surface-editing pass moved detection by 1.6 points. The audits are
 reimplemented from the published findings, not ported.
 
-Shape convergence compares each post against the last three and needs history, so finished
-posts get their skeleton recorded in `_blog-skill/post-shapes.json`. The deliberate
-non-goal: applying every audit to every post trades one detectable shape for another, so the
-guidance is one or two changes per post, varied across posts.
+Shape convergence is the one audit that needs history, so finished posts get their skeleton
+recorded in `_blog-skill/post-shapes.json`. Two tested scripts own every operation on that
+file — the comparison is deterministic, so it belongs in a script rather than agent prose —
+and an absent history is reported differently from an unreadable one, so a corrupt file can
+never be read as "no history yet".
+
+The deliberate non-goal: applying every audit to every post trades one detectable shape for
+another, so the guidance is one or two changes per post, varied across posts.
 
 ## Persona system
 
