@@ -81,27 +81,21 @@ hides the convergence the audit exists to catch.
 
 ## Reader contract — Phase 2
 
-Run `check-shape-convergence.sh` with the planned shape. It reports whether a verdict is
-possible (`can_fire`) and what the verdict is (`converged`, `converged_axes`).
+`check-shape-convergence.sh` is the only reader. It reports whether a verdict is possible
+(`can_fire`) and what the verdict is (`converged`, `converged_axes`).
 
-How many prior posts it compares, how few are too few, and what counts as converged are the
-script's decision contract — see its header, not restated here.
+The invocation and the exit-code routing live in SKILL.md Step 9, and the window size,
+history minimum, and convergence predicate live in the script's own header. Neither is
+restated here.
 
-Route on the exit code:
+Two properties belong to this artifact rather than to either of those:
 
-| Exit | Meaning | What the skill does |
-|---|---|---|
-| 0 | Result is authoritative, including `can_fire: false` | Report the verdict, or report that the audit cannot fire, and continue. `can_fire: false` covers both too little history and a history this install is too old to read in full |
-| 1 | The file exists but cannot be used | Report the script's stderr diagnostic to the author and continue planning without audit 6. Do not delete or overwrite the file |
-| 2 | Tool or usage error | Report the diagnostic and stop |
-
-**An absent file is exit 0, not exit 1.** No history is the normal state for a new author
-and never blocks planning. An unreadable or malformed file is a different thing and is
-reported rather than folded into the empty case — that distinction is the script's, and the
-skill must not re-collapse it.
-
-The file is a hint, not authority (`jbaruch/coding-policy: stateful-artifacts`). If a record
-disagrees with the actual published post, the post wins — correct the record.
+- **An absent file is not an error.** No history is the normal state for a new author. An
+  unreadable, malformed, or newer-than-supported file is a different thing, reported rather
+  than folded into the empty case, and the skill must not re-collapse that distinction.
+- **The file is a hint, not authority** (`jbaruch/coding-policy: stateful-artifacts`). Verify
+  a recalled shape against the actual post before acting on it. Where they disagree, the post
+  wins — correct the record and re-run.
 
 ## Writer contract — Phase 4
 

@@ -239,28 +239,9 @@ stopping before the resolution. A technical post still owes the reader the fix �
 is the tidy epilogue after the fix landed, never the fix itself.
 
 **Audit 6 — Shape convergence.** Name the planned opening mode, arc, and closing mode, then
-ask the script for the verdict. Do not read or compare the history yourself:
-
-```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-shape-convergence.sh \
-  <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
-```
-
-It prints `{"ok": true, "can_fire": bool, "converged": bool, "converged_axes": [...], ...}`.
-How many prior posts it compares, how few are too few, and what counts as converged are the
-script's decision contract — see its header. Route on the exit code:
-
-- **Exit 0** — the result is authoritative. When `can_fire` is false there is not enough
-  history for a verdict; say so and continue. This is normal for a new author and never
-  blocks planning. When `converged` is true, change the reported `converged_axes`, re-run the
-  script on the revised plan, and keep going until it reports no convergence. Note in the
-  plan which axis changed and why.
-- **Exit 1** — the history exists but cannot be used. Report the script's stderr diagnostic
-  to the author and continue planning without audit 6. Do not delete or overwrite the file.
-- **Exit 2** — a tool or usage error. Report the diagnostic and stop.
-
-An unreadable or malformed history is not the same as an absent one, and the script reports
-them differently on purpose. Do not re-collapse them into "no history yet."
+ask `check-shape-convergence.sh` for the verdict. Do not read or compare the history
+yourself. The invocation, the exit-code routing, and the correction loop are in SKILL.md
+Step 9; the field meanings and both contracts are in `references/post-shapes-schema.md`.
 
 When an audit finds no issue, proceed silently. Report a `can_fire` of false, though — that
 says the audit could not run, which is different from running clean. An audit that fires on

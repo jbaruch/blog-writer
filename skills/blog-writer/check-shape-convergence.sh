@@ -72,10 +72,10 @@ main() {
   fi
 
   local SHAPES_FILE=$1
-    local PLANNED_OPENING=$2
-    local PLANNED_ARC=$3
-    local PLANNED_CLOSING=$4
-    local loaded usable usable_count skipped window compared converged_axes converged_count converged reason
+  local PLANNED_OPENING=$2
+  local PLANNED_ARC=$3
+  local PLANNED_CLOSING=$4
+  local loaded usable usable_count skipped window compared converged_axes converged_count converged reason
 
   emit() {
     jq -n \
@@ -105,7 +105,7 @@ main() {
   fi
 
   if [ ! -r "$SHAPES_FILE" ]; then
-    echo "error: ${SHAPES_FILE} exists but is not readable — fix its permissions (chmod +r) or move it aside; refusing to treat an unreadable history as an absent one" >&2
+    echo "error: ${SHAPES_FILE} exists but is not readable — fix its permissions (chmod u+r) or move it aside; refusing to treat an unreadable history as an absent one" >&2
     exit 1
   fi
 

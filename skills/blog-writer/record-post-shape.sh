@@ -45,9 +45,10 @@
 #   1  the history file exists but cannot be used (unreadable, not valid JSON,
 #      not the documented shape, or holds a record from a newer skill version).
 #      Nothing is written in this case — a newer history is never clobbered.
-#   2  tool or usage error (jq missing, too few arguments, malformed date,
-#      destination directory missing, or the staged file cannot be created —
-#      unwritable directory, path too long, filesystem full)
+#   2  tool or environment error (jq missing, too few arguments, malformed date,
+#      destination directory missing, the staged file cannot be created or
+#      written — unwritable directory, path too long, filesystem full — or the
+#      staged file cannot be moved into place)
 #
 # Idempotent by slug: re-recording the same post replaces its record rather than
 # appending a duplicate, so a re-run cannot skew the convergence window.
@@ -84,14 +85,14 @@ main() {
   fi
 
   local SHAPES_FILE=$1
-    local SLUG=$2
-    local DATE=$3
-    local OPENING=$4
-    local ARC=$5
-    local CLOSING=$6
-    shift 6
-    local interventions=("$@")
-    local action existing loaded newer write_target link_target destination_dir count
+  local SLUG=$2
+  local DATE=$3
+  local OPENING=$4
+  local ARC=$5
+  local CLOSING=$6
+  shift 6
+  local interventions=("$@")
+  local action existing loaded newer write_target link_target destination_dir count
   # `staging` stays global on purpose: the EXIT trap runs after main returns, so a
   # local would be out of scope exactly when cleanup needs it.
 
@@ -200,8 +201,8 @@ main() {
          interventions: $ARGS.positional
        }])
      | .posts |= sort_by(.date)' "${interventions[@]+"${interventions[@]}"}" >"$staging"; then
-    echo "error: failed to build the updated shape history for ${SHAPES_FILE} — the existing file was left untouched" >&2
-    exit 1
+    echo "error: failed to write the updated shape history for ${SHAPES_FILE} — the existing file was left untouched; check for a full filesystem or a jq failure" >&2
+    exit 2
   fi
 
   if ! mv "$staging" "$write_target"; then

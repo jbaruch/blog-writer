@@ -176,10 +176,17 @@ For audit 6, ask the script for the verdict rather than reading the shape histor
 
 Route on the exit code:
 
-- **Exit 0** — the result is authoritative, including a `can_fire` of false. Report it and continue.
+- **Exit 0, `can_fire` false** — there is not enough usable history for a verdict. Report that and continue.
+- **Exit 0, `converged` false** — the planned shape differs enough. Proceed silently.
+- **Exit 0, `converged` true** — the audit fired. Follow the correction loop below before locking.
 - **Exit 1** — the history exists but is unusable. Report the script's diagnostic and continue without audit 6.
 - **Exit 1** — do not delete or overwrite the file.
 - **Exit 2** — a tool error. Report the diagnostic and stop.
+
+On a `converged` verdict, verify before acting. The shape history is a hint, not authority:
+check the reported posts' recorded shapes against the actual posts, and where a record
+disagrees, the post wins — correct the record and re-run the script. Then change the axes in
+`converged_axes`, re-run on the revised plan, and repeat until it reports no convergence.
 
 If an audit finds no issue, proceed silently.
 
