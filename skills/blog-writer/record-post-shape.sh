@@ -68,145 +68,158 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=skills/blog-writer/post-shapes-lib.sh
 . "${SCRIPT_DIR}/post-shapes-lib.sh"
 
-if ! command -v jq >/dev/null; then
-  echo "error: jq not found on PATH — required to write the shape history as JSON" >&2
-  exit 2
-fi
+# Assigned inside main but declared here: the EXIT trap runs after main returns,
+# so a local would be out of scope exactly when cleanup needs it.
+staging=""
 
-if [ "$#" -lt 6 ]; then
-  echo "error: expected at least 6 arguments, got $# — usage: record-post-shape.sh <shapes-file> <slug> <date> <opening_mode> <arc> <closing_mode> [intervention ...]" >&2
-  exit 2
-fi
+main() {
+  if ! command -v jq >/dev/null; then
+    echo "error: jq not found on PATH — required to write the shape history as JSON" >&2
+    exit 2
+  fi
 
-SHAPES_FILE=$1
-SLUG=$2
-DATE=$3
-OPENING=$4
-ARC=$5
-CLOSING=$6
-shift 6
-interventions=("$@")
+  if [ "$#" -lt 6 ]; then
+    echo "error: expected at least 6 arguments, got $# — usage: record-post-shape.sh <shapes-file> <slug> <date> <opening_mode> <arc> <closing_mode> [intervention ...]" >&2
+    exit 2
+  fi
 
-readonly SHAPES_FILE SLUG DATE OPENING ARC CLOSING
+  local SHAPES_FILE=$1
+    local SLUG=$2
+    local DATE=$3
+    local OPENING=$4
+    local ARC=$5
+    local CLOSING=$6
+    shift 6
+    local interventions=("$@")
+    local action existing loaded newer write_target link_target destination_dir count
+  # `staging` stays global on purpose: the EXIT trap runs after main returns, so a
+  # local would be out of scope exactly when cleanup needs it.
 
-if ! printf '%s' "$DATE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
-  echo "error: date '${DATE}' is not YYYY-MM-DD — pass the date the post was finished, e.g. 2026-08-11" >&2
-  exit 2
-fi
+  if ! printf '%s' "$DATE" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+    echo "error: date '${DATE}' is not YYYY-MM-DD — pass the date the post was finished, e.g. 2026-08-11" >&2
+    exit 2
+  fi
 
-if [ -z "$SLUG" ]; then
-  echo "error: slug is empty — pass the post's slug, matching its draft filename" >&2
-  exit 2
-fi
+  if [ -z "$SLUG" ]; then
+    echo "error: slug is empty — pass the post's slug, matching its draft filename" >&2
+    exit 2
+  fi
 
-action=created
-existing='{"posts":[]}'
+  action=created
+  existing='{"posts":[]}'
 
-if [ -L "$SHAPES_FILE" ] && [ ! -e "$SHAPES_FILE" ]; then
-  echo "error: ${SHAPES_FILE} is a symlink whose target is missing — repoint or remove it; refusing to write through a broken link" >&2
-  exit 1
-fi
-
-if [ -e "$SHAPES_FILE" ]; then
-  if [ ! -r "$SHAPES_FILE" ] || [ ! -w "$SHAPES_FILE" ]; then
-    echo "error: ${SHAPES_FILE} exists but is not both readable and writable — fix its permissions (chmod u+rw) before recording; refusing to treat it as absent" >&2
+  if [ -L "$SHAPES_FILE" ] && [ ! -e "$SHAPES_FILE" ]; then
+    echo "error: ${SHAPES_FILE} is a symlink whose target is missing — repoint or remove it; refusing to write through a broken link" >&2
     exit 1
   fi
 
-  if ! loaded=$(post_shapes_load "$SHAPES_FILE"); then
-    echo "error: refusing to append to ${SHAPES_FILE} until the problem above is fixed — the file was left untouched" >&2
+  if [ -e "$SHAPES_FILE" ]; then
+    if [ ! -r "$SHAPES_FILE" ] || [ ! -w "$SHAPES_FILE" ]; then
+      echo "error: ${SHAPES_FILE} exists but is not both readable and writable — fix its permissions (chmod u+rw) before recording; refusing to treat it as absent" >&2
+      exit 1
+    fi
+
+    if ! loaded=$(post_shapes_load "$SHAPES_FILE"); then
+      echo "error: refusing to append to ${SHAPES_FILE} until the problem above is fixed — the file was left untouched" >&2
+      exit 1
+    fi
+
+    newer=$(jq '.skipped_newer' <<<"$loaded")
+    if [ "$newer" -gt 0 ]; then
+      echo "error: ${SHAPES_FILE} holds ${newer} record(s) written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin before recording; refusing to write and risk losing them" >&2
+      exit 1
+    fi
+
+    existing=$(cat "$SHAPES_FILE")
+    if [ "$(jq --arg slug "$SLUG" '[.posts[] | select(.slug == $slug)] | length' "$SHAPES_FILE")" -gt 0 ]; then
+      action=updated
+    else
+      action=appended
+    fi
+  fi
+
+  # A history kept on a synced drive is reachable through a symlink, the same shape
+  # the persona directory uses. Staging beside the LINK and moving onto it would
+  # replace the link with a regular file and orphan the real history, so resolve
+  # the link first and write to the target it points at.
+  write_target=$SHAPES_FILE
+  if [ -L "$SHAPES_FILE" ]; then
+    link_target=$(readlink "$SHAPES_FILE")
+    case "$link_target" in
+      /*) write_target=$link_target ;;
+      *)  write_target="$(dirname "$SHAPES_FILE")/${link_target}" ;;
+    esac
+  fi
+
+  staging="${write_target}.staging.$$"
+  # Guarded rather than relying on `rm -f` to be harmless: when the staging path is
+  # itself unusable (too long for the filesystem), `rm` fails, and under `set -e`
+  # that aborts the trap before `return 0` — so the trap would rewrite the script's
+  # exit status with rm's, which is exactly what `return 0` is here to prevent.
+  cleanup() {
+    if [ -e "$staging" ]; then
+      rm -f "$staging"
+    fi
+    return 0
+  }
+  trap cleanup EXIT
+
+  destination_dir=$(dirname "$write_target")
+  if [ ! -d "$destination_dir" ]; then
+    echo "error: directory ${destination_dir} does not exist — create the Blog Home Directory before recording a post's shape" >&2
+    exit 2
+  fi
+
+  # Attempted rather than pre-checked with `-w`: `-w` is always true for root, so a
+  # pre-check cannot be exercised by a test that runs on every runner, and it would
+  # still miss the non-permission ways creation fails (path too long, filesystem
+  # full). Creating the staging file is the real question, so ask it directly.
+  if ! : >"$staging"; then
+    echo "error: cannot create a staging file at ${staging} — check that ${destination_dir} is writable (chmod u+w) and that the path length is within the filesystem's limit" >&2
+    exit 2
+  fi
+
+  # The existing history goes through stdin, not --argjson: as it grows, passing it
+  # as a command-line argument would eventually exceed the argv size limit and fail
+  # on a file that is perfectly valid.
+  if ! printf '%s' "$existing" | jq \
+    --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
+    --arg slug "$SLUG" \
+    --arg date "$DATE" \
+    --arg opening "$OPENING" \
+    --arg arc "$ARC" \
+    --arg closing "$CLOSING" \
+    --args \
+    '.posts = ((.posts | map(select(.slug != $slug))) + [{
+         schema_version: $schema,
+         slug: $slug,
+         date: $date,
+         opening_mode: $opening,
+         arc: $arc,
+         closing_mode: $closing,
+         interventions: $ARGS.positional
+       }])
+     | .posts |= sort_by(.date)' "${interventions[@]+"${interventions[@]}"}" >"$staging"; then
+    echo "error: failed to build the updated shape history for ${SHAPES_FILE} — the existing file was left untouched" >&2
     exit 1
   fi
 
-  newer=$(jq '.skipped_newer' <<<"$loaded")
-  if [ "$newer" -gt 0 ]; then
-    echo "error: ${SHAPES_FILE} holds ${newer} record(s) written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin before recording; refusing to write and risk losing them" >&2
-    exit 1
+  if ! mv "$staging" "$write_target"; then
+    echo "error: could not move the staged history into place at ${write_target} — the existing file was left untouched" >&2
+    exit 2
   fi
 
-  existing=$(cat "$SHAPES_FILE")
-  if [ "$(jq --arg slug "$SLUG" '[.posts[] | select(.slug == $slug)] | length' "$SHAPES_FILE")" -gt 0 ]; then
-    action=updated
-  else
-    action=appended
-  fi
-fi
-
-# A history kept on a synced drive is reachable through a symlink, the same shape
-# the persona directory uses. Staging beside the LINK and moving onto it would
-# replace the link with a regular file and orphan the real history, so resolve
-# the link first and write to the target it points at.
-write_target=$SHAPES_FILE
-if [ -L "$SHAPES_FILE" ]; then
-  link_target=$(readlink "$SHAPES_FILE")
-  case "$link_target" in
-    /*) write_target=$link_target ;;
-    *)  write_target="$(dirname "$SHAPES_FILE")/${link_target}" ;;
-  esac
-fi
-
-staging="${write_target}.staging.$$"
-# Guarded rather than relying on `rm -f` to be harmless: when the staging path is
-# itself unusable (too long for the filesystem), `rm` fails, and under `set -e`
-# that aborts the trap before `return 0` — so the trap would rewrite the script's
-# exit status with rm's, which is exactly what `return 0` is here to prevent.
-cleanup() {
-  if [ -e "$staging" ]; then
-    rm -f "$staging"
-  fi
-  return 0
+  count=$(jq '.posts | length' "$SHAPES_FILE")
+  jq -n \
+    --arg action "$action" \
+    --argjson count "$count" \
+    --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
+    --arg path "$SHAPES_FILE" \
+    '{ok: true, action: $action, count: $count, schema_version: $schema, path: $path}'
 }
-trap cleanup EXIT
 
-destination_dir=$(dirname "$write_target")
-if [ ! -d "$destination_dir" ]; then
-  echo "error: directory ${destination_dir} does not exist — create the Blog Home Directory before recording a post's shape" >&2
-  exit 2
+# Entry-point guard per `jbaruch/coding-policy: file-hygiene` — the script runs when
+# executed and stays sourceable for testing or reuse.
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  main "$@"
 fi
-
-# Attempted rather than pre-checked with `-w`: `-w` is always true for root, so a
-# pre-check cannot be exercised by a test that runs on every runner, and it would
-# still miss the non-permission ways creation fails (path too long, filesystem
-# full). Creating the staging file is the real question, so ask it directly.
-if ! : >"$staging"; then
-  echo "error: cannot create a staging file at ${staging} — check that ${destination_dir} is writable (chmod u+w) and that the path length is within the filesystem's limit" >&2
-  exit 2
-fi
-
-# The existing history goes through stdin, not --argjson: as it grows, passing it
-# as a command-line argument would eventually exceed the argv size limit and fail
-# on a file that is perfectly valid.
-if ! printf '%s' "$existing" | jq \
-  --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
-  --arg slug "$SLUG" \
-  --arg date "$DATE" \
-  --arg opening "$OPENING" \
-  --arg arc "$ARC" \
-  --arg closing "$CLOSING" \
-  --args \
-  '.posts = ((.posts | map(select(.slug != $slug))) + [{
-       schema_version: $schema,
-       slug: $slug,
-       date: $date,
-       opening_mode: $opening,
-       arc: $arc,
-       closing_mode: $closing,
-       interventions: $ARGS.positional
-     }])
-   | .posts |= sort_by(.date)' "${interventions[@]+"${interventions[@]}"}" >"$staging"; then
-  echo "error: failed to build the updated shape history for ${SHAPES_FILE} — the existing file was left untouched" >&2
-  exit 1
-fi
-
-if ! mv "$staging" "$write_target"; then
-  echo "error: could not move the staged history into place at ${write_target} — the existing file was left untouched" >&2
-  exit 2
-fi
-
-count=$(jq '.posts | length' "$SHAPES_FILE")
-jq -n \
-  --arg action "$action" \
-  --argjson count "$count" \
-  --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
-  --arg path "$SHAPES_FILE" \
-  '{ok: true, action: $action, count: $count, schema_version: $schema, path: $path}'

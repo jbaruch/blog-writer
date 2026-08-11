@@ -174,9 +174,12 @@ For audit 6, ask the script for the verdict rather than reading the shape histor
   <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
 ```
 
-Exit 0 is authoritative, including a `can_fire` of false — report it and continue. Exit 1
-means the history exists but is unusable: report the script's diagnostic, continue without
-audit 6, and do not delete or overwrite the file. Exit 2 is a tool error — report and stop.
+Route on the exit code:
+
+- **Exit 0** — the result is authoritative, including a `can_fire` of false. Report it and continue.
+- **Exit 1** — the history exists but is unusable. Report the script's diagnostic and continue without audit 6.
+- **Exit 1** — do not delete or overwrite the file.
+- **Exit 2** — a tool error. Report the diagnostic and stop.
 
 If an audit finds no issue, proceed silently.
 
@@ -239,8 +242,10 @@ Record the post as it ended up, not as it was first drafted. Reuse an existing m
 verbatim when the shape is the same; the comparison is by equality.
 `skills/blog-writer/references/post-shapes-schema.md` has the field meanings.
 
-On **exit 1** the history was refused and left untouched — a newer-schema or malformed file
-is never overwritten. Report the script's stderr diagnostic to the author and do not work
-around it by deleting the file. On **exit 2** report the diagnostic and stop.
+Route on the exit code:
+
+- **Exit 1** — the history was refused and left untouched. Report the script's stderr diagnostic to the author.
+- **Exit 1** — do not work around it by deleting the file.
+- **Exit 2** — report the diagnostic and stop.
 
 Finish here.
