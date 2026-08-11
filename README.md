@@ -52,6 +52,31 @@ and compares it against the anti-pattern list, adding anything the list doesn't 
 cover. The refresh is a step the agent runs, not a background process — the file changes
 only when a session finds something new in the article.
 
+## Structural audits
+
+The anti-patterns work at the sentence and section level. Above them sit six discourse-level
+audits, run one at a time, that look at the shape of the whole post: theme explicitness,
+structural tidiness, emotion mode, reference specificity, reader engagement, and shape
+convergence.
+
+Three of them run on the outline during editorial planning, where structure is still cheap
+to change. The other three run on the prose alongside the anti-pattern check. Each audit
+reads the persona's voice profile first. Where the profile already prescribes the human-side
+behavior, the audit is a drift check rather than a new rule.
+
+They are grounded in [StoryScope](https://arxiv.org/abs/2604.03136) (Russell et al. 2026),
+which classified 61,608 stories using only discourse-level features at 93.2% macro-F1 and
+found that a professional surface-editing pass moved detection by 1.6 points. The audits are
+reimplemented from the published findings, not ported.
+
+Shape convergence is the one audit that needs history, so finished posts get their skeleton
+recorded in `_blog-skill/post-shapes.json`. Two tested scripts own every operation on that
+file. An absent history is reported differently from an unreadable one, so a corrupt file is
+never read as "no history yet".
+
+The deliberate non-goal: applying every audit to every post trades one detectable shape for
+another, so the guidance is one or two changes per post, varied across posts.
+
 ## Persona system
 
 The skill learns the author's voice through an interactive onboarding flow that analyzes

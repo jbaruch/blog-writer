@@ -39,115 +39,127 @@
 # Idempotent: a second run with the same arguments reports `unchanged` and
 # touches nothing.
 
-set -euo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 readonly CANONICAL="${HOME}/.claude/blog-writer-persona"
 
-if ! command -v jq >/dev/null; then
-  echo "error: jq not found on PATH — required to emit the result as JSON" >&2
-  exit 2
-fi
+main() {
+  set -euo pipefail
 
-probe_only=0
-if [ "${1:-}" = "--probe" ]; then
-  probe_only=1
-  shift
-fi
-
-if [ "$#" -gt 1 ]; then
-  echo "error: expected at most one argument (target path), got $# — usage: setup-persona-dir.sh [--probe] [target-path]" >&2
-  exit 2
-fi
-
-if [ "$probe_only" -eq 1 ] && [ "$#" -eq 1 ]; then
-  echo "error: --probe takes no target path — it reports state and changes nothing" >&2
-  exit 2
-fi
-
-# voice.md carries the author's voice profile. Present-and-non-empty is what
-# distinguishes a finished onboarding from a directory that merely exists, and
-# deciding it here keeps the caller out of the filesystem.
-voice_ready() {
-  if [ -s "${CANONICAL}/voice.md" ]; then
-    echo true
-  else
-    echo false
+  if ! command -v jq >/dev/null; then
+    echo "error: jq not found on PATH — required to emit the result as JSON" >&2
+    exit 2
   fi
-}
 
-emit() {
-  jq -n \
-    --arg path "$CANONICAL" \
-    --argjson exists "$1" \
-    --arg kind "$2" \
-    --arg target "$3" \
-    --argjson voice_ready "$4" \
-    --arg action "$5" \
-    '{ok: true, path: $path, exists: $exists, kind: $kind, target: $target, voice_ready: $voice_ready, action: $action}'
-}
+  probe_only=0
+  if [ "${1:-}" = "--probe" ]; then
+    probe_only=1
+    shift
+  fi
 
-# `probed` under --probe, `unchanged` under a setup run that found the persona
-# already in place. Both describe "nothing was written", but the caller routes on
-# them differently, so they stay distinct.
-if [ "$probe_only" -eq 1 ]; then
-  found_action=probed
-else
-  found_action=unchanged
-fi
+  if [ "$#" -gt 1 ]; then
+    echo "error: expected at most one argument (target path), got $# — usage: setup-persona-dir.sh [--probe] [target-path]" >&2
+    exit 2
+  fi
 
-# An existing persona is authoritative. Re-pointing it on a re-run would orphan
-# the author's voice profile, so the only job here is to confirm it is usable.
-if [ -L "$CANONICAL" ]; then
-  if [ ! -d "$CANONICAL" ]; then
-    echo "error: ${CANONICAL} is a symlink whose target is missing — repoint it at the persona directory, or remove it and re-run" >&2
+  if [ "$probe_only" -eq 1 ] && [ "$#" -eq 1 ]; then
+    echo "error: --probe takes no target path — it reports state and changes nothing" >&2
+    exit 2
+  fi
+
+  # voice.md carries the author's voice profile. Present-and-non-empty is what
+  # distinguishes a finished onboarding from a directory that merely exists, and
+  # deciding it here keeps the caller out of the filesystem.
+  voice_ready() {
+    if [ -s "${CANONICAL}/voice.md" ]; then
+      echo true
+    else
+      echo false
+    fi
+  }
+
+  emit() {
+    jq -n \
+      --arg path "$CANONICAL" \
+      --argjson exists "$1" \
+      --arg kind "$2" \
+      --arg target "$3" \
+      --argjson voice_ready "$4" \
+      --arg action "$5" \
+      '{ok: true, path: $path, exists: $exists, kind: $kind, target: $target, voice_ready: $voice_ready, action: $action}'
+  }
+
+  # `probed` under --probe, `unchanged` under a setup run that found the persona
+  # already in place. Both describe "nothing was written", but the caller routes on
+  # them differently, so they stay distinct.
+  if [ "$probe_only" -eq 1 ]; then
+    found_action=probed
+  else
+    found_action=unchanged
+  fi
+
+  # An existing persona is authoritative. Re-pointing it on a re-run would orphan
+  # the author's voice profile, so the only job here is to confirm it is usable.
+  if [ -L "$CANONICAL" ]; then
+    if [ ! -d "$CANONICAL" ]; then
+      echo "error: ${CANONICAL} is a symlink whose target is missing — repoint it at the persona directory, or remove it and re-run" >&2
+      exit 1
+    fi
+    resolved=$(cd "$CANONICAL" && pwd -P)
+    emit true symlink "$resolved" "$(voice_ready)" "$found_action"
+    exit 0
+  fi
+
+  if [ -d "$CANONICAL" ]; then
+    resolved=$(cd "$CANONICAL" && pwd -P)
+    emit true directory "$resolved" "$(voice_ready)" "$found_action"
+    exit 0
+  fi
+
+  if [ -e "$CANONICAL" ]; then
+    echo "error: ${CANONICAL} exists but is not a directory or symlink — move it aside and re-run" >&2
     exit 1
   fi
-  resolved=$(cd "$CANONICAL" && pwd -P)
-  emit true symlink "$resolved" "$(voice_ready)" "$found_action"
-  exit 0
-fi
 
-if [ -d "$CANONICAL" ]; then
-  resolved=$(cd "$CANONICAL" && pwd -P)
-  emit true directory "$resolved" "$(voice_ready)" "$found_action"
-  exit 0
-fi
+  # Nothing is there. A probe reports that and stops; only a setup run creates.
+  if [ "$probe_only" -eq 1 ]; then
+    emit false none "" false probed
+    exit 0
+  fi
 
-if [ -e "$CANONICAL" ]; then
-  echo "error: ${CANONICAL} exists but is not a directory or symlink — move it aside and re-run" >&2
-  exit 1
-fi
-
-# Nothing is there. A probe reports that and stops; only a setup run creates.
-if [ "$probe_only" -eq 1 ]; then
-  emit false none "" false probed
-  exit 0
-fi
-
-parent=$(dirname "$CANONICAL")
-if ! mkdir -p "$parent"; then
-  echo "error: could not create ${parent} — check permissions on \$HOME and re-run" >&2
-  exit 2
-fi
-
-if [ "$#" -eq 1 ]; then
-  target=$1
-  if ! mkdir -p "$target"; then
-    echo "error: could not create the target directory ${target} — check the path and permissions" >&2
+  parent=$(dirname "$CANONICAL")
+  if ! mkdir -p "$parent"; then
+    echo "error: could not create ${parent} — check permissions on \$HOME and re-run" >&2
     exit 2
   fi
-  resolved=$(cd "$target" && pwd -P)
-  if ! ln -s "$resolved" "$CANONICAL"; then
-    echo "error: could not link ${CANONICAL} to ${resolved}" >&2
+
+  if [ "$#" -eq 1 ]; then
+    target=$1
+    if ! mkdir -p "$target"; then
+      echo "error: could not create the target directory ${target} — check the path and permissions" >&2
+      exit 2
+    fi
+    resolved=$(cd "$target" && pwd -P)
+    if ! ln -s "$resolved" "$CANONICAL"; then
+      echo "error: could not link ${CANONICAL} to ${resolved}" >&2
+      exit 2
+    fi
+    emit true symlink "$resolved" "$(voice_ready)" linked
+    exit 0
+  fi
+
+  if ! mkdir -p "$CANONICAL"; then
+    echo "error: could not create ${CANONICAL} — check permissions on \$HOME and re-run" >&2
     exit 2
   fi
-  emit true symlink "$resolved" "$(voice_ready)" linked
-  exit 0
-fi
+  resolved=$(cd "$CANONICAL" && pwd -P)
+  emit true directory "$resolved" "$(voice_ready)" created
+}
 
-if ! mkdir -p "$CANONICAL"; then
-  echo "error: could not create ${CANONICAL} — check permissions on \$HOME and re-run" >&2
-  exit 2
+# Entry-point guard per `jbaruch/coding-policy: file-hygiene` — the script runs when
+# executed and stays sourceable for testing or reuse.
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  main "$@"
 fi
-resolved=$(cd "$CANONICAL" && pwd -P)
-emit true directory "$resolved" "$(voice_ready)" created

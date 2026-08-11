@@ -218,6 +218,36 @@ than any amount of praise — it shows the author has real experience, not just 
 talking points. The limitation doesn't need its own section; it can live inside the
 technical meat or the broader point as a natural aside.
 
+### 2f: Structural Audit of the Outline
+
+Before the checkpoint, audit the outline against `references/structural-audits.md`. Run the
+three outline-level audits **one at a time** — the study behind them found aspect-based
+checking catches 95.4% of what it looks for against 68.4% for a single combined read.
+
+Audit the outline, not prose you haven't written yet. Structure is nearly free to change
+here and expensive to change in Phase 4.
+
+**Audit 1 — Theme explicitness.** Walk the section list and mark every place the main idea
+gets stated: the TLDR, the hook, each section close, the broader point, the CTA. More than
+one is the tell. Cut down to one and decide which placement lands hardest. Patterns #29 and
+#38 catch the sentence-level forms during the draft check; this is the document-level count.
+
+**Audit 2 — Structural tidiness.** Ask whether every thread in the plan closes and whether
+there is exactly one causal spine with no digression. If both are true, that is the tell.
+The fix is at most one move: an oblique tangent, a question raised and openly unanswered, or
+stopping before the resolution. A technical post still owes the reader the fix — the target
+is the tidy epilogue after the fix landed, never the fix itself.
+
+**Audit 6 — Shape convergence.** Name the planned opening mode, arc, and closing mode, then
+ask `check-shape-convergence.sh` for the verdict. Do not read or compare the history
+yourself. The invocation, the exit-code routing, and the correction loop are in SKILL.md
+Step 9; the field meanings and both contracts are in `references/post-shapes-schema.md`.
+
+When an audit finds no issue, proceed silently. Report a `can_fire` of false, though — that
+says the audit could not run, which is different from running clean. An audit that fires on
+every post is miscalibrated, and applying all three at once builds the new cluster the
+audits exist to prevent.
+
 **Checkpoint:** Author approves the main idea, CTA, and structure outline.
 
 ---
@@ -505,6 +535,29 @@ the pre-scan version and ask two questions at the draft level:
   cases) stays. If the answer to this question is no, restore the human sentences the
   scan didn't actually flag.
 
+Run the prose-level structural audits. Open `references/structural-audits.md` and run audits
+3, 4, and 5 **one at a time**, after the anti-pattern check is complete. Read
+`persona/voice.md` first: where the profile already prescribes the human-side behavior, the
+audit is a drift check — "did this draft wander off the profile" — not a new rule to impose.
+
+- **Audit 3 — Emotion mode.** Pattern #39 catches the individual hits during Pass 1. This
+  audit asks the document-level question: across the whole post, how many emotional beats
+  are performed through the body and how many are named? A draft can dodge every #39 hit and
+  still never once say what the author felt.
+- **Audit 4 — Reference specificity.** Sweep for unnamed things: "a popular CI tool", "the
+  team", "recently", "significant savings". Name each one. Where the specific isn't known,
+  that is a `Fact` placeholder for the author, not a licence to stay vague — a vague allusion
+  is a placeholder nobody flagged. Pattern #25 covers the "experts say" shape; this is
+  broader.
+- **Audit 5 — Reader engagement.** One moment per post that acknowledges the writing
+  situation, or none. Check `persona/voice.md` before adding any: a profile that already
+  lists asides or direct address as devices satisfies this natively, and adding more doubles
+  the dose.
+
+Apply at most two interventions from the file's menu to any one post, and vary them across
+posts. Uniform application of the whole menu is the convergence trap the file opens with —
+it trades one detectable shape for another.
+
 Run the product accuracy check (if configured). If `persona/product.md` exists and contains
 content, verify every claim the draft makes about the product — feature names, CLI commands,
 behavior, terminology — against the docs pages fetched in Phase 0. If the draft references
@@ -574,11 +627,14 @@ conversation — edit the file surgically.
   in an image or code block without adjusting the surrounding prose
 - Re-run the tightening pass on any new or rewritten sections — additions tend to
   introduce redundancy with existing content
+- Re-run structural audits 3, 4, and 5 on new or rewritten sections. A section added in
+  Phase 4 has been through no structural check at all
 
 **The post is done when the author says it's done. Not before.**
 
-**When a post is finished and added to `persona/examples.md`:** The persona has been updated
-with new writing. Ask the global voice preference question from `references/setup.md` Step 10.
+**Recording the post's shape** is Step 12 of the skill, not part of this phase. Once the
+author declares the post done, that step runs the writer and owns the routing contract.
+Do not record it here — invoking the writer from both places would file the post twice.
 
 ---
 
@@ -588,6 +644,7 @@ with new writing. Ask the global voice preference question from `references/setu
 |-------|------|-------------|
 | 0: Intake | Material read, gaps identified | Automatic |
 | 1: Clarification | All gaps resolved | Author confirms |
-| 2: Editorial Planning | Main idea + CTA + outline approved | Author approves |
-| 3: First Draft | Draft written, anti-patterns checked | Delivered to author |
+| 2: Editorial Planning | Main idea + CTA + outline approved, outline audited | Author approves |
+| 3: First Draft | Draft written, anti-patterns and structure checked | Delivered to author |
 | 4: Revision | Post meets author's standards | Author declares done |
+| Step 12: Record shape | Finished post's skeleton appended to the shape history | Automatic |
