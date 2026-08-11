@@ -71,15 +71,7 @@ set -uo pipefail
 # Every case directory is created inside one suite-owned root, so a single EXIT
 # trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
 # status (`jbaruch/coding-policy: error-handling`).
-if ! SUITE_TMP=$(mktemp -d); then
-  echo "error: could not create the suite temp directory — check TMPDIR is writable" >&2
-  exit 1
-fi
-cleanup_suite_tmp() {
-  rm -rf "$SUITE_TMP"
-  return 0
-}
-trap cleanup_suite_tmp EXIT
+
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 readonly CHECK="${SCRIPT_DIR}/check-shape-convergence.sh"
@@ -175,314 +167,332 @@ assert_contains() {
   esac
 }
 
-echo "check-shape-convergence.sh"
+main() {
+  if ! SUITE_TMP=$(mktemp -d); then
+    echo "error: could not create the suite temp directory — check TMPDIR is writable" >&2
+    exit 1
+  fi
+  cleanup_suite_tmp() {
+    rm -rf "$SUITE_TMP"
+    return 0
+  }
+  trap cleanup_suite_tmp EXIT
 
-new_dir
-if run_case "absent history reports can_fire=false, not an error" 0 \
-    bash "$CHECK" "${CASE_DIR}/missing.json" a b c; then
-  assert_json "absent" '.can_fire' "false"
-  assert_json "absent" '.compared' "0"
-  assert_json "absent" '.ok' "true"
-  assert_json "absent" '.blocked_by' "no_history"
-  assert_json "absent" '.compared_posts | length' "0"
+  echo "check-shape-convergence.sh"
+
+  new_dir
+  if run_case "absent history reports can_fire=false, not an error" 0 \
+      bash "$CHECK" "${CASE_DIR}/missing.json" a b c; then
+    assert_json "absent" '.can_fire' "false"
+    assert_json "absent" '.compared' "0"
+    assert_json "absent" '.ok' "true"
+    assert_json "absent" '.blocked_by' "no_history"
+    assert_json "absent" '.compared_posts | length' "0"
+  fi
+
+  new_dir
+  printf 'not json at all' >"${CASE_DIR}/bad.json"
+  if run_case "malformed history exits 1 rather than reading as absent" 1 \
+      bash "$CHECK" "${CASE_DIR}/bad.json" a b c; then
+    assert_contains "malformed" "$CASE_ERR" "not valid JSON"
+  fi
+
+  new_dir
+  printf '{"shapes":[]}' >"${CASE_DIR}/wrong.json"
+  run_case "history without a posts array exits 1" 1 \
+    bash "$CHECK" "${CASE_DIR}/wrong.json" a b c
+
+  new_dir
+  write_history "${CASE_DIR}/one.json" 1 "emb|p->m|stop"
+  if run_case "one record is below the history minimum" 0 \
+      bash "$CHECK" "${CASE_DIR}/one.json" emb "p->m" stop; then
+    assert_json "one record" '.can_fire' "false"
+    assert_json "one record" '.blocked_by' "insufficient_history"
+  fi
+
+  new_dir
+  write_history "${CASE_DIR}/two.json" 1 "emb|p->m|stop" "emb|p->m|stop"
+  if run_case "two records produce a verdict (the old unsatisfiable case)" 0 \
+      bash "$CHECK" "${CASE_DIR}/two.json" emb "p->m" stop; then
+    assert_json "two records" '.can_fire' "true"
+    assert_json "two records" '.compared' "2"
+    assert_json "two records" '.converged' "true"
+  fi
+
+  new_dir
+  write_history "${CASE_DIR}/three.json" 1 "emb|p->m|stop" "emb|p->m|open" "emb|p->m|hot"
+  if run_case "matching opening and arc across all three converges" 0 \
+      bash "$CHECK" "${CASE_DIR}/three.json" emb "p->m" brand-new; then
+    assert_json "converged" '.converged' "true"
+    assert_json "converged" '.converged_axes | sort | join(",")' "arc,opening_mode"
+    assert_json "converged" '.blocked_by' "null"
+    # SKILL.md requires verifying each compared record against the actual post, so
+    # the verdict must name them. Without this the instruction is unexecutable.
+    assert_json "converged" '.compared_posts | length' "3"
+    assert_json "converged" '.compared_posts | map(has("slug") and has("date") and has("opening_mode") and has("arc") and has("closing_mode")) | all' "true"
+  fi
+
+  new_dir
+  write_history "${CASE_DIR}/vary.json" 1 "emb|p->m|stop" "cold|outcome|open" "named|delayed|hot"
+  if run_case "a single matching axis does not converge" 0 \
+      bash "$CHECK" "${CASE_DIR}/vary.json" emb "brand-new" brand-new; then
+    assert_json "not converged" '.converged' "false"
+  fi
+
+  # The writer keeps the file in date order, but a hand edit or a bad merge could
+  # not. "Most recent" must mean by date, not by position.
+  new_dir
+  jq -n '{posts: [
+     {schema_version: 1, slug: "newest", date: "2025-09-01", opening_mode: "brand-new", arc: "brand-new", closing_mode: "brand-new", interventions: []},
+     {schema_version: 1, slug: "a", date: "2025-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+     {schema_version: 1, slug: "b", date: "2025-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []}
+   ]}' >"${CASE_DIR}/unsorted.json"
+  if run_case "an out-of-order history still windows by date" 0 \
+      bash "$CHECK" "${CASE_DIR}/unsorted.json" emb "p->m" stop; then
+    assert_json "unsorted" '.compared' "3"
+    assert_json "unsorted" '.converged' "false"
+  fi
+
+  new_dir
+  write_history "${CASE_DIR}/window.json" 1 \
+    "ancient|ancient|ancient" "emb|p->m|stop" "emb|p->m|open" "emb|p->m|hot"
+  if run_case "records older than the window do not affect the verdict" 0 \
+      bash "$CHECK" "${CASE_DIR}/window.json" emb "p->m" brand-new; then
+    assert_json "window" '.compared' "3"
+    assert_json "window" '.converged' "true"
+  fi
+
+  new_dir
+  write_history "${CASE_DIR}/newer.json" 99 "emb|p->m|stop" "emb|p->m|stop"
+  if run_case "a history written entirely by a newer version cannot fire" 0 \
+      bash "$CHECK" "${CASE_DIR}/newer.json" emb "p->m" stop; then
+    assert_json "newer" '.skipped_newer_records' "2"
+    assert_json "newer" '.can_fire' "false"
+    assert_json "newer" '.blocked_by' "newer_records"
+    assert_contains "newer" "$CASE_ERR" "newer skill version"
+  fi
+
+  # A lagging reader can only parse the OLDER records, so a verdict built from them
+  # would describe the wrong posts. Enough readable history must not rescue it.
+  new_dir
+  jq -n '{posts: [
+     {schema_version: 1,  slug: "a", date: "2025-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+     {schema_version: 1,  slug: "b", date: "2025-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+     {schema_version: 99, slug: "c", date: "2025-03-01", opening_mode: "new", arc: "new", closing_mode: "new", interventions: []}
+   ]}' >"${CASE_DIR}/mixed.json"
+  if run_case "one newer record disables the verdict even with readable history" 0 \
+      bash "$CHECK" "${CASE_DIR}/mixed.json" emb "p->m" stop; then
+    assert_json "mixed" '.skipped_newer_records' "1"
+    assert_json "mixed" '.can_fire' "false"
+    assert_json "mixed" '.converged' "false"
+  fi
+
+  new_dir
+  write_history "${CASE_DIR}/ro.json" 1 "emb|p->m|stop" "emb|p->m|stop"
+  before=$(cat "${CASE_DIR}/ro.json")
+  run_case "checking never modifies the history" 0 \
+    bash "$CHECK" "${CASE_DIR}/ro.json" emb "p->m" stop
+  if [ "$(cat "${CASE_DIR}/ro.json")" = "$before" ]; then ok; else fail "read-only: the check modified the history file"; fi
+
+  new_dir
+  printf '{"posts":[{"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
+  if run_case "a record without schema_version is malformed, not version zero" 1 \
+      bash "$CHECK" "${CASE_DIR}/nover.json" o a c; then
+    assert_contains "no schema_version" "$CASE_ERR" "malformed record"
+  fi
+
+  new_dir
+  printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"not-a-date","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/baddate.json"
+  run_case "a record with a malformed date is rejected" 1 \
+    bash "$CHECK" "${CASE_DIR}/baddate.json" o a c
+
+  new_dir
+  printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2025-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
+  run_case "a record with a mistyped field is rejected" 1 \
+    bash "$CHECK" "${CASE_DIR}/badtype.json" o a c
+
+  # jq's group_by sorts before grouping, so duplicates need not be adjacent to be
+  # caught. Pinned here because that is easy to assume otherwise.
+  new_dir
+  jq -n '{posts: [
+     {schema_version: 1, slug: "dupe", date: "2025-01-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
+     {schema_version: 1, slug: "other", date: "2025-02-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
+     {schema_version: 1, slug: "dupe", date: "2025-03-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []}
+   ]}' >"${CASE_DIR}/nonadjacent.json"
+  if run_case "non-adjacent duplicate slugs are still caught" 1 \
+      bash "$CHECK" "${CASE_DIR}/nonadjacent.json" o a c; then
+    assert_contains "non-adjacent dupes" "$CASE_ERR" "dupe"
+  fi
+
+  new_dir
+  jq -n '{posts: [
+     {schema_version: 1, slug: "same", date: "2025-01-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
+     {schema_version: 1, slug: "same", date: "2025-02-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []}
+   ]}' >"${CASE_DIR}/dupe.json"
+  if run_case "a history with duplicate slugs is ambiguous and rejected" 1 \
+      bash "$CHECK" "${CASE_DIR}/dupe.json" o a c; then
+    assert_contains "duplicate slugs" "$CASE_ERR" "more than one record for slug"
+  fi
+
+  new_dir
+  printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[7]}]}' >"${CASE_DIR}/badiv.json"
+  run_case "a record with a non-string intervention is rejected" 1 \
+    bash "$CHECK" "${CASE_DIR}/badiv.json" o a c
+
+  new_dir
+  printf '{"posts":[{"schema_version":0,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/old.json"
+  if run_case "a record below the minimum schema has no migration path and is rejected" 1 \
+      bash "$CHECK" "${CASE_DIR}/old.json" o a c; then
+    assert_contains "below minimum" "$CASE_ERR" "below"
+  fi
+
+  new_dir
+  ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
+  if run_case "a dangling symlink is reported, not read as absent" 1 \
+      bash "$CHECK" "${CASE_DIR}/dangling.json" a b c; then
+    assert_contains "dangling" "$CASE_ERR" "target is missing"
+  fi
+
+  new_dir
+  run_case "wrong argument count exits 2" 2 bash "$CHECK" "${CASE_DIR}/x.json" only-one
+
+  echo "record-post-shape.sh"
+
+  new_dir
+  if run_case "creates a history that does not exist yet" 0 \
+      bash "$RECORD" "${CASE_DIR}/new.json" my-slug 2025-06-01 emb "p->m" stop; then
+    assert_json "create" '.action' "created"
+    assert_json "create" '.count' "1"
+  fi
+
+  if run_case "appends to an existing history" 0 \
+      bash "$RECORD" "${CASE_DIR}/new.json" second 2025-06-02 cold outcome hot; then
+    assert_json "append" '.action' "appended"
+    assert_json "append" '.count' "2"
+  fi
+
+  written=$(jq -r '.posts[-1].slug' "${CASE_DIR}/new.json")
+  if [ "$written" = "second" ]; then ok; else fail "append: newest record is not last (got '${written}')"; fi
+
+  stamped=$(jq -r '[.posts[] | .schema_version] | unique | join(",")' "${CASE_DIR}/new.json")
+  if [ "$stamped" = "1" ]; then ok; else fail "schema stamp: every record should carry schema_version 1, got '${stamped}'"; fi
+
+  new_dir
+  run_case "interventions round-trip" 0 \
+    bash "$RECORD" "${CASE_DIR}/iv.json" s 2025-06-01 a b c open-thread named-thing
+  got=$(jq -r '.posts[0].interventions | join(",")' "${CASE_DIR}/iv.json")
+  if [ "$got" = "open-thread,named-thing" ]; then ok; else fail "interventions: expected two recorded, got '${got}'"; fi
+
+  run_case "no interventions produces an empty array" 0 \
+    bash "$RECORD" "${CASE_DIR}/iv.json" s2 2025-06-01 a b c
+  got=$(jq -r '.posts[1].interventions | length' "${CASE_DIR}/iv.json")
+  if [ "$got" = "0" ]; then ok; else fail "interventions: expected empty array, got length '${got}'"; fi
+
+  new_dir
+  write_history "${CASE_DIR}/guard.json" 99 "emb|p->m|stop"
+  before=$(cat "${CASE_DIR}/guard.json")
+  if run_case "refuses to write over a newer-schema history" 1 \
+      bash "$RECORD" "${CASE_DIR}/guard.json" s 2025-06-01 a b c; then
+    assert_contains "clobber guard" "$CASE_ERR" "newer skill version"
+  fi
+  if [ "$(cat "${CASE_DIR}/guard.json")" = "$before" ]; then ok; else fail "clobber guard: the history was modified"; fi
+
+  new_dir
+  printf 'garbage' >"${CASE_DIR}/bad.json"
+  before=$(cat "${CASE_DIR}/bad.json")
+  run_case "refuses to write over a malformed history" 1 \
+    bash "$RECORD" "${CASE_DIR}/bad.json" s 2025-06-01 a b c
+  if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
+
+  new_dir
+  run_case "recording the same slug twice updates rather than duplicates" 0 \
+    bash "$RECORD" "${CASE_DIR}/idem.json" same 2025-05-01 first-open first-arc first-close
+  if run_case "re-recording the same post reports updated" 0 \
+      bash "$RECORD" "${CASE_DIR}/idem.json" same 2025-05-01 second-open second-arc second-close; then
+    assert_json "idempotent" '.action' "updated"
+    assert_json "idempotent" '.count' "1"
+  fi
+  kept=$(jq -r '.posts[0].opening_mode' "${CASE_DIR}/idem.json")
+  if [ "$kept" = "second-open" ]; then ok; else fail "idempotent: expected the re-run to replace the record, got opening_mode '${kept}'"; fi
+  total=$(jq '.posts | length' "${CASE_DIR}/idem.json")
+  if [ "$total" = "1" ]; then ok; else fail "idempotent: expected 1 record after a re-run, got ${total}"; fi
+
+  # A staging file that cannot be created is an environment problem (exit 2), not a
+  # corrupt history (exit 1). Triggered with an over-long name rather than chmod:
+  # permission bits do not stop root, so a chmod-based case could not run on every
+  # runner, while ENAMETOOLONG stops every user identically.
+  new_dir
+  long_name=$(printf 'n%.0s' {1..250})
+  run_case "a staging file that cannot be created exits 2, not 1" 2 \
+    bash "$RECORD" "${CASE_DIR}/${long_name}.json" s 2025-06-01 a b c
+
+  new_dir
+  run_case "a backfilled earlier post lands in date order, not at the end" 0 \
+    bash "$RECORD" "${CASE_DIR}/order.json" late 2025-09-01 a b c
+  run_case "recording an earlier post after a later one" 0 \
+    bash "$RECORD" "${CASE_DIR}/order.json" early 2025-03-01 a b c
+  order=$(jq -r '[.posts[].slug] | join(",")' "${CASE_DIR}/order.json")
+  if [ "$order" = "early,late" ]; then ok; else fail "date order: expected 'early,late' (newest last), got '${order}'"; fi
+
+  new_dir
+  printf '{"posts":[{"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
+  before=$(cat "${CASE_DIR}/nover.json")
+  run_case "refuses to append to a history whose records lack schema_version" 1 \
+    bash "$RECORD" "${CASE_DIR}/nover.json" s 2025-06-01 a b c
+  if [ "$(cat "${CASE_DIR}/nover.json")" = "$before" ]; then ok; else fail "unversioned guard: the history was modified"; fi
+
+  new_dir
+  printf '{"posts":[{"schema_version":1,"slug":"a","date":"nope","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badrec.json"
+  before=$(cat "${CASE_DIR}/badrec.json")
+  run_case "refuses to append to a history holding a malformed record" 1 \
+    bash "$RECORD" "${CASE_DIR}/badrec.json" s 2025-06-01 a b c
+  if [ "$(cat "${CASE_DIR}/badrec.json")" = "$before" ]; then ok; else fail "malformed record guard: the history was modified"; fi
+
+  new_dir
+  ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
+  run_case "refuses to write through a dangling symlink" 1 \
+    bash "$RECORD" "${CASE_DIR}/dangling.json" s 2025-06-01 a b c
+
+  # A history on a synced drive is reached through a symlink, the same shape the
+  # persona directory uses. The write must land on the target, not replace the link.
+  new_dir
+  mkdir -p "${CASE_DIR}/real"
+  printf '{"posts":[]}' >"${CASE_DIR}/real/history.json"
+  ln -s "${CASE_DIR}/real/history.json" "${CASE_DIR}/link.json"
+  run_case "writing through a valid symlink preserves the link" 0 \
+    bash "$RECORD" "${CASE_DIR}/link.json" s 2025-06-01 a b c
+  if [ -L "${CASE_DIR}/link.json" ]; then ok; else fail "symlink: the link was replaced by a regular file"; fi
+  # jq's own diagnostic stays visible: an unreadable or unparseable target after a
+  # successful write is a real signal, not noise to collapse into a sentinel value.
+  if ! landed=$(jq -r '.posts[0].slug' "${CASE_DIR}/real/history.json"); then
+    fail "symlink: the target history is missing or unparseable after writing through the link"
+  elif [ "$landed" = "s" ]; then
+    ok
+  else
+    fail "symlink: the record did not land on the target, got '${landed}'"
+  fi
+  strays=$(find "${CASE_DIR}" -name '*.staging.*' | wc -l | tr -d ' ')
+  if [ "$strays" = "0" ]; then ok; else fail "symlink: ${strays} staging file(s) stranded"; fi
+
+  new_dir
+  run_case "rejects a date that is not YYYY-MM-DD" 2 \
+    bash "$RECORD" "${CASE_DIR}/d.json" s "Aug 11 2026" a b c
+
+  new_dir
+  run_case "rejects an empty slug" 2 \
+    bash "$RECORD" "${CASE_DIR}/e.json" "" 2025-06-01 a b c
+
+  new_dir
+  run_case "rejects too few arguments" 2 \
+    bash "$RECORD" "${CASE_DIR}/f.json" s 2025-06-01
+
+  echo
+  echo "passed: ${pass_count}  failed: ${fail_count}"
+  [ "$fail_count" -eq 0 ]
+}
+
+# Entry-point guard per `jbaruch/coding-policy: file-hygiene` — the suite runs when
+# executed and stays sourceable, so nothing happens merely by loading this file.
+if [ "${BASH_SOURCE[0]}" = "${0}" ]; then
+  main "$@"
 fi
-
-new_dir
-printf 'not json at all' >"${CASE_DIR}/bad.json"
-if run_case "malformed history exits 1 rather than reading as absent" 1 \
-    bash "$CHECK" "${CASE_DIR}/bad.json" a b c; then
-  assert_contains "malformed" "$CASE_ERR" "not valid JSON"
-fi
-
-new_dir
-printf '{"shapes":[]}' >"${CASE_DIR}/wrong.json"
-run_case "history without a posts array exits 1" 1 \
-  bash "$CHECK" "${CASE_DIR}/wrong.json" a b c
-
-new_dir
-write_history "${CASE_DIR}/one.json" 1 "emb|p->m|stop"
-if run_case "one record is below the history minimum" 0 \
-    bash "$CHECK" "${CASE_DIR}/one.json" emb "p->m" stop; then
-  assert_json "one record" '.can_fire' "false"
-  assert_json "one record" '.blocked_by' "insufficient_history"
-fi
-
-new_dir
-write_history "${CASE_DIR}/two.json" 1 "emb|p->m|stop" "emb|p->m|stop"
-if run_case "two records produce a verdict (the old unsatisfiable case)" 0 \
-    bash "$CHECK" "${CASE_DIR}/two.json" emb "p->m" stop; then
-  assert_json "two records" '.can_fire' "true"
-  assert_json "two records" '.compared' "2"
-  assert_json "two records" '.converged' "true"
-fi
-
-new_dir
-write_history "${CASE_DIR}/three.json" 1 "emb|p->m|stop" "emb|p->m|open" "emb|p->m|hot"
-if run_case "matching opening and arc across all three converges" 0 \
-    bash "$CHECK" "${CASE_DIR}/three.json" emb "p->m" brand-new; then
-  assert_json "converged" '.converged' "true"
-  assert_json "converged" '.converged_axes | sort | join(",")' "arc,opening_mode"
-  assert_json "converged" '.blocked_by' "null"
-  # SKILL.md requires verifying each compared record against the actual post, so
-  # the verdict must name them. Without this the instruction is unexecutable.
-  assert_json "converged" '.compared_posts | length' "3"
-  assert_json "converged" '.compared_posts | map(has("slug") and has("date") and has("opening_mode") and has("arc") and has("closing_mode")) | all' "true"
-fi
-
-new_dir
-write_history "${CASE_DIR}/vary.json" 1 "emb|p->m|stop" "cold|outcome|open" "named|delayed|hot"
-if run_case "a single matching axis does not converge" 0 \
-    bash "$CHECK" "${CASE_DIR}/vary.json" emb "brand-new" brand-new; then
-  assert_json "not converged" '.converged' "false"
-fi
-
-# The writer keeps the file in date order, but a hand edit or a bad merge could
-# not. "Most recent" must mean by date, not by position.
-new_dir
-jq -n '{posts: [
-   {schema_version: 1, slug: "newest", date: "2025-09-01", opening_mode: "brand-new", arc: "brand-new", closing_mode: "brand-new", interventions: []},
-   {schema_version: 1, slug: "a", date: "2025-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
-   {schema_version: 1, slug: "b", date: "2025-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []}
- ]}' >"${CASE_DIR}/unsorted.json"
-if run_case "an out-of-order history still windows by date" 0 \
-    bash "$CHECK" "${CASE_DIR}/unsorted.json" emb "p->m" stop; then
-  assert_json "unsorted" '.compared' "3"
-  assert_json "unsorted" '.converged' "false"
-fi
-
-new_dir
-write_history "${CASE_DIR}/window.json" 1 \
-  "ancient|ancient|ancient" "emb|p->m|stop" "emb|p->m|open" "emb|p->m|hot"
-if run_case "records older than the window do not affect the verdict" 0 \
-    bash "$CHECK" "${CASE_DIR}/window.json" emb "p->m" brand-new; then
-  assert_json "window" '.compared' "3"
-  assert_json "window" '.converged' "true"
-fi
-
-new_dir
-write_history "${CASE_DIR}/newer.json" 99 "emb|p->m|stop" "emb|p->m|stop"
-if run_case "a history written entirely by a newer version cannot fire" 0 \
-    bash "$CHECK" "${CASE_DIR}/newer.json" emb "p->m" stop; then
-  assert_json "newer" '.skipped_newer_records' "2"
-  assert_json "newer" '.can_fire' "false"
-  assert_json "newer" '.blocked_by' "newer_records"
-  assert_contains "newer" "$CASE_ERR" "newer skill version"
-fi
-
-# A lagging reader can only parse the OLDER records, so a verdict built from them
-# would describe the wrong posts. Enough readable history must not rescue it.
-new_dir
-jq -n '{posts: [
-   {schema_version: 1,  slug: "a", date: "2025-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
-   {schema_version: 1,  slug: "b", date: "2025-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
-   {schema_version: 99, slug: "c", date: "2025-03-01", opening_mode: "new", arc: "new", closing_mode: "new", interventions: []}
- ]}' >"${CASE_DIR}/mixed.json"
-if run_case "one newer record disables the verdict even with readable history" 0 \
-    bash "$CHECK" "${CASE_DIR}/mixed.json" emb "p->m" stop; then
-  assert_json "mixed" '.skipped_newer_records' "1"
-  assert_json "mixed" '.can_fire' "false"
-  assert_json "mixed" '.converged' "false"
-fi
-
-new_dir
-write_history "${CASE_DIR}/ro.json" 1 "emb|p->m|stop" "emb|p->m|stop"
-before=$(cat "${CASE_DIR}/ro.json")
-run_case "checking never modifies the history" 0 \
-  bash "$CHECK" "${CASE_DIR}/ro.json" emb "p->m" stop
-if [ "$(cat "${CASE_DIR}/ro.json")" = "$before" ]; then ok; else fail "read-only: the check modified the history file"; fi
-
-new_dir
-printf '{"posts":[{"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
-if run_case "a record without schema_version is malformed, not version zero" 1 \
-    bash "$CHECK" "${CASE_DIR}/nover.json" o a c; then
-  assert_contains "no schema_version" "$CASE_ERR" "malformed record"
-fi
-
-new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"not-a-date","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/baddate.json"
-run_case "a record with a malformed date is rejected" 1 \
-  bash "$CHECK" "${CASE_DIR}/baddate.json" o a c
-
-new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2025-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
-run_case "a record with a mistyped field is rejected" 1 \
-  bash "$CHECK" "${CASE_DIR}/badtype.json" o a c
-
-# jq's group_by sorts before grouping, so duplicates need not be adjacent to be
-# caught. Pinned here because that is easy to assume otherwise.
-new_dir
-jq -n '{posts: [
-   {schema_version: 1, slug: "dupe", date: "2025-01-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
-   {schema_version: 1, slug: "other", date: "2025-02-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
-   {schema_version: 1, slug: "dupe", date: "2025-03-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []}
- ]}' >"${CASE_DIR}/nonadjacent.json"
-if run_case "non-adjacent duplicate slugs are still caught" 1 \
-    bash "$CHECK" "${CASE_DIR}/nonadjacent.json" o a c; then
-  assert_contains "non-adjacent dupes" "$CASE_ERR" "dupe"
-fi
-
-new_dir
-jq -n '{posts: [
-   {schema_version: 1, slug: "same", date: "2025-01-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
-   {schema_version: 1, slug: "same", date: "2025-02-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []}
- ]}' >"${CASE_DIR}/dupe.json"
-if run_case "a history with duplicate slugs is ambiguous and rejected" 1 \
-    bash "$CHECK" "${CASE_DIR}/dupe.json" o a c; then
-  assert_contains "duplicate slugs" "$CASE_ERR" "more than one record for slug"
-fi
-
-new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[7]}]}' >"${CASE_DIR}/badiv.json"
-run_case "a record with a non-string intervention is rejected" 1 \
-  bash "$CHECK" "${CASE_DIR}/badiv.json" o a c
-
-new_dir
-printf '{"posts":[{"schema_version":0,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/old.json"
-if run_case "a record below the minimum schema has no migration path and is rejected" 1 \
-    bash "$CHECK" "${CASE_DIR}/old.json" o a c; then
-  assert_contains "below minimum" "$CASE_ERR" "below"
-fi
-
-new_dir
-ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
-if run_case "a dangling symlink is reported, not read as absent" 1 \
-    bash "$CHECK" "${CASE_DIR}/dangling.json" a b c; then
-  assert_contains "dangling" "$CASE_ERR" "target is missing"
-fi
-
-new_dir
-run_case "wrong argument count exits 2" 2 bash "$CHECK" "${CASE_DIR}/x.json" only-one
-
-echo "record-post-shape.sh"
-
-new_dir
-if run_case "creates a history that does not exist yet" 0 \
-    bash "$RECORD" "${CASE_DIR}/new.json" my-slug 2025-06-01 emb "p->m" stop; then
-  assert_json "create" '.action' "created"
-  assert_json "create" '.count' "1"
-fi
-
-if run_case "appends to an existing history" 0 \
-    bash "$RECORD" "${CASE_DIR}/new.json" second 2025-06-02 cold outcome hot; then
-  assert_json "append" '.action' "appended"
-  assert_json "append" '.count' "2"
-fi
-
-written=$(jq -r '.posts[-1].slug' "${CASE_DIR}/new.json")
-if [ "$written" = "second" ]; then ok; else fail "append: newest record is not last (got '${written}')"; fi
-
-stamped=$(jq -r '[.posts[] | .schema_version] | unique | join(",")' "${CASE_DIR}/new.json")
-if [ "$stamped" = "1" ]; then ok; else fail "schema stamp: every record should carry schema_version 1, got '${stamped}'"; fi
-
-new_dir
-run_case "interventions round-trip" 0 \
-  bash "$RECORD" "${CASE_DIR}/iv.json" s 2025-06-01 a b c open-thread named-thing
-got=$(jq -r '.posts[0].interventions | join(",")' "${CASE_DIR}/iv.json")
-if [ "$got" = "open-thread,named-thing" ]; then ok; else fail "interventions: expected two recorded, got '${got}'"; fi
-
-run_case "no interventions produces an empty array" 0 \
-  bash "$RECORD" "${CASE_DIR}/iv.json" s2 2025-06-01 a b c
-got=$(jq -r '.posts[1].interventions | length' "${CASE_DIR}/iv.json")
-if [ "$got" = "0" ]; then ok; else fail "interventions: expected empty array, got length '${got}'"; fi
-
-new_dir
-write_history "${CASE_DIR}/guard.json" 99 "emb|p->m|stop"
-before=$(cat "${CASE_DIR}/guard.json")
-if run_case "refuses to write over a newer-schema history" 1 \
-    bash "$RECORD" "${CASE_DIR}/guard.json" s 2025-06-01 a b c; then
-  assert_contains "clobber guard" "$CASE_ERR" "newer skill version"
-fi
-if [ "$(cat "${CASE_DIR}/guard.json")" = "$before" ]; then ok; else fail "clobber guard: the history was modified"; fi
-
-new_dir
-printf 'garbage' >"${CASE_DIR}/bad.json"
-before=$(cat "${CASE_DIR}/bad.json")
-run_case "refuses to write over a malformed history" 1 \
-  bash "$RECORD" "${CASE_DIR}/bad.json" s 2025-06-01 a b c
-if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
-
-new_dir
-run_case "recording the same slug twice updates rather than duplicates" 0 \
-  bash "$RECORD" "${CASE_DIR}/idem.json" same 2025-05-01 first-open first-arc first-close
-if run_case "re-recording the same post reports updated" 0 \
-    bash "$RECORD" "${CASE_DIR}/idem.json" same 2025-05-01 second-open second-arc second-close; then
-  assert_json "idempotent" '.action' "updated"
-  assert_json "idempotent" '.count' "1"
-fi
-kept=$(jq -r '.posts[0].opening_mode' "${CASE_DIR}/idem.json")
-if [ "$kept" = "second-open" ]; then ok; else fail "idempotent: expected the re-run to replace the record, got opening_mode '${kept}'"; fi
-total=$(jq '.posts | length' "${CASE_DIR}/idem.json")
-if [ "$total" = "1" ]; then ok; else fail "idempotent: expected 1 record after a re-run, got ${total}"; fi
-
-# A staging file that cannot be created is an environment problem (exit 2), not a
-# corrupt history (exit 1). Triggered with an over-long name rather than chmod:
-# permission bits do not stop root, so a chmod-based case could not run on every
-# runner, while ENAMETOOLONG stops every user identically.
-new_dir
-long_name=$(printf 'n%.0s' {1..250})
-run_case "a staging file that cannot be created exits 2, not 1" 2 \
-  bash "$RECORD" "${CASE_DIR}/${long_name}.json" s 2025-06-01 a b c
-
-new_dir
-run_case "a backfilled earlier post lands in date order, not at the end" 0 \
-  bash "$RECORD" "${CASE_DIR}/order.json" late 2025-09-01 a b c
-run_case "recording an earlier post after a later one" 0 \
-  bash "$RECORD" "${CASE_DIR}/order.json" early 2025-03-01 a b c
-order=$(jq -r '[.posts[].slug] | join(",")' "${CASE_DIR}/order.json")
-if [ "$order" = "early,late" ]; then ok; else fail "date order: expected 'early,late' (newest last), got '${order}'"; fi
-
-new_dir
-printf '{"posts":[{"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
-before=$(cat "${CASE_DIR}/nover.json")
-run_case "refuses to append to a history whose records lack schema_version" 1 \
-  bash "$RECORD" "${CASE_DIR}/nover.json" s 2025-06-01 a b c
-if [ "$(cat "${CASE_DIR}/nover.json")" = "$before" ]; then ok; else fail "unversioned guard: the history was modified"; fi
-
-new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"nope","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badrec.json"
-before=$(cat "${CASE_DIR}/badrec.json")
-run_case "refuses to append to a history holding a malformed record" 1 \
-  bash "$RECORD" "${CASE_DIR}/badrec.json" s 2025-06-01 a b c
-if [ "$(cat "${CASE_DIR}/badrec.json")" = "$before" ]; then ok; else fail "malformed record guard: the history was modified"; fi
-
-new_dir
-ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
-run_case "refuses to write through a dangling symlink" 1 \
-  bash "$RECORD" "${CASE_DIR}/dangling.json" s 2025-06-01 a b c
-
-# A history on a synced drive is reached through a symlink, the same shape the
-# persona directory uses. The write must land on the target, not replace the link.
-new_dir
-mkdir -p "${CASE_DIR}/real"
-printf '{"posts":[]}' >"${CASE_DIR}/real/history.json"
-ln -s "${CASE_DIR}/real/history.json" "${CASE_DIR}/link.json"
-run_case "writing through a valid symlink preserves the link" 0 \
-  bash "$RECORD" "${CASE_DIR}/link.json" s 2025-06-01 a b c
-if [ -L "${CASE_DIR}/link.json" ]; then ok; else fail "symlink: the link was replaced by a regular file"; fi
-# jq's own diagnostic stays visible: an unreadable or unparseable target after a
-# successful write is a real signal, not noise to collapse into a sentinel value.
-if ! landed=$(jq -r '.posts[0].slug' "${CASE_DIR}/real/history.json"); then
-  fail "symlink: the target history is missing or unparseable after writing through the link"
-elif [ "$landed" = "s" ]; then
-  ok
-else
-  fail "symlink: the record did not land on the target, got '${landed}'"
-fi
-strays=$(find "${CASE_DIR}" -name '*.staging.*' | wc -l | tr -d ' ')
-if [ "$strays" = "0" ]; then ok; else fail "symlink: ${strays} staging file(s) stranded"; fi
-
-new_dir
-run_case "rejects a date that is not YYYY-MM-DD" 2 \
-  bash "$RECORD" "${CASE_DIR}/d.json" s "Aug 11 2026" a b c
-
-new_dir
-run_case "rejects an empty slug" 2 \
-  bash "$RECORD" "${CASE_DIR}/e.json" "" 2025-06-01 a b c
-
-new_dir
-run_case "rejects too few arguments" 2 \
-  bash "$RECORD" "${CASE_DIR}/f.json" s 2025-06-01
-
-echo
-echo "passed: ${pass_count}  failed: ${fail_count}"
-[ "$fail_count" -eq 0 ]
