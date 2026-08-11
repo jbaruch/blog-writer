@@ -26,7 +26,12 @@
 #  12. Below-minimum schema — a record older than the documented schema has no
 #      migration path and exits 1.
 #  13. Duplicate slugs — two records for one post make the history ambiguous and
-#      contradict the idempotent-by-slug contract, so it exits 1.
+#      contradict the idempotent-by-slug contract, so it exits 1. Covered both
+#      adjacent and non-adjacent, since group_by's sorting is easy to doubt.
+#  13a. blocked_by distinguishes no_history, insufficient_history, and
+#      newer_records, which need different remediation.
+#  13b. A verdict names the records it used in compared_posts, without which
+#      SKILL.md's verify-against-the-actual-post step cannot be executed.
 #  14. Dangling symlink — an existing-but-broken link exits 1 rather than
 #      collapsing into the absent case.
 #  15. Argument validation — wrong count exits 2.
@@ -178,6 +183,8 @@ if run_case "absent history reports can_fire=false, not an error" 0 \
   assert_json "absent" '.can_fire' "false"
   assert_json "absent" '.compared' "0"
   assert_json "absent" '.ok' "true"
+  assert_json "absent" '.blocked_by' "no_history"
+  assert_json "absent" '.compared_posts | length' "0"
 fi
 
 new_dir
@@ -197,6 +204,7 @@ write_history "${CASE_DIR}/one.json" 1 "emb|p->m|stop"
 if run_case "one record is below the history minimum" 0 \
     bash "$CHECK" "${CASE_DIR}/one.json" emb "p->m" stop; then
   assert_json "one record" '.can_fire' "false"
+  assert_json "one record" '.blocked_by' "insufficient_history"
 fi
 
 new_dir
@@ -214,6 +222,11 @@ if run_case "matching opening and arc across all three converges" 0 \
     bash "$CHECK" "${CASE_DIR}/three.json" emb "p->m" brand-new; then
   assert_json "converged" '.converged' "true"
   assert_json "converged" '.converged_axes | sort | join(",")' "arc,opening_mode"
+  assert_json "converged" '.blocked_by' "null"
+  # SKILL.md requires verifying each compared record against the actual post, so
+  # the verdict must name them. Without this the instruction is unexecutable.
+  assert_json "converged" '.compared_posts | length' "3"
+  assert_json "converged" '.compared_posts | map(has("slug") and has("date") and has("opening_mode") and has("arc") and has("closing_mode")) | all' "true"
 fi
 
 new_dir
@@ -252,6 +265,7 @@ if run_case "a history written entirely by a newer version cannot fire" 0 \
     bash "$CHECK" "${CASE_DIR}/newer.json" emb "p->m" stop; then
   assert_json "newer" '.skipped_newer_records' "2"
   assert_json "newer" '.can_fire' "false"
+  assert_json "newer" '.blocked_by' "newer_records"
   assert_contains "newer" "$CASE_ERR" "newer skill version"
 fi
 
@@ -293,6 +307,19 @@ new_dir
 printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2025-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
 run_case "a record with a mistyped field is rejected" 1 \
   bash "$CHECK" "${CASE_DIR}/badtype.json" o a c
+
+# jq's group_by sorts before grouping, so duplicates need not be adjacent to be
+# caught. Pinned here because that is easy to assume otherwise.
+new_dir
+jq -n '{posts: [
+   {schema_version: 1, slug: "dupe", date: "2025-01-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
+   {schema_version: 1, slug: "other", date: "2025-02-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []},
+   {schema_version: 1, slug: "dupe", date: "2025-03-01", opening_mode: "o", arc: "a", closing_mode: "c", interventions: []}
+ ]}' >"${CASE_DIR}/nonadjacent.json"
+if run_case "non-adjacent duplicate slugs are still caught" 1 \
+    bash "$CHECK" "${CASE_DIR}/nonadjacent.json" o a c; then
+  assert_contains "non-adjacent dupes" "$CASE_ERR" "dupe"
+fi
 
 new_dir
 jq -n '{posts: [

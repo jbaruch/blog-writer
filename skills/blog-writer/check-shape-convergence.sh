@@ -33,13 +33,24 @@
 # not match its documented schema is reported, never silently averaged over.
 #
 # Output (stdout), a single JSON object:
-#   {"ok": true, "can_fire": bool, "reason": "<why>", "compared": N,
-#    "converged": bool, "converged_axes": ["opening_mode", ...],
+#   {"ok": true, "can_fire": bool, "blocked_by": "<code>"|null, "reason": "<why>",
+#    "compared": N, "converged": bool, "converged_axes": ["opening_mode", ...],
+#    "compared_posts": [{"slug", "date", "opening_mode", "arc", "closing_mode"}],
 #    "skipped_newer_records": N}
 #
-#   can_fire  false means no verdict is possible: too little history, or a
-#             history this install is too old to read in full. `converged` is
-#             false in that case and carries no meaning.
+#   can_fire        false means no verdict is possible. `converged` is false in
+#                   that case and carries no meaning.
+#   blocked_by      why no verdict was possible, so the caller can route without
+#                   parsing prose: `no_history` (nothing recorded yet),
+#                   `insufficient_history` (some records, too few),
+#                   `newer_records` (a newer plugin wrote part of it, so this
+#                   install cannot read the most recent). null when can_fire is
+#                   true. The three need different remediation, so they are
+#                   distinguished rather than collapsed.
+#   compared_posts  the records the verdict was computed from, identified so the
+#                   caller can check each recalled shape against the actual post
+#                   before acting (`stateful-artifacts`: hints, not authority).
+#                   Empty when can_fire is false.
 #
 # Exit codes:
 #   0  the reported result is authoritative, including can_fire=false
@@ -85,8 +96,11 @@ main() {
       --argjson converged "$4" \
       --argjson converged_axes "$5" \
       --argjson skipped "$6" \
-      '{ok: true, can_fire: $can_fire, reason: $reason, compared: $compared,
-        converged: $converged, converged_axes: $converged_axes,
+      --arg blocked_by "$7" \
+      --argjson compared_posts "$8" \
+      '{ok: true, can_fire: $can_fire, blocked_by: (if $blocked_by == "" then null else $blocked_by end),
+        reason: $reason, compared: $compared, converged: $converged,
+        converged_axes: $converged_axes, compared_posts: $compared_posts,
         skipped_newer_records: $skipped}'
   }
 
@@ -100,7 +114,7 @@ main() {
 
   # An absent history file is the normal first-post state, not a failure.
   if [ ! -e "$SHAPES_FILE" ]; then
-    emit false "no shape history at ${SHAPES_FILE} — audit 6 cannot fire until ${MIN_HISTORY} posts are recorded" 0 false '[]' 0
+    emit false "no shape history at ${SHAPES_FILE} — audit 6 cannot fire until ${MIN_HISTORY} posts are recorded" 0 false '[]' 0 no_history '[]'
     exit 0
   fi
 
@@ -125,13 +139,13 @@ main() {
   if [ "$skipped" -gt 0 ]; then
     echo "warning: ${SHAPES_FILE} holds ${skipped} record(s) written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin to read them; they were left untouched" >&2
     emit false "${skipped} record(s) in ${SHAPES_FILE} were written by a newer skill version, so the most recent history cannot be read — update the blog-writer plugin; a verdict from the remaining older records would describe the wrong posts" \
-      0 false '[]' "$skipped"
+      0 false '[]' "$skipped" newer_records '[]'
     exit 0
   fi
 
   if [ "$usable_count" -lt "$MIN_HISTORY" ]; then
     emit false "only ${usable_count} usable record(s) in ${SHAPES_FILE} — audit 6 needs ${MIN_HISTORY}" \
-      "$usable_count" false '[]' "$skipped"
+      "$usable_count" false '[]' "$skipped" insufficient_history '[]'
     exit 0
   fi
 
@@ -162,7 +176,10 @@ main() {
     reason="planned shape differs from the last ${compared} post(s) on enough axes"
   fi
 
-  emit true "$reason" "$compared" "$converged" "$converged_axes" "$skipped"
+  local compared_posts
+  compared_posts=$(jq -c '[.[] | {slug, date, opening_mode, arc, closing_mode}]' <<<"$window")
+
+  emit true "$reason" "$compared" "$converged" "$converged_axes" "$skipped" "" "$compared_posts"
 }
 
 # Entry-point guard per `jbaruch/coding-policy: file-hygiene` — the script runs when

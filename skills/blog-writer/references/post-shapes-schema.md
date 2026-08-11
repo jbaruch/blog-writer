@@ -93,9 +93,10 @@ Two properties belong to this artifact rather than to either of those:
 - **An absent file is not an error.** No history is the normal state for a new author. An
   unreadable, malformed, or newer-than-supported file is a different thing, reported rather
   than folded into the empty case, and the skill must not re-collapse that distinction.
-- **The file is a hint, not authority** (`jbaruch/coding-policy: stateful-artifacts`). Verify
-  a recalled shape against the actual post before acting on it. Where they disagree, the post
-  wins — correct the record and re-run.
+- **The file is a hint, not authority** (`jbaruch/coding-policy: stateful-artifacts`). The
+  reader reports the records a verdict was built from in `compared_posts`, so each recalled
+  shape can be checked against the actual post before the verdict is acted on. Where they
+  disagree, the post wins: correct the record and re-run.
 
 ## Writer contract — Phase 4
 

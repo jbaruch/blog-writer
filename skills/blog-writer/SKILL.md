@@ -176,16 +176,24 @@ For audit 6, ask the script for the verdict rather than reading the shape histor
 
 Route on the exit code:
 
-- **Exit 0, `can_fire` false** — there is not enough usable history for a verdict. Report that and continue.
+- **Exit 0, `can_fire` false** — no verdict is possible. Report the `blocked_by` code and continue.
 - **Exit 0, `converged` false** — the planned shape differs enough. Proceed silently.
 - **Exit 0, `converged` true** — the audit fired. Follow the correction loop below before locking.
 - **Exit 1** — the history exists but is unusable. Report the script's diagnostic and continue without audit 6.
-- **Exit 1** — do not delete or overwrite the file.
+- Never delete or overwrite an unusable history file.
 - **Exit 2** — a tool error. Report the diagnostic and stop.
 
-On a `converged` verdict, verify before acting. The shape history is a hint, not authority:
-check the reported posts' recorded shapes against the actual posts, and where a record
-disagrees, the post wins — correct the record and re-run the script. Then change the axes in
+`blocked_by` says why no verdict was possible, and the three need different answers. Do not
+report one as another:
+
+- `no_history` — nothing recorded yet. Normal for a new author.
+- `insufficient_history` — some posts recorded, not enough yet.
+- `newer_records` — a newer plugin wrote part of the history, so this install cannot read the
+  most recent posts. The fix is updating the plugin, not writing more posts.
+
+On a `converged` verdict, verify before acting. The shape history is a hint, not authority.
+Check each entry in `compared_posts` against the actual post. Where a record disagrees, the
+post wins: correct the record and re-run the script. Then change the axes in
 `converged_axes`, re-run on the revised plan, and repeat until it reports no convergence.
 
 If an audit finds no issue, proceed silently.
@@ -252,7 +260,7 @@ verbatim when the shape is the same; the comparison is by equality.
 Route on the exit code:
 
 - **Exit 1** — the history was refused and left untouched. Report the script's stderr diagnostic to the author.
-- **Exit 1** — do not work around it by deleting the file.
+- Never work around a refusal by deleting the file.
 - **Exit 2** — report the diagnostic and stop.
 
 Finish here.
