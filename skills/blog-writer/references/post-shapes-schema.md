@@ -96,7 +96,10 @@ Two properties belong to this artifact rather than to either of those:
 - **The file is a hint, not authority** (`jbaruch/coding-policy: stateful-artifacts`). The
   reader reports the records a verdict was built from in `compared_posts`, so each recalled
   shape can be checked against the actual post before the verdict is acted on. Where they
-  disagree, the post wins: correct the record and re-run.
+  disagree, the post wins: correct the record by re-recording that post through
+  `record-post-shape.sh`, passing back every field the reported entry carries, and re-run.
+  Each entry is the complete record precisely so that correction is lossless. The file is
+  never hand-edited — the writer owns it.
 
 ## Writer contract — Phase 4
 

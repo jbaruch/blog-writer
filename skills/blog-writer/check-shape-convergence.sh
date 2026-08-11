@@ -35,7 +35,8 @@
 # Output (stdout), a single JSON object:
 #   {"ok": true, "can_fire": bool, "blocked_by": "<code>"|null, "reason": "<why>",
 #    "compared": N, "converged": bool, "converged_axes": ["opening_mode", ...],
-#    "compared_posts": [{"slug", "date", "opening_mode", "arc", "closing_mode"}],
+#    "compared_posts": [{"slug", "date", "opening_mode", "arc", "closing_mode",
+#                        "interventions"}],
 #    "skipped_newer_records": N}
 #
 #   can_fire        false means no verdict is possible. `converged` is false in
@@ -50,7 +51,9 @@
 #   compared_posts  the records the verdict was computed from, identified so the
 #                   caller can check each recalled shape against the actual post
 #                   before acting (`stateful-artifacts`: hints, not authority).
-#                   Empty when can_fire is false.
+#                   Each entry is the complete record, so correcting a wrong one
+#                   through the writer cannot drop a field. Empty when can_fire
+#                   is false.
 #
 # Exit codes:
 #   0  the reported result is authoritative, including can_fire=false
@@ -61,7 +64,9 @@
 # Read-only: never creates, edits, or migrates the history file. Writing is
 # `record-post-shape.sh`.
 
-set -euo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=skills/blog-writer/post-shapes-lib.sh
@@ -72,6 +77,8 @@ readonly MIN_HISTORY=2
 readonly CONVERGED_AXES_REQUIRED=2
 
 main() {
+  set -euo pipefail
+
   if ! command -v jq >/dev/null; then
     echo "error: jq not found on PATH — required to read the shape history and emit JSON" >&2
     exit 2
@@ -177,7 +184,10 @@ main() {
   fi
 
   local compared_posts
-  compared_posts=$(jq -c '[.[] | {slug, date, opening_mode, arc, closing_mode}]' <<<"$window")
+  # interventions rides along: the caller corrects a wrong record by re-recording
+  # it through the writer, and a re-record without them would silently blank the
+  # field. Reporting the complete record is what makes the correction lossless.
+  compared_posts=$(jq -c '[.[] | {slug, date, opening_mode, arc, closing_mode, interventions}]' <<<"$window")
 
   emit true "$reason" "$compared" "$converged" "$converged_axes" "$skipped" "" "$compared_posts"
 }

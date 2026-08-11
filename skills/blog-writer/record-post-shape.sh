@@ -63,7 +63,9 @@
 # happen at its target, so the link survives the write rather than being replaced
 # by a regular file.
 
-set -euo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 # shellcheck source=skills/blog-writer/post-shapes-lib.sh
@@ -74,6 +76,8 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 staging=""
 
 main() {
+  set -euo pipefail
+
   if ! command -v jq >/dev/null; then
     echo "error: jq not found on PATH — required to write the shape history as JSON" >&2
     exit 2
@@ -152,7 +156,19 @@ main() {
     esac
   fi
 
-  staging="${write_target}.staging.$$"
+  destination_dir=$(dirname "$write_target")
+  if [ ! -d "$destination_dir" ]; then
+    echo "error: directory ${destination_dir} does not exist — create the Blog Home Directory before recording a post's shape" >&2
+    exit 2
+  fi
+
+  # mktemp rather than a `$$`-suffixed name: a PID repeats, so a predictable path
+  # could collide with a stale file, and a pre-created symlink at that path would
+  # redirect the write outside the history's directory entirely.
+  if ! staging=$(mktemp "${write_target}.staging.XXXXXX"); then
+    echo "error: cannot create a staging file beside ${write_target} — check that $(dirname "$write_target") is writable (chmod u+w) and that the path length is within the filesystem's limit" >&2
+    exit 2
+  fi
   # Guarded rather than relying on `rm -f` to be harmless: when the staging path is
   # itself unusable (too long for the filesystem), `rm` fails, and under `set -e`
   # that aborts the trap before `return 0` — so the trap would rewrite the script's
@@ -165,20 +181,7 @@ main() {
   }
   trap cleanup EXIT
 
-  destination_dir=$(dirname "$write_target")
-  if [ ! -d "$destination_dir" ]; then
-    echo "error: directory ${destination_dir} does not exist — create the Blog Home Directory before recording a post's shape" >&2
-    exit 2
-  fi
 
-  # Attempted rather than pre-checked with `-w`: `-w` is always true for root, so a
-  # pre-check cannot be exercised by a test that runs on every runner, and it would
-  # still miss the non-permission ways creation fails (path too long, filesystem
-  # full). Creating the staging file is the real question, so ask it directly.
-  if ! : >"$staging"; then
-    echo "error: cannot create a staging file at ${staging} — check that ${destination_dir} is writable (chmod u+w) and that the path length is within the filesystem's limit" >&2
-    exit 2
-  fi
 
   # The existing history goes through stdin, not --argjson: as it grows, passing it
   # as a command-line argument would eventually exceed the argv size limit and fail

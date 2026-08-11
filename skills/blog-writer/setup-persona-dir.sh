@@ -39,11 +39,15 @@
 # Idempotent: a second run with the same arguments reports `unchanged` and
 # touches nothing.
 
-set -euo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 readonly CANONICAL="${HOME}/.claude/blog-writer-persona"
 
 main() {
+  set -euo pipefail
+
   if ! command -v jq >/dev/null; then
     echo "error: jq not found on PATH — required to emit the result as JSON" >&2
     exit 2

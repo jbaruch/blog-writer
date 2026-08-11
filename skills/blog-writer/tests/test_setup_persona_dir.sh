@@ -22,7 +22,9 @@
 #
 # Run: bash skills/blog-writer/tests/test_setup_persona_dir.sh
 
-set -uo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 # Every case directory is created inside one suite-owned root, so a single EXIT
 # trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
@@ -87,6 +89,8 @@ assert_json() {
 }
 
 main() {
+  set -uo pipefail
+
   if ! SUITE_TMP=$(mktemp -d); then
     echo "error: could not create the suite temp directory — check TMPDIR is writable" >&2
     exit 1

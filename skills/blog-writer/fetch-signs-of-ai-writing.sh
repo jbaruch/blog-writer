@@ -34,13 +34,17 @@
 # A non-zero exit is a real signal, never swallowed: the diagnostic goes to
 # stderr and the caller decides. This script does not fall back silently.
 
-set -euo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 readonly ARTICLE_URL="https://en.wikipedia.org/w/index.php?title=Wikipedia:Signs_of_AI_writing&action=raw"
 readonly USER_AGENT="Mozilla/5.0 (compatible; blog-writer-skill/1.0)"
 readonly MIN_BYTES=1000
 
 main() {
+  set -euo pipefail
+
   if ! command -v curl >/dev/null; then
     echo "error: curl not found on PATH — install curl, or skip the freshness check and proceed with references/ai-anti-patterns.md as-is" >&2
     exit 2

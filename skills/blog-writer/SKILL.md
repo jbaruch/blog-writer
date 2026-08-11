@@ -192,9 +192,16 @@ report one as another:
   most recent posts. The fix is updating the plugin, not writing more posts.
 
 On a `converged` verdict, verify before acting. The shape history is a hint, not authority.
-Check each entry in `compared_posts` against the actual post. Where a record disagrees, the
-post wins: correct the record and re-run the script. Then change the axes in
-`converged_axes`, re-run on the revised plan, and repeat until it reports no convergence.
+Check each entry in `compared_posts` against the actual post.
+
+Where a record disagrees, the post wins. Correct it by re-recording that post through
+`record-post-shape.sh` (Step 12's script) with the corrected values, passing back every
+field the entry carries — its `interventions` included, since re-recording without them
+replaces the list with an empty one. Never hand-edit the JSON; the writer owns the file.
+Then re-run the check.
+
+Once the verdict is built on verified records, change the axes in `converged_axes`, re-run
+on the revised plan, and repeat until it reports no convergence.
 
 If an audit finds no issue, proceed silently.
 

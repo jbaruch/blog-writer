@@ -66,7 +66,9 @@
 #
 # Run: bash skills/blog-writer/tests/test_post_shapes.sh
 
-set -uo pipefail
+# Shell options are set inside main() rather than at file scope: the entry-point
+# guard below makes this file sourceable, and a sourced file must not change the
+# caller's shell options.
 
 # Every case directory is created inside one suite-owned root, so a single EXIT
 # trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
@@ -168,6 +170,8 @@ assert_contains() {
 }
 
 main() {
+  set -uo pipefail
+
   if ! SUITE_TMP=$(mktemp -d); then
     echo "error: could not create the suite temp directory — check TMPDIR is writable" >&2
     exit 1
@@ -229,7 +233,7 @@ main() {
     # SKILL.md requires verifying each compared record against the actual post, so
     # the verdict must name them. Without this the instruction is unexecutable.
     assert_json "converged" '.compared_posts | length' "3"
-    assert_json "converged" '.compared_posts | map(has("slug") and has("date") and has("opening_mode") and has("arc") and has("closing_mode")) | all' "true"
+    assert_json "converged" '.compared_posts | map(has("slug") and has("date") and has("opening_mode") and has("arc") and has("closing_mode") and has("interventions")) | all' "true"
   fi
 
   new_dir
@@ -403,6 +407,25 @@ main() {
   run_case "refuses to write over a malformed history" 1 \
     bash "$RECORD" "${CASE_DIR}/bad.json" s 2025-06-01 a b c
   if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
+
+  # Correcting a wrong record means re-recording it through the writer, so the
+  # reported record must carry every field the writer takes — a missing
+  # interventions list would be silently blanked by the correction.
+  new_dir
+  run_case "a reported record round-trips through the writer without loss" 0 \
+    bash "$RECORD" "${CASE_DIR}/rt.json" ep1 2025-01-01 emb "p->m" stop open-thread named-thing
+  run_case "second post so a verdict is possible" 0 \
+    bash "$RECORD" "${CASE_DIR}/rt.json" ep2 2025-02-01 emb "p->m" stop
+  reported=$(bash "$CHECK" "${CASE_DIR}/rt.json" emb "p->m" stop | jq -c '.compared_posts[0]')
+  rt_iv=()
+  while IFS= read -r iv; do rt_iv+=("$iv"); done < <(jq -r '.interventions[]' <<<"$reported")
+  run_case "re-recording from the reported record preserves interventions" 0 \
+    bash "$RECORD" "${CASE_DIR}/rt.json" \
+      "$(jq -r '.slug' <<<"$reported")" "$(jq -r '.date' <<<"$reported")" \
+      "$(jq -r '.opening_mode' <<<"$reported")" "$(jq -r '.arc' <<<"$reported")" \
+      "corrected-close" "${rt_iv[@]}"
+  kept_iv=$(jq -r '.posts[] | select(.slug == "ep1") | .interventions | join(",")' "${CASE_DIR}/rt.json")
+  if [ "$kept_iv" = "open-thread,named-thing" ]; then ok; else fail "round-trip: interventions lost, got '${kept_iv}'"; fi
 
   new_dir
   run_case "recording the same slug twice updates rather than duplicates" 0 \
