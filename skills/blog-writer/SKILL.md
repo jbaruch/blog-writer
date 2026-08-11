@@ -170,7 +170,7 @@ at a time. `skills/blog-writer/references/process.md` section 2f has the procedu
 For audit 6, ask the script for the verdict rather than reading the shape history yourself:
 
 ```bash
-skills/blog-writer/check-shape-convergence.sh \
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-shape-convergence.sh \
   <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
 ```
 
@@ -232,7 +232,7 @@ something to compare against. Do not write the file yourself — the script owns
 format, the schema stamp, and the refusal cases:
 
 ```bash
-skills/blog-writer/record-post-shape.sh \
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \
   <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
   "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
 ```

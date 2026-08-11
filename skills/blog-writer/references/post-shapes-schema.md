@@ -15,7 +15,13 @@ it, and the skill routes on their JSON output:
 ```text
 skills/blog-writer/check-shape-convergence.sh   read + compare (read-only)
 skills/blog-writer/record-post-shape.sh         append
+skills/blog-writer/post-shapes-lib.sh           shared record contract, sourced by both
 ```
+
+Both validate every existing record before doing anything: a history that does not match
+the field contract below is reported and refused, never averaged over by the reader or
+extended by the writer. The accepted version range and the per-record field contract live
+in `post-shapes-lib.sh` so the two scripts cannot drift.
 
 ## Why a file and not the series tracker
 
@@ -57,6 +63,12 @@ want fixed fields. The two artifacts coexist: the tracker carries narrative cont
 
 `schema_version` is per record rather than per file: a migration that upgrades some records
 and is interrupted leaves a history that still describes itself accurately.
+
+Every field above is required and type-checked. A record missing `schema_version`, carrying
+a `date` that is not `YYYY-MM-DD`, or holding a mistyped field is **malformed**, not merely
+old — both scripts refuse a history containing one rather than guessing at its meaning. A
+record whose `schema_version` falls below the accepted minimum predates the documented
+schema and has no migration path, so it is refused the same way.
 
 The three mode values are descriptive, not a closed enum — a new opening mode is a new
 string. The constraint that matters is **reusing an existing string verbatim when the shape
@@ -104,9 +116,13 @@ is never overwritten. Report the diagnostic; do not work around it by deleting t
 
 ## Migration policy
 
-- Only `blog-writer` migrates. A shape change bumps the scripts' supported version.
-- Records above the supported version are skipped by the reader, counted in
+- Only `blog-writer` migrates. A shape change bumps the version range in
+  `post-shapes-lib.sh`, and the upgrade path goes there beside it.
+- Records above the accepted range are skipped by the reader, counted in
   `skipped_newer_records`, and refused by the writer. Neither script rewrites them.
+- Records below the accepted range are refused by both. Version 1 is the first, so nothing
+  legitimately sits below it today; when version 2 lands, version 1 stays readable and the
+  library gains the upgrade.
 - A history written by a newer skill version means this install is lagging, not that the
   file is broken (`stateful-artifacts`, Migration Policy). Update the plugin rather than
   repairing the file.

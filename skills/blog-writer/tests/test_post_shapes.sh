@@ -17,18 +17,25 @@
 #   8. Window bound — records older than the window do not affect the verdict.
 #   9. Newer records skipped and counted, never read as usable history.
 #  10. Read-only — a check never modifies the history file.
-#  11. Argument validation — wrong count exits 2.
+#  11. Malformed records — a missing schema_version, a bad date, a mistyped
+#      field, or a non-string intervention each exit 1 rather than producing an
+#      authoritative verdict from state that does not match its schema.
+#  12. Below-minimum schema — a record older than the documented schema has no
+#      migration path and exits 1.
+#  13. Argument validation — wrong count exits 2.
 #
 # record-post-shape.sh
-#  12. Creates a history that does not exist yet.
-#  13. Appends to an existing history, newest last.
-#  14. Every written record carries schema_version.
-#  15. Interventions round-trip, and absent ones produce an empty array.
-#  16. Newer-schema history is refused and left byte-identical (clobber guard).
-#  17. Malformed history is refused and left byte-identical.
-#  18. Date format is validated.
-#  19. Empty slug is rejected.
-#  20. Argument count is validated.
+#  14. Creates a history that does not exist yet.
+#  15. Appends to an existing history, newest last.
+#  16. Every written record carries schema_version.
+#  17. Interventions round-trip, and absent ones produce an empty array.
+#  18. Newer-schema history is refused and left byte-identical (clobber guard).
+#  19. Malformed history is refused and left byte-identical.
+#  20. A history whose records lack schema_version is refused, not extended.
+#  21. A history holding a malformed record is refused and left byte-identical.
+#  22. Date format is validated.
+#  23. Empty slug is rejected.
+#  24. Argument count is validated.
 #
 # Approach: every case runs in a fresh temp directory, so no test touches a real
 # history file. Dates are literals passed as arguments — the scripts never read
@@ -211,6 +218,35 @@ run_case "checking never modifies the history" 0 \
 if [ "$(cat "${CASE_DIR}/ro.json")" = "$before" ]; then ok; else fail "read-only: the check modified the history file"; fi
 
 new_dir
+printf '{"posts":[{"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
+if run_case "a record without schema_version is malformed, not version zero" 1 \
+    bash "$CHECK" "${CASE_DIR}/nover.json" o a c; then
+  assert_contains "no schema_version" "$CASE_ERR" "malformed record"
+fi
+
+new_dir
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"not-a-date","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/baddate.json"
+run_case "a record with a malformed date is rejected" 1 \
+  bash "$CHECK" "${CASE_DIR}/baddate.json" o a c
+
+new_dir
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2026-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
+run_case "a record with a mistyped field is rejected" 1 \
+  bash "$CHECK" "${CASE_DIR}/badtype.json" o a c
+
+new_dir
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[7]}]}' >"${CASE_DIR}/badiv.json"
+run_case "a record with a non-string intervention is rejected" 1 \
+  bash "$CHECK" "${CASE_DIR}/badiv.json" o a c
+
+new_dir
+printf '{"posts":[{"schema_version":0,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/old.json"
+if run_case "a record below the minimum schema has no migration path and is rejected" 1 \
+    bash "$CHECK" "${CASE_DIR}/old.json" o a c; then
+  assert_contains "below minimum" "$CASE_ERR" "below"
+fi
+
+new_dir
 run_case "wrong argument count exits 2" 2 bash "$CHECK" "${CASE_DIR}/x.json" only-one
 
 echo "record-post-shape.sh"
@@ -260,6 +296,20 @@ before=$(cat "${CASE_DIR}/bad.json")
 run_case "refuses to write over a malformed history" 1 \
   bash "$RECORD" "${CASE_DIR}/bad.json" s 2026-08-11 a b c
 if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
+
+new_dir
+printf '{"posts":[{"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
+before=$(cat "${CASE_DIR}/nover.json")
+run_case "refuses to append to a history whose records lack schema_version" 1 \
+  bash "$RECORD" "${CASE_DIR}/nover.json" s 2026-08-11 a b c
+if [ "$(cat "${CASE_DIR}/nover.json")" = "$before" ]; then ok; else fail "unversioned guard: the history was modified"; fi
+
+new_dir
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"nope","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badrec.json"
+before=$(cat "${CASE_DIR}/badrec.json")
+run_case "refuses to append to a history holding a malformed record" 1 \
+  bash "$RECORD" "${CASE_DIR}/badrec.json" s 2026-08-11 a b c
+if [ "$(cat "${CASE_DIR}/badrec.json")" = "$before" ]; then ok; else fail "malformed record guard: the history was modified"; fi
 
 new_dir
 run_case "rejects a date that is not YYYY-MM-DD" 2 \

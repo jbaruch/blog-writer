@@ -242,7 +242,7 @@ is the tidy epilogue after the fix landed, never the fix itself.
 ask the script for the verdict. Do not read or compare the history yourself:
 
 ```bash
-skills/blog-writer/check-shape-convergence.sh \
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-shape-convergence.sh \
   <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
 ```
 
@@ -652,7 +652,7 @@ conversation — edit the file surgically.
 **Record the post's shape.** Once the author declares it done, run:
 
 ```bash
-skills/blog-writer/record-post-shape.sh \
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \
   <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
   "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
 ```

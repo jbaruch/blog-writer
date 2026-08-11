@@ -22,9 +22,14 @@
 #   $7+  optional intervention-menu moves used, one per argument
 #
 # Decision contract (this script owns these; callers must not restate them):
-#   SUPPORTED_SCHEMA  the `schema_version` stamped on new records, and the
-#                     highest this script will write alongside. A history
-#                     holding any record above it is refused, never rewritten.
+#   The `schema_version` stamped on new records, the accepted version range, and
+#   the per-record field contract live in post-shapes-lib.sh, shared with the
+#   reader so the two cannot drift. A history holding any record above the
+#   accepted range is refused, never rewritten.
+#
+# Every existing record is validated before anything is appended: a history that
+# does not match its documented schema is refused rather than extended, so a
+# corrupt file is never made larger.
 #
 # Output (stdout), a single JSON object:
 #   {"ok": true, "action": "created|appended", "count": N, "schema_version": N,
@@ -43,7 +48,9 @@
 
 set -euo pipefail
 
-readonly SUPPORTED_SCHEMA=1
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=skills/blog-writer/post-shapes-lib.sh
+. "${SCRIPT_DIR}/post-shapes-lib.sh"
 
 if ! command -v jq >/dev/null; then
   echo "error: jq not found on PATH — required to write the shape history as JSON" >&2
@@ -85,15 +92,14 @@ if [ -e "$SHAPES_FILE" ]; then
     exit 1
   fi
 
-  if ! jq -e 'type == "object" and (.posts | type) == "array"' "$SHAPES_FILE" >/dev/null 2>&1; then
-    echo "error: ${SHAPES_FILE} is not valid JSON in the documented shape (an object with a \"posts\" array) — see references/post-shapes-schema.md and repair it; refusing to overwrite an unreadable history" >&2
+  if ! loaded=$(post_shapes_load "$SHAPES_FILE"); then
+    echo "error: refusing to append to ${SHAPES_FILE} until the problem above is fixed — the file was left untouched" >&2
     exit 1
   fi
 
-  newer=$(jq --argjson max "$SUPPORTED_SCHEMA" \
-    '[.posts[] | select((.schema_version // 0) > $max)] | length' "$SHAPES_FILE")
+  newer=$(jq '.skipped_newer' <<<"$loaded")
   if [ "$newer" -gt 0 ]; then
-    echo "error: ${SHAPES_FILE} holds ${newer} record(s) written by a newer skill version (schema_version above ${SUPPORTED_SCHEMA}) — update the blog-writer plugin before recording; refusing to write and risk losing them" >&2
+    echo "error: ${SHAPES_FILE} holds ${newer} record(s) written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin before recording; refusing to write and risk losing them" >&2
     exit 1
   fi
 
@@ -116,7 +122,7 @@ fi
 
 if ! jq -n \
   --argjson existing "$existing" \
-  --argjson schema "$SUPPORTED_SCHEMA" \
+  --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
   --arg slug "$SLUG" \
   --arg date "$DATE" \
   --arg opening "$OPENING" \
@@ -143,6 +149,6 @@ count=$(jq '.posts | length' "$SHAPES_FILE")
 jq -n \
   --arg action "$action" \
   --argjson count "$count" \
-  --argjson schema "$SUPPORTED_SCHEMA" \
+  --argjson schema "$POST_SHAPES_MAX_SCHEMA" \
   --arg path "$SHAPES_FILE" \
   '{ok: true, action: $action, count: $count, schema_version: $schema, path: $path}'

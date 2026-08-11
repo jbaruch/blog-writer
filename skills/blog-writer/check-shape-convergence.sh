@@ -18,8 +18,6 @@
 #   $4  the planned closing mode
 #
 # Decision contract (this script owns these; callers must not restate them):
-#   SUPPORTED_SCHEMA  highest per-record `schema_version` this script reads.
-#                     Records above it are skipped, never rewritten.
 #   WINDOW            how many of the most recent usable records to compare against.
 #   MIN_HISTORY       fewest usable records that permit a verdict. Below it the
 #                     audit cannot fire, which is the normal state for a new author.
@@ -27,6 +25,11 @@
 #   EVERY compared record — so the rule is well-defined whether the window holds
 #   MIN_HISTORY records or WINDOW of them.
 #   CONVERGED_AXES_REQUIRED  converged axes needed before the verdict is `true`.
+#   Accepted schema versions and the per-record field contract live in
+#   post-shapes-lib.sh, shared with the writer so the two cannot drift.
+#
+# Every record is validated before any verdict is computed: a history that does
+# not match its documented schema is reported, never silently averaged over.
 #
 # Output (stdout), a single JSON object:
 #   {"ok": true, "can_fire": bool, "reason": "<why>", "compared": N,
@@ -47,7 +50,10 @@
 
 set -euo pipefail
 
-readonly SUPPORTED_SCHEMA=1
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+# shellcheck source=skills/blog-writer/post-shapes-lib.sh
+. "${SCRIPT_DIR}/post-shapes-lib.sh"
+
 readonly WINDOW=3
 readonly MIN_HISTORY=2
 readonly CONVERGED_AXES_REQUIRED=2
@@ -91,21 +97,16 @@ if [ ! -r "$SHAPES_FILE" ]; then
   exit 1
 fi
 
-if ! jq -e 'type == "object" and (.posts | type) == "array"' "$SHAPES_FILE" >/dev/null 2>/tmp/shape-jq-err.$$; then
-  rm -f "/tmp/shape-jq-err.$$"
-  echo "error: ${SHAPES_FILE} is not valid JSON in the documented shape (an object with a \"posts\" array) — see references/post-shapes-schema.md and repair or remove the file" >&2
+if ! loaded=$(post_shapes_load "$SHAPES_FILE"); then
   exit 1
 fi
-rm -f "/tmp/shape-jq-err.$$"
 
-total_records=$(jq '.posts | length' "$SHAPES_FILE")
-usable=$(jq --argjson max "$SUPPORTED_SCHEMA" \
-  '[.posts[] | select((.schema_version // 0) <= $max)]' "$SHAPES_FILE")
+usable=$(jq -c '.usable' <<<"$loaded")
 usable_count=$(jq 'length' <<<"$usable")
-skipped=$((total_records - usable_count))
+skipped=$(jq '.skipped_newer' <<<"$loaded")
 
 if [ "$skipped" -gt 0 ]; then
-  echo "warning: skipped ${skipped} record(s) in ${SHAPES_FILE} written by a newer skill version (schema_version above ${SUPPORTED_SCHEMA}) — update the blog-writer plugin to read them; they were left untouched" >&2
+  echo "warning: skipped ${skipped} record(s) in ${SHAPES_FILE} written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin to read them; they were left untouched" >&2
 fi
 
 if [ "$usable_count" -lt "$MIN_HISTORY" ]; then
