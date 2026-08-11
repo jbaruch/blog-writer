@@ -87,7 +87,7 @@ Route on the exit code:
 
 | Exit | Meaning | What the skill does |
 |---|---|---|
-| 0 | Result is authoritative, including `can_fire: false` | Report the verdict, or report that the audit cannot fire, and continue |
+| 0 | Result is authoritative, including `can_fire: false` | Report the verdict, or report that the audit cannot fire, and continue. `can_fire: false` covers both too little history and a history this install is too old to read in full |
 | 1 | The file exists but cannot be used | Report the script's stderr diagnostic to the author and continue planning without audit 6. Do not delete or overwrite the file |
 | 2 | Tool or usage error | Report the diagnostic and stop |
 
@@ -102,8 +102,10 @@ disagrees with the actual published post, the post wins — correct the record.
 ## Writer contract — Phase 4
 
 Run `record-post-shape.sh` once the author declares the post done. It stamps
-`schema_version`, appends newest-last, and writes atomically through a staging file so an
-interrupted run cannot truncate an author's history.
+`schema_version`, keeps the history sorted by `date` so the reader's "newest last" window
+stays correct even when a post finished earlier is recorded after a later one, and writes
+atomically through a staging file so an interrupted run cannot truncate an author's
+history.
 
 Two rules the caller owns, because no script can check them:
 
@@ -118,12 +120,20 @@ is never overwritten. Report the diagnostic; do not work around it by deleting t
 
 - Only `blog-writer` migrates. A shape change bumps the version range in
   `post-shapes-lib.sh`, and the upgrade path goes there beside it.
-- Records above the accepted range are skipped by the reader, counted in
-  `skipped_newer_records`, and refused by the writer. Neither script rewrites them.
-- Records below the accepted range are refused by both. Version 1 is the first, so nothing
-  legitimately sits below it today; when version 2 lands, version 1 stays readable and the
-  library gains the upgrade.
-- A history written by a newer skill version means this install is lagging, not that the
-  file is broken (`stateful-artifacts`, Migration Policy). Update the plugin rather than
-  repairing the file.
+- **On reading a record from an older accepted version, the owner upgrades it to the
+  current version and rewrites the history**, so the file converges on one version rather
+  than accumulating mixed ones. This is the owner's job alone; no other skill migrates, and
+  a non-owner reader stays read-only.
+- Version 1 is the first, so no older version exists to migrate from today. When version 2
+  lands, `post-shapes-lib.sh` gains the version-1 upgrade and `record-post-shape.sh` rewrites
+  upgraded records as it appends.
+- Records below the accepted range have no migration path — nothing legitimately predates
+  version 1 — so both scripts refuse them as malformed.
+- **A history holding any record above the accepted range makes the whole history unusable
+  to this install, not just that record.** The reader reports `can_fire: false` and computes
+  no verdict, because the records it can still parse are the older ones: a verdict built
+  from them would describe the wrong posts while appearing to describe the most recent. The
+  writer refuses outright. This install is lagging, not the file broken
+  (`stateful-artifacts`, Migration Policy) — update the plugin rather than repairing the
+  file.
 - No other skill reads or writes this file.

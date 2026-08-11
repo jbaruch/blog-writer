@@ -36,8 +36,9 @@
 #    "converged": bool, "converged_axes": ["opening_mode", ...],
 #    "skipped_newer_records": N}
 #
-#   can_fire  false means there is not enough usable history for a verdict.
-#             `converged` is false in that case and carries no meaning.
+#   can_fire  false means no verdict is possible: too little history, or a
+#             history this install is too old to read in full. `converged` is
+#             false in that case and carries no meaning.
 #
 # Exit codes:
 #   0  the reported result is authoritative, including can_fire=false
@@ -105,8 +106,16 @@ usable=$(jq -c '.usable' <<<"$loaded")
 usable_count=$(jq 'length' <<<"$usable")
 skipped=$(jq '.skipped_newer' <<<"$loaded")
 
+# A newer record means this install is lagging, not that the history is partly
+# valid. The records it can still parse are the OLDER ones, so a verdict built
+# from them would describe ancient history while claiming to describe the most
+# recent posts. The whole history is unusable until the plugin is updated
+# (`jbaruch/coding-policy: stateful-artifacts`, Migration Policy).
 if [ "$skipped" -gt 0 ]; then
-  echo "warning: skipped ${skipped} record(s) in ${SHAPES_FILE} written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin to read them; they were left untouched" >&2
+  echo "warning: ${SHAPES_FILE} holds ${skipped} record(s) written by a newer skill version (schema_version above ${POST_SHAPES_MAX_SCHEMA}) — update the blog-writer plugin to read them; they were left untouched" >&2
+  emit false "${skipped} record(s) in ${SHAPES_FILE} were written by a newer skill version, so the most recent history cannot be read — update the blog-writer plugin; a verdict from the remaining older records would describe the wrong posts" \
+    0 false '[]' "$skipped"
+  exit 0
 fi
 
 if [ "$usable_count" -lt "$MIN_HISTORY" ]; then

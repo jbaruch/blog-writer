@@ -15,7 +15,9 @@
 #   6. Converged — enough axes matching every compared post reports converged.
 #   7. Not converged — a single matching axis does not trip the verdict.
 #   8. Window bound — records older than the window do not affect the verdict.
-#   9. Newer records skipped and counted, never read as usable history.
+#   9. Newer records disable the verdict for the whole history — including when
+#      enough older records remain readable, since those describe the wrong
+#      posts and a lagging reader has no usable prior state.
 #  10. Read-only — a check never modifies the history file.
 #  11. Malformed records — a missing schema_version, a bad date, a mistyped
 #      field, or a non-string intervention each exit 1 rather than producing an
@@ -26,7 +28,8 @@
 #
 # record-post-shape.sh
 #  14. Creates a history that does not exist yet.
-#  15. Appends to an existing history, newest last.
+#  15. Appends to an existing history, keeping it sorted by date so a backfilled
+#      earlier post does not break the reader's "newest last" window.
 #  16. Every written record carries schema_version.
 #  17. Interventions round-trip, and absent ones produce an empty array.
 #  18. Newer-schema history is refused and left byte-identical (clobber guard).
@@ -213,11 +216,26 @@ fi
 
 new_dir
 write_history "${CASE_DIR}/newer.json" 99 "emb|p->m|stop" "emb|p->m|stop"
-if run_case "records from a newer skill version are skipped, not read" 0 \
+if run_case "a history written entirely by a newer version cannot fire" 0 \
     bash "$CHECK" "${CASE_DIR}/newer.json" emb "p->m" stop; then
   assert_json "newer" '.skipped_newer_records' "2"
   assert_json "newer" '.can_fire' "false"
   assert_contains "newer" "$CASE_ERR" "newer skill version"
+fi
+
+# A lagging reader can only parse the OLDER records, so a verdict built from them
+# would describe the wrong posts. Enough readable history must not rescue it.
+new_dir
+jq -n '{posts: [
+   {schema_version: 1,  slug: "a", date: "2026-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+   {schema_version: 1,  slug: "b", date: "2026-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+   {schema_version: 99, slug: "c", date: "2026-03-01", opening_mode: "new", arc: "new", closing_mode: "new", interventions: []}
+ ]}' >"${CASE_DIR}/mixed.json"
+if run_case "one newer record disables the verdict even with readable history" 0 \
+    bash "$CHECK" "${CASE_DIR}/mixed.json" emb "p->m" stop; then
+  assert_json "mixed" '.skipped_newer_records' "1"
+  assert_json "mixed" '.can_fire' "false"
+  assert_json "mixed" '.converged' "false"
 fi
 
 new_dir
@@ -306,6 +324,14 @@ before=$(cat "${CASE_DIR}/bad.json")
 run_case "refuses to write over a malformed history" 1 \
   bash "$RECORD" "${CASE_DIR}/bad.json" s 2026-08-11 a b c
 if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
+
+new_dir
+run_case "a backfilled earlier post lands in date order, not at the end" 0 \
+  bash "$RECORD" "${CASE_DIR}/order.json" late 2026-09-01 a b c
+run_case "recording an earlier post after a later one" 0 \
+  bash "$RECORD" "${CASE_DIR}/order.json" early 2026-03-01 a b c
+order=$(jq -r '[.posts[].slug] | join(",")' "${CASE_DIR}/order.json")
+if [ "$order" = "early,late" ]; then ok; else fail "date order: expected 'early,late' (newest last), got '${order}'"; fi
 
 new_dir
 printf '{"posts":[{"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"

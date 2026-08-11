@@ -42,6 +42,10 @@
 #      Nothing is written in this case — a newer history is never clobbered.
 #   2  tool or usage error (jq missing, too few arguments, malformed date)
 #
+# Keeps the history sorted by `date`, so the "newest last" invariant the reader
+# depends on holds even when a post finished earlier is recorded after a later
+# one. jq's sort is stable, so same-date records keep their insertion order.
+#
 # Writes atomically: the new history is staged beside the destination and moved
 # into place only after jq succeeds, so an interrupted run cannot truncate an
 # author's history.
@@ -138,7 +142,8 @@ if ! jq -n \
        arc: $arc,
        closing_mode: $closing,
        interventions: $ARGS.positional
-     }]' "${interventions[@]+"${interventions[@]}"}" >"$staging"; then
+     }]
+   | .posts |= sort_by(.date)' "${interventions[@]+"${interventions[@]}"}" >"$staging"; then
   echo "error: failed to build the updated shape history for ${SHAPES_FILE} — the existing file was left untouched" >&2
   exit 1
 fi
