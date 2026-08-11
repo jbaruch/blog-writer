@@ -181,26 +181,18 @@ move, same arc, same closing move? How far back the comparison reaches is the sc
 yours.
 
 **Where the history lives:** `_blog-skill/post-shapes.json` in the Blog Home Directory
-records the shape of each published post. Do not read or compare it yourself — run
-`skills/blog-writer/check-shape-convergence.sh` and route on its result. How many prior
-posts it compares, how few are too few, and what counts as converged are the script's
-decision contract; see its header. Field meanings and both contracts are in
-`references/post-shapes-schema.md`.
+records the shape of each published post. Do not read or compare it yourself. SKILL.md
+Step 9 has the invocation, the routing, and the correction loop; `references/post-shapes-schema.md`
+has the field meanings.
 
-Treat the history as a hint, not authority — if a record disagrees with the actual post,
-the post wins.
-
-**When the script reports it cannot fire**, say so and move on. A first post has nothing to
-converge with. An unusable history is reported differently from an absent one, and the two
-must never be collapsed.
-
-**The fix:** change the axes the script reports in `converged_axes`. If it reports
-`opening_mode`, open this one somewhere else. Then re-run the script on the revised plan and
-keep adjusting until it reports no convergence — how many axes must differ is its contract,
-not a number to carry in your head.
+**The fix:** open somewhere else, arc somewhere else, or close somewhere else — whichever
+the verdict names. The intervention menu below and the mode menus in
+`references/blog-anatomy.md` are what to reach for.
 
 Change what the verdict asks for and no more. Rewriting every axis on every post rebuilds
 the same problem with different defaults, which is the convergence trap in a new costume.
+
+A first post has nothing to converge with, and that is not a finding.
 
 ---
 

@@ -55,9 +55,8 @@ to the post's content. See the bio format in `persona/bio.md`.
 ## Varying the Shape
 
 Audit 6 compares a planned post against recent ones and reports which axes have converged.
-Run `skills/blog-writer/check-shape-convergence.sh` and route on its verdict; how far back it
-reaches is the script's contract. Vary the axes it reports, then re-run it until it reports
-no convergence.
+Its invocation, routing, and correction loop are in SKILL.md Step 9. Vary the axes it
+reports; the menus below are what to vary them to.
 
 **Opening modes** — public embarrassment or confession; cold open mid-incident; outcome
 first, then rewind; the delayed reveal that withholds the central number; a named artifact
