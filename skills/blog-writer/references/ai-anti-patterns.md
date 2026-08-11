@@ -13,7 +13,7 @@ specific patterns, symptoms, examples, structural variants, and alternatives —
 general knowledge of AI writing patterns.
 
 **Follow the three-pass procedure exactly as written in `references/process.md`.** Pass 1
-is the surface scan against all 38 patterns. Pass 2 is the skeleton scan on adjacent
+is the surface scan against all 39 patterns. Pass 2 is the skeleton scan on adjacent
 sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
 that passes pattern checks but still reads as AI. Then the rewrite audit. Then the voice
 check. Then the proportionality check — was the amount of rewriting proportional to the
@@ -21,7 +21,7 @@ slop found, and would the author still recognize the draft as their own voice. I
 order. Do not skip passes, do not merge them, do not substitute your own method.
 
 **Do not invent patterns that aren't in this file.** If something feels "AI-ish" but
-doesn't match any of the 38 defined patterns or their structural variants, leave it alone.
+doesn't match any of the 39 defined patterns or their structural variants, leave it alone.
 False positives from improvised rules damage the author's voice more than the pattern
 they're trying to fix.
 
@@ -1592,3 +1592,59 @@ missing fact or a missing CTA, not a missing aphorism.
 **Carve-out:** The author bio ends with a deliberate kicker (see `persona/bio.md`) — that's
 a schema element, a joke connected to the post's content, not a profundity claim. This
 pattern is about body prose endings. The bio kicker stays.
+
+---
+
+## 39. Body-Performance Emotion
+
+**The tell:** A feeling delivered through the body or the room instead of named. The
+stomach drops, the chest tightens, the cursor blinks mockingly. The emotion gets staged
+rather than stated.
+
+**Symptoms:**
+- A body part acting on the writer's behalf: chest tightening, stomach dropping, breath
+  catching, heart sinking, throat closing, hands shaking
+- The environment carrying the mood: the cold glow of the monitor, the silence of the
+  office at 3 AM, the cursor blinking accusingly
+- An emotional beat where no feeling is ever named, only performed
+- "Something shifted." "Something clicked." — an internal event reported without saying
+  what it was
+
+**Examples:**
+- ❌ "My stomach dropped when I saw the diff."
+- ❌ "I felt my chest tighten as the pipeline went red."
+- ❌ "The terminal sat there, cursor blinking, mocking me."
+- ❌ "Something shifted in how I thought about testing that day."
+- ❌ "I let out a breath I didn't know I was holding."
+
+**Structural variants:**
+- **Setting as mirror** — the weather, the lighting, or the empty office doing the
+  emotional work the sentence won't do. "The rain hadn't stopped since the incident began."
+- **Sensory pile-on** — stacking smell, sound, and texture detail at an emotional beat as
+  a substitute for saying what the beat was.
+- **The unnamed realization** — "something clicked," "it finally made sense," without ever
+  stating what clicked or what made sense.
+- **Deferred naming** — three sentences of body-performance followed by the feeling named
+  anyway. The naming was the whole sentence; the performance was throat-clearing.
+
+**Why it's a tell:** This is the single largest human-AI gap measured in the StoryScope
+corpus (Russell et al. 2026, arXiv:2604.03136): AI performs emotion through the body 81%
+of the time against 38% for human writers, while humans name the feeling outright 29%
+against 8%. It inverts the advice every writing class gives, and that's exactly why it
+became a signature — models were trained on "show, don't tell" and apply it far harder
+than people do. The underlying mechanism is worth knowing: a model reaches for a body
+because it has no feeling to report.
+
+**Instead:** Name it plainly, in the author's register. Reserve physical detail for the one
+moment that actually earns it.
+- ✅ "Honestly, that one stung."
+- ✅ "I was pissed."
+- ✅ "I read the diff twice, then went to get coffee, which is what I do instead of
+  screaming."
+
+**Carve-out — this is not a ban on physical detail.** Detail that is factually what
+happened is reportage: the one sock, the cat on the keyboard, the 2:14 AM kitchen, the
+terminal output you actually saw. That's narrative density and it stays (see
+`references/tone-guide.md`). The pattern is a body part standing in for a feeling the
+sentence declines to name. Concrete lived specifics are the human marker; body-performance
+is the machine one.

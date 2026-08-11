@@ -8,7 +8,7 @@ Write developer blog posts from video transcripts, meeting notes, or rough ideas
 
 | Skill | What it does |
 |-------|--------------|
-| [`blog-writer`](skills/blog-writer/SKILL.md) | Turns a transcript, meeting notes, or a rough idea into a drafted blog post in the author's voice, then checks it against 38 AI writing anti-patterns |
+| [`blog-writer`](skills/blog-writer/SKILL.md) | Turns a transcript, meeting notes, or a rough idea into a drafted blog post in the author's voice, then checks it against 39 AI writing anti-patterns |
 
 ## Installation
 
@@ -34,7 +34,7 @@ can show the same thing with less abstraction.
 
 ## Anti-pattern detection
 
-Drafts are checked against 38 named AI writing anti-patterns, each with symptoms,
+Drafts are checked against 39 named AI writing anti-patterns, each with symptoms,
 examples, and alternatives (plus structural variants where applicable). The check runs
 in three passes:
 
@@ -44,7 +44,7 @@ in three passes:
 - **Soul check** — holistic read for sterile, voiceless writing that passes pattern
   checks but still reads as obviously AI
 
-Every rewrite is re-audited against all 38 patterns before it's considered fixed.
+Every rewrite is re-audited against all 39 patterns before it's considered fixed.
 
 At the start of each session the skill fetches
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)

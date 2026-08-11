@@ -1,5 +1,14 @@
 # Changelog
 
+### Added
+
+- **Anti-pattern #39, body-performance emotion** (#29) — a feeling delivered through the body or the room instead of named: "my stomach dropped", "the cursor blinked mockingly", "something shifted". This is the single largest human-AI gap measured in the StoryScope corpus (Russell et al. 2026, arXiv:2604.03136), which classified 61,608 stories using only discourse-level features: AI performs emotion through the body 81% of the time against 38% for humans, while humans name the feeling outright 29% against 8%. The pattern covers setting-as-mirror, sensory pile-on, the unnamed realization, and deferred naming, and carries a carve-out protecting factual physical detail — the one sock, the cat on the keyboard, the terminal output you actually saw — which is reportage and stays.
+
+### Changed
+
+- **The narrative-density doctrine is scoped, not reversed** (#29) — `tone-guide.md` opened by calling "Show, Don't Summarize" the single biggest quality differentiator, which collides with the finding above. The collision turned out to be narrower than it looked: every "good (specific)" example in that section is a *named, checkable specific* — real terminal output, a real file count — which is the half of the advice where humans beat machines roughly two to one. Only the emotional half inverted. The section now splits the rule explicitly with a push-harder / cut table, and points at #39 for the emotional half rather than restating it. No existing guidance was dropped, and the density rule still governs.
+- **The anti-pattern count reads 39 across every surface** — `SKILL.md` frontmatter and reading list, `plugin.json` description, three README claims, the `tone-guide.md` quick index (which gains its 39th entry), and five scan-procedure references in `process.md` and `ai-anti-patterns.md` that name the count in the check itself. A count that disagrees with the file it describes teaches the agent to distrust both.
+
 ## 1.1.25 — 2026-08-11
 
 ### Changed

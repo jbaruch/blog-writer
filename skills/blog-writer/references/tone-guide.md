@@ -31,6 +31,32 @@ reading a report about what happened.
 - "It hardcoded — and I cannot stress this enough — HARDCODED — the loyalty program
   information directly into the source code."
 
+### What "show" does not mean: name the feeling, don't perform it
+
+The examples above all share one property — they are **named, checkable specifics**. Real
+terminal output, a real file count, a real thing that was hardcoded. That is the half of
+"show, don't tell" that reads as human, and it's the half to push harder on. Humans name
+real things at roughly twice the rate machines do.
+
+The other half — emotion staged through the body or the room — inverted while nobody was
+looking. "My stomach dropped," "the cursor blinked mockingly," "I felt something shift"
+are now the strongest single machine signature in the measured corpus, because models were
+trained on the same writing advice and follow it harder than people do. See pattern #39 in
+`references/ai-anti-patterns.md` for the full treatment.
+
+So the density rule splits cleanly:
+
+| Push harder | Cut |
+|---|---|
+| "All 47 tests passing. Build successful." | "My stomach dropped." |
+| "It scaffolded 62 files in twelve seconds." | "The terminal glowed accusingly." |
+| "It HARDCODED the loyalty program info." | "Something shifted that day." |
+| The one sock, the cat on the keyboard, 2:14 AM | "I let out a breath I didn't know I was holding." |
+
+Both columns are "specific." Only the left one is checkable. When an emotional beat needs
+to land, say the feeling in the author's own register — "honestly, that one stung" — and
+save the physical detail for the moment that actually earns it.
+
 ### How to maintain density throughout the post
 
 The opening hook always has personality because writers focus there. The quality crime happens
@@ -61,7 +87,7 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**Read `references/ai-anti-patterns.md` for the full list.** It contains 38 named patterns
+**Read `references/ai-anti-patterns.md` for the full list.** It contains 39 named patterns
 with symptoms, examples, and alternatives. Scan the draft against every one of them during
 Phase 3 and Phase 4. Zero tolerance.
 
@@ -104,6 +130,7 @@ Quick index for scanning:
 36. Corporate cliché phrases — "passionate team", "end-to-end solution", "trusted by industry leaders"
 37. Euphemistic smoothing — "encountered challenges" instead of "it broke"; softening failures
 38. Fake-profound kickers — mic-drop metaphor endings; delete, don't rewrite into a better metaphor
+39. Body-performance emotion — "my stomach dropped", "the cursor blinked mockingly"; name the feeling instead
 
 ---
 
@@ -408,7 +435,7 @@ Before submitting a draft, check:
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
   (holistic read for sterile, voiceless writing). Rewrite any hits, then re-check each
-  rewrite against all 38 patterns before considering it fixed.
+  rewrite against all 39 patterns before considering it fixed.
 
 ---
 
