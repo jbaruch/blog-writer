@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.27 — 2026-08-11
+
 ### Added
 
 - **A structural audit layer above the 39 anti-patterns** (#29) — `references/structural-audits.md` adds six discourse-level audits that work on the shape of the whole post rather than its sentences: theme explicitness, structural tidiness, emotion mode, reference specificity, reader engagement, and shape convergence. Grounded in StoryScope (Russell et al. 2026, arXiv:2604.03136), which classified 61,608 stories using only discourse features at 93.2% macro-F1, then ran the AI text through a professional span-level rewriting pass and watched detection fall 1.6 points. Surface editing is not the durable half, so a draft can pass all 39 patterns and still be identifiable from its skeleton. Reimplemented from the published findings; the paper is cited, not relicensed.
