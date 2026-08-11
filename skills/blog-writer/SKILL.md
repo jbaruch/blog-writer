@@ -204,10 +204,9 @@ procedure in order, and never invent a pattern the file does not define.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from
 `skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern
-passes. Read `persona/voice.md` first — where the profile already prescribes the human-side
+passes. Read `persona/voice.md` first. Where the profile already prescribes the human-side
 behavior, the audit is a drift check rather than a new rule. Never apply more than two
-interventions from the menu to one post; uniform application is the convergence trap the
-file opens with.
+interventions from the menu to one post.
 
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
@@ -237,8 +236,8 @@ format, the schema stamp, and the refusal cases:
   "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
 ```
 
-Record the post as it ended up, not as it was first drafted, and reuse an existing mode
-string verbatim when the shape is the same — the comparison is by equality.
+Record the post as it ended up, not as it was first drafted. Reuse an existing mode string
+verbatim when the shape is the same; the comparison is by equality.
 `skills/blog-writer/references/post-shapes-schema.md` has the field meanings.
 
 On **exit 1** the history was refused and left untouched — a newer-schema or malformed file

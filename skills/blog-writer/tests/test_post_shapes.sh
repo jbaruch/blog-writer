@@ -24,7 +24,9 @@
 #      authoritative verdict from state that does not match its schema.
 #  12. Below-minimum schema — a record older than the documented schema has no
 #      migration path and exits 1.
-#  13. Argument validation — wrong count exits 2.
+#  13. Dangling symlink — an existing-but-broken link exits 1 rather than
+#      collapsing into the absent case.
+#  14. Argument validation — wrong count exits 2.
 #
 # record-post-shape.sh
 #  14. Creates a history that does not exist yet.
@@ -41,13 +43,16 @@
 #  23. An unwritable destination directory exits 2 (environment) rather than 1
 #      (history unusable). Skipped with a visible note when the process can write
 #      to a chmod a-w directory, which is the case as root.
-#  24. Date format is validated.
-#  25. Empty slug is rejected.
-#  26. Argument count is validated.
+#  24. A dangling symlink is refused rather than written through.
+#  25. Date format is validated.
+#  26. Empty slug is rejected.
+#  27. Argument count is validated.
 #
-# Approach: every case runs in a fresh temp directory, so no test touches a real
-# history file. Dates are literals passed as arguments — the scripts never read
-# the clock, so these assertions do not rot. No network, no randomness.
+# Approach: every case runs in a fresh temp directory under one suite-owned root,
+# so no test touches a real history file and the EXIT trap removes everything.
+# Dates are fixed past literals passed as arguments; the scripts never read the
+# clock, so these assertions are as true next year as today. No network, no
+# randomness, no future dates.
 #
 # Run: bash skills/blog-writer/tests/test_post_shapes.sh
 
@@ -91,7 +96,7 @@ run_case() {
 
   echo "  ${name}"
   local err_file
-  err_file=$(mktemp)
+  err_file=$(mktemp "${SUITE_TMP}/err.XXXXXX")
   # The suite runs without errexit, so no save/restore is needed here. Enabling
   # it would leave errexit on for every later case.
   CASE_OUT=$("$@" 2>"$err_file")
@@ -127,7 +132,7 @@ write_history() {
     records=$(jq \
       --argjson schema "$schema" \
       --arg slug "post-${i}" \
-      --arg date "2026-0${i}-01" \
+      --arg date "2025-0${i}-01" \
       --arg opening "$opening" \
       --arg arc "$arc" \
       --arg closing "$closing" \
@@ -232,9 +237,9 @@ fi
 # would describe the wrong posts. Enough readable history must not rescue it.
 new_dir
 jq -n '{posts: [
-   {schema_version: 1,  slug: "a", date: "2026-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
-   {schema_version: 1,  slug: "b", date: "2026-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
-   {schema_version: 99, slug: "c", date: "2026-03-01", opening_mode: "new", arc: "new", closing_mode: "new", interventions: []}
+   {schema_version: 1,  slug: "a", date: "2025-01-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+   {schema_version: 1,  slug: "b", date: "2025-02-01", opening_mode: "emb", arc: "p->m", closing_mode: "stop", interventions: []},
+   {schema_version: 99, slug: "c", date: "2025-03-01", opening_mode: "new", arc: "new", closing_mode: "new", interventions: []}
  ]}' >"${CASE_DIR}/mixed.json"
 if run_case "one newer record disables the verdict even with readable history" 0 \
     bash "$CHECK" "${CASE_DIR}/mixed.json" emb "p->m" stop; then
@@ -251,32 +256,39 @@ run_case "checking never modifies the history" 0 \
 if [ "$(cat "${CASE_DIR}/ro.json")" = "$before" ]; then ok; else fail "read-only: the check modified the history file"; fi
 
 new_dir
-printf '{"posts":[{"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
+printf '{"posts":[{"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
 if run_case "a record without schema_version is malformed, not version zero" 1 \
     bash "$CHECK" "${CASE_DIR}/nover.json" o a c; then
   assert_contains "no schema_version" "$CASE_ERR" "malformed record"
 fi
 
 new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"not-a-date","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/baddate.json"
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"not-a-date","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/baddate.json"
 run_case "a record with a malformed date is rejected" 1 \
   bash "$CHECK" "${CASE_DIR}/baddate.json" o a c
 
 new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2026-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]},{"schema_version":1,"slug":"b","date":"2025-02-01","opening_mode":123,"arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badtype.json"
 run_case "a record with a mistyped field is rejected" 1 \
   bash "$CHECK" "${CASE_DIR}/badtype.json" o a c
 
 new_dir
-printf '{"posts":[{"schema_version":1,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[7]}]}' >"${CASE_DIR}/badiv.json"
+printf '{"posts":[{"schema_version":1,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[7]}]}' >"${CASE_DIR}/badiv.json"
 run_case "a record with a non-string intervention is rejected" 1 \
   bash "$CHECK" "${CASE_DIR}/badiv.json" o a c
 
 new_dir
-printf '{"posts":[{"schema_version":0,"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/old.json"
+printf '{"posts":[{"schema_version":0,"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/old.json"
 if run_case "a record below the minimum schema has no migration path and is rejected" 1 \
     bash "$CHECK" "${CASE_DIR}/old.json" o a c; then
   assert_contains "below minimum" "$CASE_ERR" "below"
+fi
+
+new_dir
+ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
+if run_case "a dangling symlink is reported, not read as absent" 1 \
+    bash "$CHECK" "${CASE_DIR}/dangling.json" a b c; then
+  assert_contains "dangling" "$CASE_ERR" "target is missing"
 fi
 
 new_dir
@@ -286,13 +298,13 @@ echo "record-post-shape.sh"
 
 new_dir
 if run_case "creates a history that does not exist yet" 0 \
-    bash "$RECORD" "${CASE_DIR}/new.json" my-slug 2026-08-11 emb "p->m" stop; then
+    bash "$RECORD" "${CASE_DIR}/new.json" my-slug 2025-06-01 emb "p->m" stop; then
   assert_json "create" '.action' "created"
   assert_json "create" '.count' "1"
 fi
 
 if run_case "appends to an existing history" 0 \
-    bash "$RECORD" "${CASE_DIR}/new.json" second 2026-08-12 cold outcome hot; then
+    bash "$RECORD" "${CASE_DIR}/new.json" second 2025-06-02 cold outcome hot; then
   assert_json "append" '.action' "appended"
   assert_json "append" '.count' "2"
 fi
@@ -305,12 +317,12 @@ if [ "$stamped" = "1" ]; then ok; else fail "schema stamp: every record should c
 
 new_dir
 run_case "interventions round-trip" 0 \
-  bash "$RECORD" "${CASE_DIR}/iv.json" s 2026-08-11 a b c open-thread named-thing
+  bash "$RECORD" "${CASE_DIR}/iv.json" s 2025-06-01 a b c open-thread named-thing
 got=$(jq -r '.posts[0].interventions | join(",")' "${CASE_DIR}/iv.json")
 if [ "$got" = "open-thread,named-thing" ]; then ok; else fail "interventions: expected two recorded, got '${got}'"; fi
 
 run_case "no interventions produces an empty array" 0 \
-  bash "$RECORD" "${CASE_DIR}/iv.json" s2 2026-08-11 a b c
+  bash "$RECORD" "${CASE_DIR}/iv.json" s2 2025-06-01 a b c
 got=$(jq -r '.posts[1].interventions | length' "${CASE_DIR}/iv.json")
 if [ "$got" = "0" ]; then ok; else fail "interventions: expected empty array, got length '${got}'"; fi
 
@@ -318,7 +330,7 @@ new_dir
 write_history "${CASE_DIR}/guard.json" 99 "emb|p->m|stop"
 before=$(cat "${CASE_DIR}/guard.json")
 if run_case "refuses to write over a newer-schema history" 1 \
-    bash "$RECORD" "${CASE_DIR}/guard.json" s 2026-08-11 a b c; then
+    bash "$RECORD" "${CASE_DIR}/guard.json" s 2025-06-01 a b c; then
   assert_contains "clobber guard" "$CASE_ERR" "newer skill version"
 fi
 if [ "$(cat "${CASE_DIR}/guard.json")" = "$before" ]; then ok; else fail "clobber guard: the history was modified"; fi
@@ -327,14 +339,14 @@ new_dir
 printf 'garbage' >"${CASE_DIR}/bad.json"
 before=$(cat "${CASE_DIR}/bad.json")
 run_case "refuses to write over a malformed history" 1 \
-  bash "$RECORD" "${CASE_DIR}/bad.json" s 2026-08-11 a b c
+  bash "$RECORD" "${CASE_DIR}/bad.json" s 2025-06-01 a b c
 if [ "$(cat "${CASE_DIR}/bad.json")" = "$before" ]; then ok; else fail "malformed guard: the history was modified"; fi
 
 new_dir
 run_case "recording the same slug twice updates rather than duplicates" 0 \
-  bash "$RECORD" "${CASE_DIR}/idem.json" same 2026-05-01 first-open first-arc first-close
+  bash "$RECORD" "${CASE_DIR}/idem.json" same 2025-05-01 first-open first-arc first-close
 if run_case "re-recording the same post reports updated" 0 \
-    bash "$RECORD" "${CASE_DIR}/idem.json" same 2026-05-01 second-open second-arc second-close; then
+    bash "$RECORD" "${CASE_DIR}/idem.json" same 2025-05-01 second-open second-arc second-close; then
   assert_json "idempotent" '.action' "updated"
   assert_json "idempotent" '.count' "1"
 fi
@@ -351,31 +363,36 @@ if [ -w "${CASE_DIR}/ro" ]; then
   echo "    NOTE: running with write access to a chmod a-w directory (root?); skipping the unwritable-directory case" >&2
 else
   run_case "an unwritable destination directory exits 2, not 1" 2 \
-    bash "$RECORD" "${CASE_DIR}/ro/s.json" s 2026-08-11 a b c
+    bash "$RECORD" "${CASE_DIR}/ro/s.json" s 2025-06-01 a b c
 fi
 chmod u+w "${CASE_DIR}/ro"
 
 new_dir
 run_case "a backfilled earlier post lands in date order, not at the end" 0 \
-  bash "$RECORD" "${CASE_DIR}/order.json" late 2026-09-01 a b c
+  bash "$RECORD" "${CASE_DIR}/order.json" late 2025-09-01 a b c
 run_case "recording an earlier post after a later one" 0 \
-  bash "$RECORD" "${CASE_DIR}/order.json" early 2026-03-01 a b c
+  bash "$RECORD" "${CASE_DIR}/order.json" early 2025-03-01 a b c
 order=$(jq -r '[.posts[].slug] | join(",")' "${CASE_DIR}/order.json")
 if [ "$order" = "early,late" ]; then ok; else fail "date order: expected 'early,late' (newest last), got '${order}'"; fi
 
 new_dir
-printf '{"posts":[{"slug":"a","date":"2026-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
+printf '{"posts":[{"slug":"a","date":"2025-01-01","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/nover.json"
 before=$(cat "${CASE_DIR}/nover.json")
 run_case "refuses to append to a history whose records lack schema_version" 1 \
-  bash "$RECORD" "${CASE_DIR}/nover.json" s 2026-08-11 a b c
+  bash "$RECORD" "${CASE_DIR}/nover.json" s 2025-06-01 a b c
 if [ "$(cat "${CASE_DIR}/nover.json")" = "$before" ]; then ok; else fail "unversioned guard: the history was modified"; fi
 
 new_dir
 printf '{"posts":[{"schema_version":1,"slug":"a","date":"nope","opening_mode":"o","arc":"a","closing_mode":"c","interventions":[]}]}' >"${CASE_DIR}/badrec.json"
 before=$(cat "${CASE_DIR}/badrec.json")
 run_case "refuses to append to a history holding a malformed record" 1 \
-  bash "$RECORD" "${CASE_DIR}/badrec.json" s 2026-08-11 a b c
+  bash "$RECORD" "${CASE_DIR}/badrec.json" s 2025-06-01 a b c
 if [ "$(cat "${CASE_DIR}/badrec.json")" = "$before" ]; then ok; else fail "malformed record guard: the history was modified"; fi
+
+new_dir
+ln -s "${CASE_DIR}/nowhere.json" "${CASE_DIR}/dangling.json"
+run_case "refuses to write through a dangling symlink" 1 \
+  bash "$RECORD" "${CASE_DIR}/dangling.json" s 2025-06-01 a b c
 
 new_dir
 run_case "rejects a date that is not YYYY-MM-DD" 2 \
@@ -383,11 +400,11 @@ run_case "rejects a date that is not YYYY-MM-DD" 2 \
 
 new_dir
 run_case "rejects an empty slug" 2 \
-  bash "$RECORD" "${CASE_DIR}/e.json" "" 2026-08-11 a b c
+  bash "$RECORD" "${CASE_DIR}/e.json" "" 2025-06-01 a b c
 
 new_dir
 run_case "rejects too few arguments" 2 \
-  bash "$RECORD" "${CASE_DIR}/f.json" s 2026-08-11
+  bash "$RECORD" "${CASE_DIR}/f.json" s 2025-06-01
 
 echo
 echo "passed: ${pass_count}  failed: ${fail_count}"

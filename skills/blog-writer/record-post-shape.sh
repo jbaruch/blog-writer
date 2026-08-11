@@ -99,6 +99,11 @@ fi
 action=created
 existing='{"posts":[]}'
 
+if [ -L "$SHAPES_FILE" ] && [ ! -e "$SHAPES_FILE" ]; then
+  echo "error: ${SHAPES_FILE} is a symlink whose target is missing — repoint or remove it; refusing to write through a broken link" >&2
+  exit 1
+fi
+
 if [ -e "$SHAPES_FILE" ]; then
   if [ ! -r "$SHAPES_FILE" ] || [ ! -w "$SHAPES_FILE" ]; then
     echo "error: ${SHAPES_FILE} exists but is not both readable and writable — fix its permissions (chmod u+rw) before recording; refusing to treat it as absent" >&2

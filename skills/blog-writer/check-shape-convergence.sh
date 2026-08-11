@@ -87,6 +87,14 @@ emit() {
       skipped_newer_records: $skipped}'
 }
 
+# A dangling symlink is an existing-but-broken setup, not an absent history.
+# `-e` is false for one, so it would otherwise collapse into the empty case and
+# hide a real problem — the same distinction the unreadable case below draws.
+if [ -L "$SHAPES_FILE" ] && [ ! -e "$SHAPES_FILE" ]; then
+  echo "error: ${SHAPES_FILE} is a symlink whose target is missing — repoint or remove it; refusing to treat a broken link as an absent history" >&2
+  exit 1
+fi
+
 # An absent history file is the normal first-post state, not a failure.
 if [ ! -e "$SHAPES_FILE" ]; then
   emit false "no shape history at ${SHAPES_FILE} — audit 6 cannot fire until ${MIN_HISTORY} posts are recorded" 0 false '[]' 0
