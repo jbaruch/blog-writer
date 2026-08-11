@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.26 — 2026-08-11
+
 ### Added
 
 - **Anti-pattern #39, body-performance emotion** (#29) — a feeling delivered through the body or the room instead of named: "my stomach dropped", "the cursor blinked mockingly", "something shifted". This is the single largest human-AI gap measured in the StoryScope corpus (Russell et al. 2026, arXiv:2604.03136), which classified 61,608 stories using only discourse-level features: AI performs emotion through the body 81% of the time against 38% for humans, while humans name the feeling outright 29% against 8%. The pattern covers setting-as-mirror, sensory pile-on, the unnamed realization, and deferred naming, and carries a carve-out protecting factual physical detail — the one sock, the cat on the keyboard, the terminal output you actually saw — which is reportage and stays.
