@@ -435,8 +435,15 @@ ln -s "${CASE_DIR}/real/history.json" "${CASE_DIR}/link.json"
 run_case "writing through a valid symlink preserves the link" 0 \
   bash "$RECORD" "${CASE_DIR}/link.json" s 2025-06-01 a b c
 if [ -L "${CASE_DIR}/link.json" ]; then ok; else fail "symlink: the link was replaced by a regular file"; fi
-landed=$(jq -r '.posts[0].slug' "${CASE_DIR}/real/history.json" 2>/dev/null || echo MISSING)
-if [ "$landed" = "s" ]; then ok; else fail "symlink: the record did not land on the target, got '${landed}'"; fi
+# jq's own diagnostic stays visible: an unreadable or unparseable target after a
+# successful write is a real signal, not noise to collapse into a sentinel value.
+if ! landed=$(jq -r '.posts[0].slug' "${CASE_DIR}/real/history.json"); then
+  fail "symlink: the target history is missing or unparseable after writing through the link"
+elif [ "$landed" = "s" ]; then
+  ok
+else
+  fail "symlink: the record did not land on the target, got '${landed}'"
+fi
 strays=$(find "${CASE_DIR}" -name '*.staging.*' | wc -l | tr -d ' ')
 if [ "$strays" = "0" ]; then ok; else fail "symlink: ${strays} staging file(s) stranded"; fi
 
