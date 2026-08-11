@@ -31,6 +31,16 @@
 
 set -uo pipefail
 
+# Every case directory is created inside one suite-owned root, so a single EXIT
+# trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
+# status (`jbaruch/coding-policy: error-handling`).
+SUITE_TMP=$(mktemp -d)
+cleanup_suite_tmp() {
+  rm -rf "$SUITE_TMP"
+  return 0
+}
+trap cleanup_suite_tmp EXIT
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 readonly SCRIPT="${SCRIPT_DIR}/fetch-signs-of-ai-writing.sh"
 
@@ -87,7 +97,7 @@ run_case() {
   local body=$1; shift
 
   local tmp bin rc out err
-  tmp=$(mktemp -d)
+  tmp=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
   bin="${tmp}/bin"
   make_stub_bin "$bin"
 
@@ -210,7 +220,7 @@ if run_case "short body: 200 under the floor exits 1" 1 200 0 "too short"; then
 fi
 
 # 5. Explicit destination honoured
-dest_tmp=$(mktemp -d)
+dest_tmp=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 if run_case "explicit destination is honoured" 0 200 0 "$(long_body)" "${dest_tmp}/article.txt"; then
   if [ "$(jq -r '.path' <<<"$LAST_STDOUT")" != "${dest_tmp}/article.txt" ]; then
     fail "reported path is not the requested destination, got: ${LAST_STDOUT}"
@@ -227,7 +237,7 @@ fi
 rm -rf "$dest_tmp"
 
 # 6. JSON escaping regression — a quote in the path must not break the contract
-quote_tmp=$(mktemp -d)
+quote_tmp=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 weird_path="${quote_tmp}/we\"ird.txt"
 if run_case "json escaping: a quote in the path still yields valid JSON" 0 200 0 "$(long_body)" "$weird_path"; then
   if ! jq -e . >/dev/null 2>&1 <<<"$LAST_STDOUT"; then
@@ -246,7 +256,7 @@ fi
 rm -rf "$quote_tmp"
 
 # 6b. Atomicity — a failed fetch must not disturb an existing destination file.
-atomic_tmp=$(mktemp -d)
+atomic_tmp=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 printf 'original contents' > "${atomic_tmp}/existing.txt"
 if run_case "atomicity: a failed fetch leaves the destination untouched" 1 503 0 "$(long_body)" "${atomic_tmp}/existing.txt"; then
   if [ "$(cat "${atomic_tmp}/existing.txt")" != "original contents" ]; then
@@ -272,7 +282,7 @@ rm -rf "$atomic_tmp"
 # file. Both processes are then signalled, because bash defers a trapped signal
 # until its foreground child returns — killing only the script would leave it
 # blocked in the curl call with the TERM still pending.
-interrupt_tmp=$(mktemp -d)
+interrupt_tmp=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 mkfifo "${interrupt_tmp}/ready"
 mkfifo "${interrupt_tmp}/block"
 cat > "${interrupt_tmp}/curl" <<'SLOWSTUB'

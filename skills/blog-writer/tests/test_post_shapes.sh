@@ -45,6 +45,16 @@
 
 set -uo pipefail
 
+# Every case directory is created inside one suite-owned root, so a single EXIT
+# trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
+# status (`jbaruch/coding-policy: error-handling`).
+SUITE_TMP=$(mktemp -d)
+cleanup_suite_tmp() {
+  rm -rf "$SUITE_TMP"
+  return 0
+}
+trap cleanup_suite_tmp EXIT
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 readonly CHECK="${SCRIPT_DIR}/check-shape-convergence.sh"
 readonly RECORD="${SCRIPT_DIR}/record-post-shape.sh"
@@ -74,10 +84,10 @@ run_case() {
   echo "  ${name}"
   local err_file
   err_file=$(mktemp)
-  set +e
+  # The suite runs without errexit, so no save/restore is needed here. Enabling
+  # it would leave errexit on for every later case.
   CASE_OUT=$("$@" 2>"$err_file")
   CASE_RC=$?
-  set -e
   CASE_ERR=$(cat "$err_file")
   rm -f "$err_file"
 
@@ -90,7 +100,7 @@ run_case() {
 }
 
 new_dir() {
-  CASE_DIR=$(mktemp -d)
+  CASE_DIR=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 }
 
 # Builds a history file from a list of "opening|arc|closing" triples.

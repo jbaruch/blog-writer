@@ -261,9 +261,10 @@ script's decision contract — see its header. Route on the exit code:
 An unreadable or malformed history is not the same as an absent one, and the script reports
 them differently on purpose. Do not re-collapse them into "no history yet."
 
-Report what each audit found, including "nothing." An audit that fires on every post is
-miscalibrated, and applying all three at once builds the new cluster the audits exist to
-prevent.
+When an audit finds no issue, proceed silently. Report a `can_fire` of false, though — that
+says the audit could not run, which is different from running clean. An audit that fires on
+every post is miscalibrated, and applying all three at once builds the new cluster the
+audits exist to prevent.
 
 **Checkpoint:** Author approves the main idea, CTA, and structure outline.
 

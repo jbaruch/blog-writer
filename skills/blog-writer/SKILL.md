@@ -178,7 +178,7 @@ Exit 0 is authoritative, including a `can_fire` of false — report it and conti
 means the history exists but is unusable: report the script's diagnostic, continue without
 audit 6, and do not delete or overwrite the file. Exit 2 is a tool error — report and stop.
 
-If an audit finds nothing, say so and move on.
+If an audit finds no issue, proceed silently.
 
 Gate: the author approves the plan.
 

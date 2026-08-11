@@ -24,6 +24,16 @@
 
 set -uo pipefail
 
+# Every case directory is created inside one suite-owned root, so a single EXIT
+# trap removes them all. `return 0` keeps cleanup from rewriting the suite's exit
+# status (`jbaruch/coding-policy: error-handling`).
+SUITE_TMP=$(mktemp -d)
+cleanup_suite_tmp() {
+  rm -rf "$SUITE_TMP"
+  return 0
+}
+trap cleanup_suite_tmp EXIT
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 readonly SCRIPT="${SCRIPT_DIR}/setup-persona-dir.sh"
 
@@ -45,7 +55,7 @@ run_case() {
   local name=$1; shift
   local expect_rc=$1; shift
 
-  CASE_HOME=$(mktemp -d)
+  CASE_HOME=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
   local err_file="${CASE_HOME}.err"
 
   echo "  ${name}"
@@ -98,7 +108,7 @@ fi
 rm -rf "${CASE_HOME:?}"
 
 # 2. Custom target — symlink
-custom_root=$(mktemp -d)
+custom_root=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 custom_target="${custom_root}/persona"
 if run_case "custom target: links the canonical path to it" 0 "$custom_target"; then
   assert_json '.kind' symlink "kind"
@@ -137,9 +147,9 @@ fi
 rm -rf "${CASE_HOME:?}"
 
 # 4. Idempotence over a symlink — an established persona is never repointed
-first_root=$(mktemp -d)
+first_root=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 first_target="${first_root}/first"
-second_root=$(mktemp -d)
+second_root=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 second_target="${second_root}/second"
 if run_case "idempotent: an established symlink is not repointed" 0 "$first_target"; then
   rerun_in_case "$second_target"
@@ -164,7 +174,7 @@ fi
 rm -rf "${CASE_HOME:?}" "${first_root:?}" "${second_root:?}"
 
 # 5. Dangling symlink
-dangling_home=$(mktemp -d)
+dangling_home=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 mkdir -p "${dangling_home}/.claude"
 ln -s "${dangling_home}/nowhere" "${dangling_home}/.claude/blog-writer-persona"
 echo "  dangling symlink: exits 1 instead of replacing the author's link"
@@ -189,7 +199,7 @@ fi
 rm -rf "$dangling_home" "$dangle_err"
 
 # 6. Canonical path occupied by a regular file
-file_home=$(mktemp -d)
+file_home=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 mkdir -p "${file_home}/.claude"
 printf 'not a directory' > "${file_home}/.claude/blog-writer-persona"
 echo "  occupied by a file: exits 1"
@@ -250,7 +260,7 @@ rm -rf "${CASE_HOME:?}"
 
 # 7d. Probe over a symlinked persona reports `probed`, while a setup re-run over
 # the same persona reports `unchanged` — the two invocations stay distinguishable.
-symlink_root=$(mktemp -d)
+symlink_root=$(mktemp -d "${SUITE_TMP}/case.XXXXXX")
 symlink_target="${symlink_root}/persona"
 if run_case "probe: a symlinked persona reports probed, setup reports unchanged" 0 "$symlink_target"; then
   rerun_in_case --probe
