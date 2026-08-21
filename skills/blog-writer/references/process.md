@@ -410,19 +410,25 @@ when counting; a paired em-dash hides in a sentence you wrote yourself an hour a
 Run `sweep.py` over the draft. `SKILL.md` Step 10 carries the invocation and the exit-code
 routing — that is the only place they live. The script covers:
 
-- **Fragment chains (#3, #4)** — sentences under six words, flagged at 3+ consecutive.
-- **Parenthetical em-dashes (#7)** — every paired ` — X — `. Each occurrence is a flag
-  regardless of count. This is a usage check, not a density check, so a passing #8 count
-  never clears it. Fix by converting to parentheses, restructuring the sentence, or
-  promoting the aside to its own clause.
-- **Em-dash density (#8)** — the per-section count. The density check only; individual
-  paired em-dashes are #7's job, and a section that passes the count can still carry one.
-- **Low burstiness (#14)** — runs of consecutive sentences whose lengths sit close
+- **Fragment chains (#3, #4)** — a run of consecutive very short sentences. Fold them back
+  into the surrounding prose, or give one of them real content.
+- **Parenthetical em-dashes (#7)** — an aside fenced by a pair of em-dashes. A usage check,
+  not a density check, so a passing #8 count never clears it. Convert to parentheses,
+  restructure the sentence, or promote the aside to its own clause.
+- **Em-dash density (#8)** — too many em-dashes in one section. The density check only;
+  individual paired em-dashes are #7's job, and a section that passes the count can still
+  carry one.
+- **Low burstiness (#14)** — a run of consecutive sentences whose lengths sit too close
   together. The fix is genuine variety — a mix of short, medium, and long sentences — not
   merging everything into one compound sentence, which trades seven monotone beats for one
   run-on.
 - **Unicode giveaways (#18)** — curly quotes, ellipsis and bullet characters, en dashes,
-  non-breaking spaces.
+  non-breaking spaces, where the ASCII form is what belongs in the file.
+
+What counts as "very short", "too many", and "too close" is the script's call, not yours to
+re-derive: the figures are the named constants under "Decision contract" at the top of
+`skills/blog-writer/sweep.py`. The patterns those constants implement are defined in
+`references/ai-anti-patterns.md`.
 
 Do not reproduce these counts by reading, and do not report them as checked without having
 run the script. Re-run it after every rewrite: a clean draft plus one edit is an unchecked

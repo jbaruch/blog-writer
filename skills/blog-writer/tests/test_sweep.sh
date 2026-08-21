@@ -16,7 +16,8 @@
 #   7. #18 unicode giveaways — an opening and closing curly quote report as one
 #      finding with the combined count, not as two identical lines.
 #   8. Markdown exclusions — fenced code, frontmatter, HTML comments, headings
-#      and asset placeholders do not contribute hits.
+#      and asset placeholders do not contribute hits, for #18 as well as for the
+#      sentence sweeps, with a control proving the sweep still fires in prose.
 #   9. Abbreviation guard — "e.g." does not end a sentence, so it cannot
 #      manufacture a fragment chain.
 #  10. --json — valid JSON carrying each hit's pattern, line, and detail.
@@ -285,6 +286,60 @@ The body itself is ordinary prose that carries no findings of any kind at all.' 
     'We pinned the usual suspects, e.g. the linter, e.g. the formatter, e.g. the
 test runner, and the build finally went quiet for the first time in weeks.' \
     0 no "fragment chain"
+
+  # Regression: a digit guard on the sentence splitter merged two real
+  # sentences when one ended and the next began with a number, which suppressed
+  # exactly the fragment-chain and burstiness findings the script exists for.
+  assert_sweep "adjacent numeric sentences still split" \
+    'It failed at 4. 3 people knew. Nobody cared. Then the pager went off at three.' \
+    1 yes "fragment chain"
+
+  # Regression: #18 read the raw file, so it reported characters inside regions
+  # the parser excludes for every other sweep.
+  assert_sweep "#18 ignores unicode inside fenced code" \
+    '# Title
+
+```text
+Bullet • and “curly quotes” and an en–dash live in this sample output.
+```
+
+The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
+    0 no "unicode giveaway"
+
+  assert_sweep "#18 ignores unicode inside an HTML comment" \
+    '# Title
+
+<!-- VERIFY: reconstructed, the “quoted” bit is uncertain -->
+
+The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
+    0 no "unicode giveaway"
+
+  assert_sweep "#18 ignores unicode inside frontmatter" \
+    '---
+title: A “quoted” title
+---
+
+The body itself carries nothing wrong at all, so the sweep must stay quiet.' \
+    0 no "unicode giveaway"
+
+  assert_sweep "#18 ignores unicode inside an asset placeholder" \
+    '[Screenshot 01: the “dashboard” view]
+
+The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
+    0 no "unicode giveaway"
+
+  # Control for the four above: the same character in prose is still a finding,
+  # so the exclusions narrow the input rather than disabling the sweep.
+  assert_sweep "#18 still fires on unicode in the prose itself" \
+    'The prose carries a “curly quote” that genuinely sits in the sentence.' \
+    1 yes "unicode giveaway"
+
+  # #18 covers headings and list items, since the reader sees them.
+  assert_sweep "#18 covers a heading" \
+    '## A “quoted” heading
+
+The prose itself carries nothing else wrong at all in any way whatsoever.' \
+    1 yes "unicode giveaway"
 
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.

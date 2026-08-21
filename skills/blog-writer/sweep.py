@@ -151,12 +151,13 @@ def split_sentences(text):
         if last_token in ABBREVIATIONS:
             continue
 
-        # "v1.2" / "0.3%" / "Section 4. " — a period between digits, or a lone
-        # initial, is not a terminator.
-        before = text[match.start(1) - 1] if match.start(1) > 0 else ""
-        after = text[match.end(3) : match.end(3) + 1]
-        if match.group(1) == "." and before.isdigit() and after.isdigit():
-            continue
+        # A lone capital before the period is an initial ("J. R. R. Tolkien"),
+        # not a terminator. There is deliberately no digit guard here: the
+        # pattern above requires whitespace after the period, so a decimal
+        # ("v1.2", "0.3%") never matches in the first place, while "It failed at
+        # 4. 3 people knew." is two real sentences that a digit guard would
+        # merge — suppressing exactly the fragment-chain and burstiness findings
+        # this script exists to catch.
         if re.search(r"\b[A-Z]\.$", head):
             continue
 
@@ -203,12 +204,18 @@ def count_words(sentence):
 
 
 class Block:
-    """One markdown block, with the source line it starts on."""
+    """One markdown block, with the source lines it was built from.
 
-    def __init__(self, kind, line, text):
+    `numbered` keeps each surviving source line paired with its 1-indexed
+    number, so a sweep that reports per line (#18) can point at the real line
+    while still seeing only content the parser did not exclude.
+    """
+
+    def __init__(self, kind, line, text, numbered=None):
         self.kind = kind
         self.line = line
         self.text = text
+        self.numbered = numbered if numbered is not None else [(line, text)]
 
 
 def parse(raw):
@@ -249,9 +256,10 @@ def parse(raw):
         nonlocal pending, pending_line
         if not pending:
             return
-        text = "\n".join(pending).strip()
+        text = "\n".join(line for _, line in pending).strip()
         if text:
-            blocks.append(Block(classify(pending), pending_line, text))
+            raw_lines = [line for _, line in pending]
+            blocks.append(Block(classify(raw_lines), pending_line, text, list(pending)))
         pending = []
 
     def classify(group):
@@ -281,11 +289,11 @@ def parse(raw):
         # A heading always stands alone, even when not blank-line separated.
         if _HEADING.match(line):
             flush()
-            blocks.append(Block("heading", index, line.strip()))
+            blocks.append(Block("heading", index, line.strip(), [(index, line)]))
             continue
         if not pending:
             pending_line = index
-        pending.append(line)
+        pending.append((index, line))
     flush()
 
     sections = []
@@ -453,27 +461,34 @@ def sweep_burstiness(blocks):
     return hits
 
 
-def sweep_unicode(raw):
-    """#18 — characters that mark the text as machine-set."""
+def sweep_unicode(blocks):
+    """#18 — characters that mark the text as machine-set.
+
+    Runs over parsed blocks rather than the raw file, so the exclusions
+    `parse()` documents hold here too: a bullet character inside a fenced code
+    block, a curly quote in a `<!-- VERIFY -->` marker, or an en dash in the
+    frontmatter is not a tell in the prose. Headings and lists are included,
+    since the reader sees them; asset placeholders are not.
+    """
+    eligible = [
+        (number, text)
+        for block in blocks
+        if block.kind != "placeholder"
+        for number, text in block.numbered
+    ]
+
     hits = []
-    lines = raw.split("\n")
     for description, chars in UNICODE_GIVEAWAYS:
-        total = sum(raw.count(char) for char in chars)
+        total = sum(text.count(char) for _, text in eligible for char in chars)
         if not total:
             continue
-        first = next(
-            i
-            for i, line in enumerate(lines, start=1)
-            if any(char in line for char in chars)
+        number, text = next(
+            (number, text)
+            for number, text in eligible
+            if any(char in text for char in chars)
         )
         hits.append(
-            hit(
-                "#18",
-                "unicode giveaway",
-                first,
-                f"{description} x{total}",
-                lines[first - 1],
-            )
+            hit("#18", "unicode giveaway", number, f"{description} x{total}", text)
         )
     return hits
 
@@ -485,7 +500,7 @@ def run_sweeps(raw):
     hits += sweep_paired_emdash(blocks)
     hits += sweep_emdash_density(sections)
     hits += sweep_burstiness(blocks)
-    hits += sweep_unicode(raw)
+    hits += sweep_unicode(blocks)
     hits.sort(key=lambda h: (h["line"], h["pattern"]))
     return hits
 

@@ -237,8 +237,8 @@ a script, never by reading. Run it over the draft:
 Route on the exit code:
 
 - **Exit 0** — no hits in the counting sweeps. This is not a clean draft: the script
-  examines 6 of the 39 patterns and reports which. Continue with the contextual read for
-  the rest.
+  examines a subset of the 39 patterns and names both halves in its own output. Continue
+  with the contextual read for the rest.
 - **Exit 1** — hits found. Every predicate in the script is arithmetic, so each hit is a
   finding, not a candidate to weigh. Fix them all, then re-run until it exits 0.
 - **Exit 2** — a tool or usage error. Report the script's stderr diagnostic to the author
