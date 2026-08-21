@@ -17,9 +17,11 @@ kinds of work. This script owns one of them.
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script therefore covers 5 of the 39 patterns, and says so on every run.
-A bare "clean" is never printed: silence about coverage is what lets a passing
-script displace the contextual read it never performed.
+This script therefore covers 6 of the 39 patterns across 5 sweeps (#3 and #4
+share the fragment-chain sweep), and says so on every run.
+Every result carries its coverage, including a result with no findings: silence
+about coverage is what lets a passing script displace the contextual read it
+never performed.
 
 Usage:
     sweep.py <draft.md>
@@ -41,7 +43,7 @@ Output (stdout):
     "the counting half passed".
 
 Exit codes:
-    0  swept, no hits in the counting sweeps. NOT "the draft is clean" — 34 of
+    0  swept, no hits in the counting sweeps. NOT "the draft is clean" — 33 of
        the 39 patterns were not examined by this script.
     1  swept, at least one hit. Each is a real finding: every predicate here is
        arithmetic, so there is no judgment call left for the caller to make.

@@ -402,7 +402,8 @@ halves fail. Keep them apart.
 
 #### The counting half — the script does this, not you
 
-Five patterns have a verdict that falls out of an arithmetic result: word counts per
+Six patterns, across five sweeps, have a verdict that falls out of an arithmetic
+result: word counts per
 sentence, occurrences per section, character presence, runs and windows. Reading for them
 does not work. Uniform sentence length is invisible when reading for content and obvious
 when counting; a paired em-dash hides in a sentence you wrote yourself an hour ago.
@@ -441,7 +442,7 @@ its silence about them is not a pass.
 
 #### The judging half — no script does this, you do
 
-For the six below the string match is the trivial part and the call is the work. Search
+For the seven below the string match is the trivial part and the call is the work. Search
 literally where a watchlist is named, then read every hit and decide. A hit is a candidate,
 not a finding.
 

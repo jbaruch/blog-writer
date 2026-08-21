@@ -51,9 +51,9 @@ length is invisible when you read for content and obvious when you count. Those 
 a script (`sweep.py`) over the draft, which reports the patterns it did not examine on
 every run, so a passing sweep can never be mistaken for a passing check.
 
-The rest stay with the model, because their check is a reading and not a match: whether
-deleting a filler word changes the meaning, whether a product claim still works with a
-competitor's name in it, whether two phrases in different sections name the same concept.
+The rest stay with the model. Their check is a reading, not a match: whether deleting a
+filler word changes the meaning, whether a product claim still works with a competitor's
+name in it, whether two phrases in different sections name the same concept.
 
 Every rewrite is re-audited against all 39 patterns before it's considered fixed,
 including the script, which is re-run after every edit.

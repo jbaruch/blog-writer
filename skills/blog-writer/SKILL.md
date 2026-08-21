@@ -249,8 +249,8 @@ Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` 
 
 Re-run it after every rewrite, including the rewrites made to fix its own findings and
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
-the sweep as clean without having run it, and never report the draft as clean because the
-sweep was — the patterns it does not examine are listed in its own output.
+the sweep as clean without having run it. Never report the draft as clean from this sweep;
+the patterns it does not examine are listed in `.coverage.not_run_judgment`.
 `references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
 you read for.
 
