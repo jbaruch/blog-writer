@@ -216,7 +216,7 @@ anti-pattern, structural, accuracy, and tightening checks.
 `skills/blog-writer/references/process.md` Phase 3 has the writing rules, the placeholder
 conventions, and the check procedure.
 
-Three rules bind this step and Step 11:
+Four rules bind this step and Step 11:
 
 **Persona adherence.** Re-read `persona/voice.md` before every writing action — before this
 draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. At
@@ -226,6 +226,30 @@ the profile; if you can't, read it again.
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
 procedure in order, and never invent a pattern the file does not define.
+
+**Mechanical sweep adherence.** The counting half of the Pass 1 anti-pattern check runs as
+a script, never by reading. Run it over the draft:
+
+```bash
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
+```
+
+Route on the exit code:
+
+- **Exit 0** — no hits in the counting sweeps. This is not a clean draft: the script
+  examines 6 of the 39 patterns and reports which. Continue with the contextual read for
+  the rest.
+- **Exit 1** — hits found. Every predicate in the script is arithmetic, so each hit is a
+  finding, not a candidate to weigh. Fix them all, then re-run until it exits 0.
+- **Exit 2** — a tool or usage error. Report the script's stderr diagnostic to the author
+  and do not claim the sweep ran.
+
+Re-run it after every rewrite, including the rewrites made to fix its own findings and
+those from any other check. A clean draft plus one edit is an unchecked draft. Never report
+the sweep as clean without having run it, and never report the draft as clean because the
+sweep was — the patterns it does not examine are listed in its own output.
+`references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
+you read for.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from
 `skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern

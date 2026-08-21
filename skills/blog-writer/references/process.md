@@ -395,61 +395,94 @@ Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md`
 the draft:
 
 **Pass 1 — Surface scan:** Read the draft against each of the 39 patterns, looking for
-the forms described in the examples and structural variants. For the following patterns,
-do a dedicated mechanical sweep instead of relying on contextual reading alone:
+the forms described in the examples and structural variants.
+
+Pass 1 is two different jobs, and running either one as if it were the other is how both
+halves fail. Keep them apart.
+
+#### The counting half — the script does this, not you
+
+Five patterns have a verdict that falls out of an arithmetic result: word counts per
+sentence, occurrences per section, character presence, runs and windows. Reading for them
+does not work. Uniform sentence length is invisible when reading for content and obvious
+when counting; a paired em-dash hides in a sentence you wrote yourself an hour ago.
+
+Run `sweep.py` over the draft. `SKILL.md` Step 10 carries the invocation and the exit-code
+routing — that is the only place they live. The script covers:
+
+- **Fragment chains (#3, #4)** — sentences under six words, flagged at 3+ consecutive.
+- **Parenthetical em-dashes (#7)** — every paired ` — X — `. Each occurrence is a flag
+  regardless of count. This is a usage check, not a density check, so a passing #8 count
+  never clears it. Fix by converting to parentheses, restructuring the sentence, or
+  promoting the aside to its own clause.
+- **Em-dash density (#8)** — the per-section count. The density check only; individual
+  paired em-dashes are #7's job, and a section that passes the count can still carry one.
+- **Low burstiness (#14)** — runs of consecutive sentences whose lengths sit close
+  together. The fix is genuine variety — a mix of short, medium, and long sentences — not
+  merging everything into one compound sentence, which trades seven monotone beats for one
+  run-on.
+- **Unicode giveaways (#18)** — curly quotes, ellipsis and bullet characters, en dashes,
+  non-breaking spaces.
+
+Do not reproduce these counts by reading, and do not report them as checked without having
+run the script. Re-run it after every rewrite: a clean draft plus one edit is an unchecked
+draft, and the most common way a tell ships is being introduced by the fix for something
+else.
+
+**A clean sweep is not a clean draft.** The script examines 6 of the 39 patterns and says
+so on every run. It cannot report on the other 33, and its silence about them is not a
+pass.
+
+#### The judging half — no script does this, you do
+
+For the six below the string match is the trivial part and the call is the work. Search
+literally where a watchlist is named, then read every hit and decide. A hit is a candidate,
+not a finding.
 
 - **Contrastive negation (#1):** Do a literal, case-insensitive search for "rather than".
-  Every hit that joins two candidates for the same slot is pattern #1 wearing a
-  comparative — the negation-then-affirmation is intact, with "rather than" doing the work
-  of "not". Case matters: "Rather than X, Y" fronts the construction at the start of a
-  sentence, and a case-sensitive search silently misses every one of them. The "Not X. Y."
-  form announces itself on a contextual read; this one doesn't, which is exactly why it
-  needs the literal search.
-- **Fragments (#3, #4):** Find every sentence under six words in the draft and check
-  whether 3+ appear consecutively. Surrounding sentences can make fragments feel embedded
-  when they're actually standalone. Count periods, not vibes.
-- **Parenthetical em-dashes (#7):** Find every paired em-dash (` — X — `) in the draft.
-  Each occurrence is a flag regardless of count. Convert to parentheses, restructure the
-  sentence, or promote the aside to its own clause. This is a usage check, not a density
-  check — a single pair is still a hit, so don't let a passing #8 count clear it.
-- **Em-dashes (#8):** Count em-dashes per section. More than two in a section is a flag.
-  Don't judge whether each em-dash is "justified" — just count them first. This is the
-  density check only; individual paired em-dashes are #7's job above, and a section that
-  passes the count can still carry a #7 violation.
-- **AI vocabulary (#12):** Scan the draft for the watchlist words (delve, leverage, tapestry,
-  landscape, pivotal, crucial, seamless, etc.). One in a post is fine. Two or more is a
-  contamination event. Do a literal word search, not a vibe read — these words hide in
-  otherwise clean paragraphs.
-- **Low burstiness (#14):** Count the word length of each sentence in every paragraph. Flag
-  any run of 3+ consecutive sentences within 5 words of each other in length. Uniform
-  sentence length is invisible when reading for content but obvious when counting. The fix
-  is genuine variety — a mix of short, medium, and long sentences — not merging everything
-  into one compound sentence, which just trades seven monotone beats for one run-on.
-- **Synonym cycling (#17):** After the surface scan, build a term inventory: list every
-  noun phrase used for each core concept in the post. If any concept has more than one
-  name, flag it. Cross-section cycling (one term in the intro, a different one in the
-  conclusion) is the most common miss.
-- **Stacked data points (#32):** Find every sentence or passage with two or more statistics.
-  Count how many of those numbers describe the same change. If two or more data points
-  make the same point (e.g., a raw number AND a percentage AND a time savings), keep the
-  strongest one and cut the rest.
+  Case matters: "Rather than X, Y" fronts the construction at the start of a sentence, and
+  a case-sensitive search silently misses every one of them. Then judge each hit — it is
+  pattern #1 only when the two sides are candidates for the same slot, with the negation
+  doing the work of "not". The "Not X. Y." form announces itself on a contextual read; this
+  one does not, which is why it needs the literal search first and the judgment second.
+- **Introductory filler words (#10):** Search for the watchlist words from the
+  "introductory filler words" variant in pattern #10: "of course", "naturally", "obviously",
+  "clearly", "certainly", "indeed", "in fact", "honestly", "frankly", "additionally",
+  "furthermore", "moreover", "first of all", "that said", "that being said", "needless to
+  say". For each hit, apply the delete test: remove the word and re-read the sentence. If
+  the meaning is unchanged, delete. If it is not, the word is doing real grammatical work
+  and stays. No script can run that test. These accumulate invisibly — one per paragraph is
+  death by a thousand cuts.
+- **AI vocabulary (#12):** Scan for the watchlist words (delve, leverage, tapestry,
+  landscape, pivotal, crucial, seamless, and the rest). One in a post is fine. Two or more
+  is a contamination event. Read the qualifiers in the watchlist rather than matching the
+  bare word: "highlight" is listed as a verb, "navigate" in its abstract sense, "rich" and
+  "key" only when figurative. In a technical post the literal senses are ordinary English
+  and are not hits, which is exactly the distinction a string match cannot make.
+- **Synonym cycling (#17):** Build a term inventory: list every noun phrase used for each
+  core concept in the post. If any concept has more than one name, flag it. Cross-section
+  cycling — one term in the intro, a different one in the conclusion — is the most common
+  miss. Deciding that two phrases denote one concept is the whole check.
+- **Stacked data points (#32):** Find every sentence or passage with two or more
+  statistics. Count how many of those numbers describe the same change. If two or more data
+  points make the same point (a raw number AND a percentage AND a time savings), keep the
+  strongest one and cut the rest. Whether two numbers make one point is a reading, not a
+  count.
 - **Temporal filler (#35):** Scan for the watchlist phrases ("In today's", "Now more than
   ever", "In the age of", "In the current", "As [X] continues to evolve", "In an
-  increasingly"). These hide in opening sentences and topic transitions. If the temporal
-  phrase can be deleted without changing the meaning, delete it. If the sentence collapses
-  without it, the sentence had no content — replace with a specific fact.
-- **Corporate cliché phrases (#36):** After the surface scan, check whether any product or
-  tool description uses composite corporate phrases ("end-to-end solution", "trusted by
-  industry leaders", "passionate team", "drives business value"). Apply the
-  interchangeability test: swap the product name for a competitor's. If the sentence still
-  works, it's a cliché — replace with a specific fact.
-- **Introductory filler words (#10):** Scan for the watchlist words from the "introductory
-  filler words" variant in pattern #10: "of course", "naturally", "obviously", "clearly",
-  "certainly", "indeed", "in fact", "honestly", "frankly", "additionally", "furthermore",
-  "moreover", "first of all", "that said", "that being said", "needless to say". For each
-  hit, apply the delete test: remove the word and re-read the sentence. If the meaning is
-  unchanged, delete. These accumulate invisibly — one per paragraph is death by a thousand
-  cuts.
+  increasingly"). These hide in opening sentences and topic transitions. Apply the delete
+  test: if the phrase can be deleted without changing the meaning, delete it. If the
+  sentence collapses without it, the sentence had no content — replace it with a specific
+  fact.
+- **Corporate cliché phrases (#36):** Check whether any product or tool description uses
+  composite corporate phrases ("end-to-end solution", "trusted by industry leaders",
+  "passionate team", "drives business value"). Apply the interchangeability test: swap the
+  product name for a competitor's. If the sentence still works, it is a cliché — replace it
+  with a specific fact.
+
+The remaining patterns in `references/ai-anti-patterns.md` get the contextual read this
+pass is named for. The script's silence is not a verdict on them, and neither is a clean
+result on the seven above.
 
 **Craft sweep (between Pass 1 and Pass 2):** Check the draft against `references/tone-guide.md`
 section "Sentence & Paragraph Craft":
