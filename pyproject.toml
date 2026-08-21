@@ -1,0 +1,16 @@
+# Tool configuration only. The repo ships no Python package and
+# skills/blog-writer/sweep.py imports nothing outside the standard library, so
+# there is no dependency table to declare here.
+#
+# Pinning the target version is what makes the gate in .github/lint-python.sh
+# reproducible: without it ruff and pyright each assume a version from the
+# runner, and a finding could appear or vanish with the image rather than with
+# the code.
+
+[tool.ruff]
+target-version = "py39"
+line-length = 88
+
+[tool.pyright]
+pythonVersion = "3.9"
+typeCheckingMode = "standard"

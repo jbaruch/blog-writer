@@ -59,23 +59,50 @@ jobs:
           tar -x -J -f /tmp/shellcheck.tar.xz -C /tmp
           sudo install -m 0755 "/tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
 
+      # The Python gate's engines, per language-diagnostics (pyright is the
+      # engine that rule names for Python) and code-formatting (ruff runs the
+      # format check and the lint). Both come from their package managers at a
+      # pinned version, which ubuntu-latest preinstalls — pipx keeps ruff out of
+      # the runner's externally-managed system Python.
+      #
+      # Renewal cadence for RUFF_VERSION and PYRIGHT_VERSION: reviewed on the
+      # first Monday of each quarter, alongside SHELLCHECK_VERSION above,
+      # against https://github.com/astral-sh/ruff/releases and
+      # https://github.com/microsoft/pyright/releases. No scanner tracks a
+      # version embedded in a workflow step, so this cadence is the renewal
+      # mechanism dependency-management Freshness requires.
+      - name: Install Python gate tooling
+        env:
+          RUFF_VERSION: 0.9.5
+          PYRIGHT_VERSION: 1.1.408
+        run: |
+          set -euo pipefail
+          pipx install "ruff==${RUFF_VERSION}"
+          npm install --global "pyright@${PYRIGHT_VERSION}"
+
       # A tool that failed to install must stop the run here rather than surface
       # later as a confusing gate failure.
       - name: Verify the tooling is usable
         run: |
           set -euo pipefail
-          for tool in shellcheck jq curl; do
+          for tool in shellcheck jq curl ruff pyright python3; do
             if ! command -v "$tool" >/dev/null; then
-              echo "error: ${tool} is not on PATH after the install step — the shell gates need it" >&2
+              echo "error: ${tool} is not on PATH after the install step — the gates need it" >&2
               exit 1
             fi
           done
           shellcheck --version
+          ruff --version
+          pyright --version
+          python3 --version
 
       # Diagnostics at zero findings before the tests run, per
       # language-diagnostics and code-formatting. Same command locally.
       - name: Lint shell scripts
         run: bash .github/lint-shell.sh
+
+      - name: Lint Python scripts
+        run: bash .github/lint-python.sh
 
       - name: Run script test suites
         run: bash .github/run-script-tests.sh
