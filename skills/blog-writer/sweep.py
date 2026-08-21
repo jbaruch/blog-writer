@@ -22,21 +22,23 @@ A bare "clean" is never printed: silence about coverage is what lets a passing
 script displace the contextual read it never performed.
 
 Usage:
-    sweep.py <draft.md> [--json]
+    sweep.py <draft.md>
 
 Input:
-    $1        path to the draft. Markdown is parsed, not treated as flat text —
-              see "What is excluded" below.
-    --json    emit the structured result instead of the readable report.
+    $1  path to the draft. Markdown is parsed, not treated as flat text — see
+        "What is excluded" in parse().
 
 Output (stdout):
-    Default, a readable report: one line per hit with its source line, then the
-    coverage statement naming what ran and what did not.
+    A single JSON object (`script-delegation` Script Requirements):
+      {"ok": true, "path": "<file>", "hits": [ ... ], "coverage": { ... }}
 
-    With --json, a single object:
-      {"ok": true, "path": "<file>", "hits": [ ... ], "ran": [...],
-       "not_run": [...], "patterns_total": 39}
-    Each hit carries {"pattern", "label", "line", "detail", "context"}.
+    Each hit carries {"pattern", "label", "line", "detail", "context"}, where
+    `line` is the 1-indexed line of the sentence the finding sits in.
+
+    `coverage` carries {"ran", "not_run_judgment", "patterns_examined",
+    "patterns_total", "note"}. It is present on every run, including a run with
+    no hits, because an empty `hits` reads as "the check passed" when it means
+    "the counting half passed".
 
 Exit codes:
     0  swept, no hits in the counting sweeps. NOT "the draft is clean" — 34 of
@@ -100,6 +102,9 @@ UNICODE_GIVEAWAYS = [
 # avoid is a clean report displacing the read it never performed.
 
 PATTERNS_TOTAL = 39
+
+# Six, not five: #3 and #4 are two patterns sharing one fragment-chain sweep.
+PATTERNS_EXAMINED = 6
 
 COUNTING_SWEEPS = [
     ("#3/#4", "fragment chains"),
@@ -174,8 +179,6 @@ def split_sentences(text):
 
 # --- Markdown handling -------------------------------------------------------
 
-_FRONTMATTER = re.compile(r"\A---\n.*?\n---\n", re.DOTALL)
-_HTML_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 _PLACEHOLDER = re.compile(
     r"\[(?:Screenshot|Code|Link|Fact|Diagram)\s+\d+:[^\]]*\]", re.IGNORECASE
 )
@@ -218,6 +221,88 @@ class Block:
         self.numbered = numbered if numbered is not None else [(line, text)]
 
 
+def classify(group):
+    """Name the kind of a block from its lines."""
+    first = group[0]
+    if _HEADING.match(first):
+        return "heading"
+    if any(_LIST_ITEM.match(line) for line in group):
+        return "list"
+    if _TABLE_ROW.match(first):
+        return "list"
+    if _BLOCKQUOTE.match(first):
+        return "quote"
+    if _PLACEHOLDER.fullmatch(first.strip()):
+        return "placeholder"
+    return "prose"
+
+
+def read_lines(source):
+    """Label every source line content, blank, or transparent.
+
+    Three roles rather than two, because deleting excluded text is not safe in
+    either direction. Deleting it outright collapses its newlines, which shifts
+    the reported line of every later finding and can concatenate the prose on
+    either side onto one line. Blanking it preserves the numbering but turns a
+    multi-line comment into a paragraph break, which splits a paragraph the
+    author wrote as one and can lose a fragment-chain or burstiness finding
+    entirely — the failure this script exists to prevent.
+
+    A transparent line therefore holds its number without being either content
+    or a separator: block assembly skips it and does not flush on it.
+    """
+    records = []
+    in_fence = False
+    in_comment = False
+    in_frontmatter = bool(source) and source[0].strip() == "---"
+
+    for index, line in enumerate(source, start=1):
+        if in_frontmatter:
+            if index > 1 and line.strip() == "---":
+                in_frontmatter = False
+            records.append((index, "", "transparent"))
+            continue
+
+        was_blank = not line.strip()
+
+        if in_comment:
+            close = line.find("-->")
+            if close < 0:
+                records.append((index, "", "transparent"))
+                continue
+            in_comment = False
+            line = line[close + 3 :]
+
+        while True:
+            start = line.find("<!--")
+            if start < 0:
+                break
+            close = line.find("-->", start)
+            if close < 0:
+                line = line[:start]
+                in_comment = True
+                break
+            line = line[:start] + line[close + 3 :]
+
+        if _FENCE.match(line):
+            in_fence = not in_fence
+            records.append((index, "", "transparent"))
+            continue
+        if in_fence:
+            records.append((index, "", "transparent"))
+            continue
+
+        if not line.strip():
+            # A line the author left empty separates paragraphs; a line left
+            # empty by removing a comment does not.
+            records.append((index, "", "blank" if was_blank else "transparent"))
+            continue
+
+        records.append((index, line, "content"))
+
+    return records
+
+
 def parse(raw):
     """Split a draft into blocks and sections.
 
@@ -226,10 +311,11 @@ def parse(raw):
 
       fenced code, frontmatter, HTML comments
           not prose. `<!-- VERIFY: ... -->` markers and ```d2 diagram sources
-          are draft machinery per `process.md` placeholder conventions.
+          are draft machinery per `process.md` placeholder conventions. They are
+          made transparent rather than deleted — see read_lines().
       headings
           not sentences. Counting them inflates the short-sentence runs #3/#4
-          looks for.
+          looks for. They are still swept for #18, which the reader sees.
       list items and table rows (for #3/#4 and #14 only)
           a list of five three-word items is a list, not a fragment chain, and
           parallel list items are supposed to be uniform in length. Flagging
@@ -243,12 +329,7 @@ def parse(raw):
     delimited by markdown headings; text before the first heading forms an
     implicit leading section so a heading-less draft is still swept.
     """
-    raw = _FRONTMATTER.sub("", raw)
-    raw = _HTML_COMMENT.sub("", raw)
-
-    lines = raw.split("\n")
     blocks = []
-    in_fence = False
     pending = []
     pending_line = 0
 
@@ -262,38 +343,19 @@ def parse(raw):
             blocks.append(Block(classify(raw_lines), pending_line, text, list(pending)))
         pending = []
 
-    def classify(group):
-        first = group[0]
-        if _HEADING.match(first):
-            return "heading"
-        if any(_LIST_ITEM.match(line) for line in group):
-            return "list"
-        if _TABLE_ROW.match(first):
-            return "list"
-        if _BLOCKQUOTE.match(first):
-            return "quote"
-        if _PLACEHOLDER.fullmatch(first.strip()):
-            return "placeholder"
-        return "prose"
-
-    for index, line in enumerate(lines, start=1):
-        if _FENCE.match(line):
-            flush()
-            in_fence = not in_fence
+    for index, text, role in read_lines(raw.split("\n")):
+        if role == "transparent":
             continue
-        if in_fence:
-            continue
-        if not line.strip():
+        if role == "blank":
             flush()
             continue
-        # A heading always stands alone, even when not blank-line separated.
-        if _HEADING.match(line):
+        if _HEADING.match(text):
             flush()
-            blocks.append(Block("heading", index, line.strip(), [(index, line)]))
+            blocks.append(Block("heading", index, text.strip(), [(index, text)]))
             continue
         if not pending:
             pending_line = index
-        pending.append((index, line))
+        pending.append((index, text))
     flush()
 
     sections = []
@@ -317,21 +379,40 @@ def parse(raw):
 
 
 def sentence_units(block):
-    """Yield the units a sentence-level sweep may look inside.
+    """Yield (source line, sentence) for every sentence a sweep may look inside.
 
     A prose paragraph is one unit wrapped across source lines, so it is
-    sentence-split whole. A list or table is a set of independent items that
-    happen to be adjacent, so each line is split separately — otherwise the
-    trailing em-dash of one item pairs with the leading em-dash of the next and
-    reports an aside that does not exist.
+    sentence-split whole and each sentence is mapped back to the line it starts
+    on. A list or table is a set of independent items that happen to be
+    adjacent, so each line is split separately — otherwise the trailing em-dash
+    of one item pairs with the leading em-dash of the next and reports an aside
+    that does not exist.
     """
     if block.kind in ("list", "quote"):
-        sources = [line for line in block.text.split("\n") if line.strip()]
-    else:
-        sources = [block.text]
-    for source in sources:
-        for sentence in split_sentences(source):
-            yield sentence
+        for number, text in block.numbered:
+            for sentence in split_sentences(text):
+                yield number, sentence
+        return
+
+    starts = []
+    cursor = 0
+    for number, text in block.numbered:
+        starts.append((cursor, number))
+        cursor += len(text) + 1
+    whole = "\n".join(text for _, text in block.numbered)
+
+    searched = 0
+    for sentence in split_sentences(whole):
+        found = whole.find(sentence, searched)
+        if found < 0:
+            found = searched
+        searched = found + len(sentence)
+        number = starts[0][1] if starts else block.line
+        for start, candidate in starts:
+            if start > found:
+                break
+            number = candidate
+        yield number, sentence
 
 
 def hit(pattern, label, line, detail, context=""):
@@ -345,40 +426,34 @@ def hit(pattern, label, line, detail, context=""):
 
 
 def sweep_fragments(blocks):
-    """#3/#4 — 3+ consecutive sentences under six words in one paragraph."""
+    """#3/#4 — a run of consecutive short sentences in one paragraph."""
     hits = []
     for block in blocks:
         if block.kind != "prose":
             continue
-        sentences = split_sentences(block.text)
-        run = []
-        for sentence in sentences:
-            if count_words(sentence) < FRAGMENT_MAX_WORDS:
-                run.append(sentence)
-                continue
-            if len(run) >= FRAGMENT_RUN:
-                hits.append(
-                    hit(
-                        "#3/#4",
-                        "fragment chain",
-                        block.line,
-                        f"{len(run)} consecutive sentences under "
-                        f"{FRAGMENT_MAX_WORDS} words",
-                        " ".join(run),
-                    )
-                )
-            run = []
-        if len(run) >= FRAGMENT_RUN:
+
+        def flag(run):
             hits.append(
                 hit(
                     "#3/#4",
                     "fragment chain",
-                    block.line,
+                    run[0][0],
                     f"{len(run)} consecutive sentences under "
                     f"{FRAGMENT_MAX_WORDS} words",
-                    " ".join(run),
+                    " ".join(sentence for _, sentence in run),
                 )
             )
+
+        run = []
+        for number, sentence in sentence_units(block):
+            if count_words(sentence) < FRAGMENT_MAX_WORDS:
+                run.append((number, sentence))
+                continue
+            if len(run) >= FRAGMENT_RUN:
+                flag(run)
+            run = []
+        if len(run) >= FRAGMENT_RUN:
+            flag(run)
     return hits
 
 
@@ -402,13 +477,13 @@ def sweep_paired_emdash(blocks):
     for block in blocks:
         if block.kind in ("heading", "placeholder"):
             continue
-        for sentence in sentence_units(block):
+        for number, sentence in sentence_units(block):
             for match in pattern.finditer(sentence):
                 hits.append(
                     hit(
                         "#7",
                         "PAIRED EM-DASH",
-                        block.line,
+                        number,
                         match.group().replace("\n", " "),
                         sentence,
                     )
@@ -437,12 +512,13 @@ def sweep_emdash_density(sections):
 
 
 def sweep_burstiness(blocks):
-    """#14 — a run of sentences whose lengths sit within 5 words of each other."""
+    """#14 — a run of sentences whose lengths sit close to each other."""
     hits = []
     for block in blocks:
         if block.kind != "prose":
             continue
-        lengths = [count_words(s) for s in split_sentences(block.text)]
+        units = list(sentence_units(block))
+        lengths = [count_words(sentence) for _, sentence in units]
         if len(lengths) < BURSTINESS_RUN:
             continue
         for index in range(len(lengths) - BURSTINESS_RUN + 1):
@@ -452,7 +528,7 @@ def sweep_burstiness(blocks):
                     hit(
                         "#14",
                         "low burstiness",
-                        block.line,
+                        units[index][0],
                         f"{window} of {lengths}",
                         block.text,
                     )
@@ -505,40 +581,37 @@ def run_sweeps(raw):
     return hits
 
 
-# --- Reporting ---------------------------------------------------------------
+# --- Result -----------------------------------------------------------------
 
 
-def report(path, hits):
-    """The readable report. Always states coverage, hits or not."""
-    out = [f"=== MECHANICAL SWEEP: {path} ===", ""]
+def result(path, hits):
+    """The full result object.
 
-    if hits:
-        for item in hits:
-            out.append(f"  [{item['pattern']} {item['label']}] {item['detail']}")
-            if item["context"]:
-                out.append(f"      L{item['line']}: {item['context']}")
-        out.append("")
-        out.append(f"{len(hits)} hit(s). Every predicate here is arithmetic, so each")
-        out.append("is a finding, not a candidate for you to weigh.")
-    else:
-        out.append("  no hits in the counting sweeps")
-
-    out.append("")
-    out.append(f"RAN ({len(COUNTING_SWEEPS)} counting sweeps):")
-    out.append("  " + " · ".join(f"{num} {name}" for num, name in COUNTING_SWEEPS))
-    out.append("")
-    out.append("NOT RUN — these need your read, no regex decides them:")
-    for num, name in JUDGMENT_SWEEPS:
-        out.append(f"  {num:<6} {name}")
-    covered = len(COUNTING_SWEEPS) + 1  # #3/#4 is two patterns under one sweep
-    out.append("")
-    out.append(
-        f"This script examined {covered} of {PATTERNS_TOTAL} patterns. The other "
-        f"{PATTERNS_TOTAL - covered} —"
-    )
-    out.append("  the seven above plus the rest of references/ai-anti-patterns.md —")
-    out.append("  are unexamined. A zero-hit sweep is not an anti-pattern check.")
-    return "\n".join(out)
+    `coverage` is not decoration. This script examines a minority of the 39
+    patterns, and an empty `hits` on its own reads as "the check passed" rather
+    than "the counting half passed". Every consumer sees what was not examined
+    in the same object that tells it what was.
+    """
+    examined = PATTERNS_EXAMINED
+    return {
+        "ok": True,
+        "path": str(path),
+        "hits": hits,
+        "coverage": {
+            "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
+            "not_run_judgment": [
+                f"{number} {name}" for number, name in JUDGMENT_SWEEPS
+            ],
+            "patterns_examined": examined,
+            "patterns_total": PATTERNS_TOTAL,
+            "note": (
+                f"{PATTERNS_TOTAL - examined} of the {PATTERNS_TOTAL} patterns "
+                "were not examined by this script. An empty hits list is not an "
+                "anti-pattern check: the judgment sweeps in not_run_judgment and "
+                "the rest of references/ai-anti-patterns.md still need a read."
+            ),
+        },
+    }
 
 
 def main(argv=None):
@@ -547,12 +620,6 @@ def main(argv=None):
         description="Counting sweeps of the Pass 1 anti-pattern check.",
     )
     parser.add_argument("draft", help="path to the draft markdown file")
-    parser.add_argument(
-        "--json",
-        action="store_true",
-        dest="as_json",
-        help="emit the structured result instead of the readable report",
-    )
     args = parser.parse_args(argv)
 
     path = Path(args.draft)
@@ -585,24 +652,7 @@ def main(argv=None):
         return 2
 
     hits = run_sweeps(raw)
-
-    if args.as_json:
-        print(
-            json.dumps(
-                {
-                    "ok": True,
-                    "path": str(path),
-                    "hits": hits,
-                    "ran": [f"{num} {name}" for num, name in COUNTING_SWEEPS],
-                    "not_run": [f"{num} {name}" for num, name in JUDGMENT_SWEEPS],
-                    "patterns_total": PATTERNS_TOTAL,
-                },
-                indent=2,
-            )
-        )
-    else:
-        print(report(path, hits))
-
+    print(json.dumps(result(path, hits), indent=2))
     return 1 if hits else 0
 
 

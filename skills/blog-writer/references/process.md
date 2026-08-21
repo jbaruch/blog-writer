@@ -435,9 +435,9 @@ run the script. Re-run it after every rewrite: a clean draft plus one edit is an
 draft, and the most common way a tell ships is being introduced by the fix for something
 else.
 
-**A clean sweep is not a clean draft.** The script examines 6 of the 39 patterns and says
-so on every run. It cannot report on the other 33, and its silence about them is not a
-pass.
+**A clean sweep is not a clean draft.** The script reports its own coverage on every run,
+including a run with no findings. It cannot speak for the patterns it did not examine, and
+its silence about them is not a pass.
 
 #### The judging half — no script does this, you do
 

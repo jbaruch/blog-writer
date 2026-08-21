@@ -234,15 +234,18 @@ a script, never by reading. Run it over the draft:
 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
 ```
 
-Route on the exit code:
+Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` and
+`context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
+`patterns_total` and `note`. Route on the exit code:
 
-- **Exit 0** — no hits in the counting sweeps. This is not a clean draft: the script
-  examines a subset of the 39 patterns and names both halves in its own output. Continue
-  with the contextual read for the rest.
-- **Exit 1** — hits found. Every predicate in the script is arithmetic, so each hit is a
-  finding, not a candidate to weigh. Fix them all, then re-run until it exits 0.
-- **Exit 2** — a tool or usage error. Report the script's stderr diagnostic to the author
-  and do not claim the sweep ran.
+- **Exit 0** — `.hits` is empty. This is not a clean draft: read `.coverage.note`, which
+  states how many of the 39 patterns went unexamined, and continue with the contextual
+  read for every pattern in `.coverage.not_run_judgment`.
+- **Exit 1** — `.hits` is non-empty. Every predicate in the script is arithmetic, so each
+  hit is a finding, not a candidate to weigh. Fix them all, then re-run until it exits 0.
+  Report findings to the author in your own words; the object is for you, not for them.
+- **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
+  stdout. Report the diagnostic to the author and do not claim the sweep ran.
 
 Re-run it after every rewrite, including the rewrites made to fix its own findings and
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report

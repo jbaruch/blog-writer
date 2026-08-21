@@ -68,11 +68,11 @@ sweep_fixture() {
   CASE_ERR=$(cat "${SUITE_TMP}/err")
 }
 
-# The findings only. The coverage statement names every sweep on every run, so a
-# negative assertion against the whole report would always match its own "RAN"
-# line and never fail. Hit lines are the ones opening with "  [#".
+# The findings, flattened to one line each. The coverage object names every
+# sweep on every run, so a negative assertion against the whole document would
+# always match coverage's own "ran" list and never fail.
 hit_lines() {
-  grep '^  \[#' <<<"$CASE_OUT"
+  jq -r '.hits[] | "\(.pattern) \(.label) \(.detail)"' <<<"$CASE_OUT"
   return 0
 }
 
@@ -104,10 +104,10 @@ assert_sweep() {
   return 0
 }
 
-# Asserts the sweep of $2 exits $3 and that the FULL report mentions $4. Used for
-# the coverage statement, which is deliberately not a finding.
-assert_report() {
-  local label=$1 body=$2 expect_rc=$3 needle=$4
+# Asserts the sweep of $2 exits $3 and that the jq filter $4 holds on the result.
+# Used for the coverage object, which is deliberately not a finding.
+assert_json() {
+  local label=$1 body=$2 expect_rc=$3 filter=$4
 
   sweep_fixture "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body"
 
@@ -115,8 +115,26 @@ assert_report() {
     fail "${label}: expected exit ${expect_rc}, got ${CASE_RC} (stderr: ${CASE_ERR})"
     return 1
   fi
-  if ! grep -qF "$needle" <<<"$CASE_OUT"; then
-    fail "${label}: report does not carry '${needle}'"
+  if ! jq -e "$filter" <<<"$CASE_OUT" >/dev/null; then
+    fail "${label}: filter '${filter}' did not hold on the result"
+    return 1
+  fi
+
+  ok
+  echo "  ${label}"
+  return 0
+}
+
+# Asserts the first hit whose pattern is $4 sits on line $5.
+assert_hit_line() {
+  local label=$1 body=$2 pattern=$3 expect_line=$4
+  local actual
+
+  sweep_fixture "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body"
+  actual=$(jq -r --arg p "$pattern" 'first(.hits[] | select(.pattern == $p) | .line) // "none"' <<<"$CASE_OUT")
+
+  if [ "$actual" != "$expect_line" ]; then
+    fail "${label}: expected ${pattern} on line ${expect_line}, got ${actual}"
     return 1
   fi
 
@@ -154,19 +172,19 @@ which everyone had quietly accepted as simply the cost of shipping anything at a
 
 We cut it.'
 
-  assert_report "clean draft exits 0" "$clean_draft" 0 "no hits in the counting sweeps"
-  assert_report "clean draft still names what ran" "$clean_draft" 0 "RAN (5 counting sweeps)"
-  assert_report "clean draft still names what did not run" "$clean_draft" 0 "NOT RUN"
-  assert_report "clean draft states partial coverage" "$clean_draft" 0 "is not an anti-pattern check"
+  assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
+  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
+  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 7'
+  assert_json "clean draft states partial coverage" "$clean_draft" 0 '.coverage.patterns_examined == 6 and .coverage.patterns_total == 39 and (.coverage.note | length) > 0'
 
-  # A bare "clean" is the exact string the contract forbids, since it reads as
-  # "the check passed" rather than "five of thirty-nine passed".
-  sweep_fixture bare_clean "$clean_draft"
-  if grep -qxE ' *clean *' <<<"$CASE_OUT"; then
-    fail "report prints a bare 'clean' line, which the output contract forbids"
+  # The contract's core guarantee: a zero-hit run must still carry coverage, so
+  # no consumer can read an empty hits list as "the check passed".
+  sweep_fixture coverage_on_clean "$clean_draft"
+  if ! jq -e '(.hits | length) == 0 and (.coverage | has("note")) and (.coverage.patterns_examined < .coverage.patterns_total)' <<<"$CASE_OUT" >/dev/null; then
+    fail "a zero-hit run does not carry the coverage statement"
   else
     ok
-    echo "  clean draft never prints a bare 'clean'"
+    echo "  a zero-hit run still carries coverage"
   fi
 
   # 2. #7 paired em-dash
@@ -344,38 +362,99 @@ The prose itself carries nothing else wrong at all in any way whatsoever.' \
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
 In todays landscape, it is important to note that this is, of course, pivotal.'
-  local leaked=""
-  local judged
-  for judged in '[#1 ' '[#10 ' '[#12 ' '[#17 ' '[#32 ' '[#35 ' '[#36 '; do
-    if grep -qF "$judged" <<<"$CASE_OUT"; then
-      leaked="${leaked} ${judged}"
-    fi
-  done
+  local leaked
+  leaked=$(jq -r '[.hits[].pattern] - ["#3/#4","#7","#8","#14","#18"] | join(" ")' <<<"$CASE_OUT")
   if [ -n "$leaked" ]; then
-    fail "judgment patterns reported as hits:${leaked} — those stay with the agent"
+    fail "judgment patterns reported as hits: ${leaked} — those stay with the agent"
   else
     ok
     echo "  judgment patterns are never reported as hits"
   fi
 
-  # 10. --json
-  local json_fixture="${SUITE_TMP}/json.md"
+  # 10. The object shape every consumer routes on
+  local json_fixture="${SUITE_TMP}/shape.md"
   printf '%s\n' 'Three facilities — Austin, Berlin, Osaka — ran the job.' >"$json_fixture"
-  local json_out
-  json_out=$("$PYTHON" "$SCRIPT" "$json_fixture" --json)
-  local json_rc=$?
+  local json_out json_rc
+  json_out=$("$PYTHON" "$SCRIPT" "$json_fixture")
+  json_rc=$?
   if [ "$json_rc" -ne 1 ]; then
-    fail "--json: expected exit 1 on a hit, got ${json_rc}"
-  elif ! jq -e '.ok == true and (.hits | length) >= 1' <<<"$json_out" >/dev/null; then
-    fail "--json: output is not the promised object shape"
-  elif ! jq -e '.hits[0] | has("pattern") and has("line") and has("detail")' <<<"$json_out" >/dev/null; then
-    fail "--json: a hit is missing pattern, line, or detail"
-  elif ! jq -e '(.ran | length) == 5 and (.not_run | length) == 7' <<<"$json_out" >/dev/null; then
-    fail "--json: coverage arrays do not match the documented split"
+    fail "object shape: expected exit 1 on a hit, got ${json_rc}"
+  elif ! jq -e '.ok == true and (.hits | length) >= 1 and (.path | length) > 0' <<<"$json_out" >/dev/null; then
+    fail "object shape: output is not the promised object"
+  elif ! jq -e '.hits[0] | has("pattern") and has("label") and has("line") and has("detail") and has("context")' <<<"$json_out" >/dev/null; then
+    fail "object shape: a hit is missing a documented field"
   else
     ok
-    echo "  --json emits the promised object shape"
+    echo "  stdout is the promised JSON object"
   fi
+
+  # 11. Exact hit lines. Excluded regions are blanked rather than deleted, so a
+  # finding after frontmatter or a multi-line comment still points at the line
+  # the author sees in their editor.
+  assert_hit_line "line is exact after frontmatter" \
+    '---
+title: A post
+date: 2026-01-01
+---
+
+# Heading
+
+Three facilities — Austin, Berlin, Osaka — ran the nightly job.' \
+    "#7" 8
+
+  assert_hit_line "line is exact after a multi-line HTML comment" \
+    '# Heading
+
+<!-- VERIFY: reconstructed
+     from the transcript
+     confirm this -->
+
+Three facilities — Austin, Berlin, Osaka — ran the nightly job.' \
+    "#7" 7
+
+  # A multi-line comment must not join the prose on either side of it into one
+  # line, and must not split a paragraph the author wrote as one. Deleting the
+  # comment does the first; blanking it does the second, which would lose this
+  # fragment chain entirely.
+  assert_sweep "a multi-line comment does not split the paragraph around it" \
+    'It failed. We knew.
+<!-- VERIFY: reconstructed
+     confirm this -->
+Nobody cared. Then the pager went off at three in the morning.' \
+    1 yes "fragment chain"
+
+  assert_hit_line "prose before a multi-line comment keeps its own line" \
+    'It failed. We knew. Nobody cared.
+
+<!-- VERIFY: a note
+     spanning two lines -->
+
+Then the pager went off at three in the morning and everyone woke up at once.' \
+    "#3/#4" 1
+
+  # An inline comment is removed without breaking the sentence around it.
+  assert_sweep "an inline comment does not break the sentence around it" \
+    'The build broke <!-- VERIFY: which build? --> twice that week, and the second
+time nobody noticed until the pager went off at three in the morning.' \
+    0 no "fragment chain"
+
+  # Inside a list, the finding points at the item, not at the block.
+  assert_hit_line "line is the list item, not the block" \
+    '# Heading
+
+- a plain first item
+- a plain second item
+- a third item — with an aside — inside it' \
+    "#7" 5
+
+  # Inside a wrapped paragraph, the finding points at the sentence's own line.
+  assert_hit_line "line is the sentence, not the paragraph" \
+    '# Heading
+
+This first sentence is perfectly ordinary and carries nothing worth reporting.
+This second one is also ordinary and equally quiet on every count.
+The third — an aside — is not.' \
+    "#7" 5
 
   # 11. Error paths all exit 2 with an actionable diagnostic
   local case_err
