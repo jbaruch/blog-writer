@@ -366,11 +366,14 @@ The prose itself carries nothing else wrong at all in any way whatsoever.' \
     'Pick A. Go. Stop. Then the pager went off at three in the morning and woke us.' \
     1 yes "fragment chain"
 
-  # The narrow guard it was replaced by: a genuine run of initials does not
-  # shatter into one-word sentences.
-  assert_sweep "a run of initials is not a fragment chain" \
-    'The copy on the shelf was J. R. R. Tolkien, and nobody had opened it in years.' \
-    0 no "fragment chain"
+  # The guard it was replaced by, asserted on a fixture that discriminates: the
+  # run must survive whole, its LAST initial included. Splitting anywhere inside
+  # "J. R. R. Tolkien" turns one 11-word sentence into [4, 1, 1, 5] and the
+  # paragraph into a six-sentence fragment chain, so a regression here is a
+  # finding the author is told to fix rather than a silent difference.
+  assert_json "a run of initials survives whole, last initial included" \
+    'It failed. We knew. Beside it sat J. R. R. Tolkien, unopened for eleven years.' \
+    0 '(.hits | length) == 0'
 
   # Regression: blockquotes were classified, handled by the splitter, and then
   # silently dropped from both sentence sweeps.

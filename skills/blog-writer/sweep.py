@@ -154,15 +154,16 @@ ABBREVIATIONS = frozenset(
 
 _SENTENCE_END = re.compile(r"([.!?])([\"')\]]*)(\s+)")
 
-# A single capital letter standing as its own token, ending the text so far.
-_LONE_INITIAL = re.compile(r"(?:^|\s)[A-Z]\.$")
-
-# The same shape opening the text that follows.
-_LONE_INITIAL_NEXT = re.compile(r"[A-Z]\.(?:\s|$)")
+# A run of two or more single-letter initials ("J. R. R. ", "H. G. "). Two is
+# the threshold that makes this enumerable: one lone capital before a period is
+# genuinely ambiguous ("A. Smith wrote it." against "Pick A. Smith wrote it."),
+# and no regex settles it. Two in a row is a name.
+_INITIAL_RUN = re.compile(r"(?:\b[A-Z]\.[ \t]+){2,}")
 
 
 def split_sentences(text):
-    """Split prose into sentences, guarding abbreviations and numeric periods."""
+    """Split prose into sentences, guarding abbreviations and runs of initials."""
+    protected = [found.span() for found in _INITIAL_RUN.finditer(text)]
     sentences = []
     start = 0
     for match in _SENTENCE_END.finditer(text):
@@ -173,24 +174,25 @@ def split_sentences(text):
         if last_token in ABBREVIATIONS:
             continue
 
-        # An initial is only an initial inside a run of them: a lone capital
-        # AND another lone capital next ("J. R. R. Tolkien"). Treating every
+        # No period inside a run of initials ends a sentence, the run's last one
+        # included — "J. R. R. Tolkien" is one name, and splitting before the
+        # surname leaves two one-word sentences that read as a fragment chain.
+        #
+        # A single lone capital is deliberately NOT protected. Treating every
         # trailing capital as an initial swallowed the boundary in ordinary
-        # prose — "Pick A. Go. Stop." merged at "A." and took the fragment
-        # chain with it. The narrow form is enumerable; "detect an initial" in
-        # general is not (`script-delegation` The Regex Trap).
+        # prose ("Pick A. Go. Stop." merged at "A."), and telling the two apart
+        # needs to know whether a name follows, which is reasoning rather than
+        # scripting (`script-delegation` The Regex Trap).
         #
-        # There is deliberately no digit guard here: the pattern above requires
-        # whitespace after the period, so a decimal ("v1.2", "0.3%") never
-        # matches in the first place, while "It failed at 4. 3 people knew." is
-        # two real sentences a digit guard would merge.
+        # There is deliberately no digit guard either: the pattern above
+        # requires whitespace after the period, so a decimal ("v1.2", "0.3%")
+        # never matches in the first place, while "It failed at 4. 3 people
+        # knew." is two real sentences a digit guard would merge.
         #
-        # Both guards fail toward a false split rather than a merge. A false
-        # split inflates the count of short sentences, which the agent dismisses
-        # off a false #3/#4 hit; a merge silently removes a finding.
-        if _LONE_INITIAL.search(head) and _LONE_INITIAL_NEXT.match(
-            text[match.end(3) :]
-        ):
+        # Every remaining ambiguity falls toward a split rather than a merge. A
+        # false split inflates the count of short sentences and surfaces as a
+        # #3/#4 hit the agent dismisses; a merge removes a finding silently.
+        if any(lo <= match.start(1) < hi for lo, hi in protected):
             continue
 
         sentence = head.strip()
