@@ -22,10 +22,22 @@ if ! command -v shellcheck >/dev/null; then
   exit 2
 fi
 
+# Discovery runs in its own command substitution so its exit status is checked.
+# Reading it through a process substitution discards that status, so a `find`
+# that failed part-way — an unreadable directory, a bad predicate — would yield
+# a short list the gate then reports clean, which is the silent under-checking
+# these gates exist to prevent.
+if ! discovered=$(find .github skills -type f -name '*.sh' | sort); then
+  echo "error: could not enumerate shell scripts under .github/ or skills/ — re-run from the repository root and check the search paths are readable" >&2
+  exit 2
+fi
+
 scripts=()
 while IFS= read -r script; do
-  scripts+=("$script")
-done < <(find .github skills -type f -name '*.sh' | sort)
+  if [ -n "$script" ]; then
+    scripts+=("$script")
+  fi
+done <<<"$discovered"
 
 if [ "${#scripts[@]}" -eq 0 ]; then
   echo "error: no shell scripts found under .github/ or skills/ — expected at least this repo's own gates" >&2

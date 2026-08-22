@@ -23,10 +23,22 @@ if [ ! -d "$TEST_ROOT" ]; then
   exit 1
 fi
 
+# Discovery runs in its own command substitution so its exit status is checked.
+# Reading it through a process substitution discards that status, so a `find`
+# that failed part-way — an unreadable directory, a bad predicate — would yield
+# a short list the gate then reports clean, which is the silent under-checking
+# these gates exist to prevent.
+if ! discovered=$(find "$TEST_ROOT" -type f -name 'test_*.sh' | sort); then
+  echo "error: could not enumerate test suites under ${TEST_ROOT}/ — re-run from the repository root and check the search paths are readable" >&2
+  exit 2
+fi
+
 suites=()
 while IFS= read -r suite; do
-  suites+=("$suite")
-done < <(find "$TEST_ROOT" -type f -name 'test_*.sh' | sort)
+  if [ -n "$suite" ]; then
+    suites+=("$suite")
+  fi
+done <<<"$discovered"
 
 if [ "${#suites[@]}" -eq 0 ]; then
   echo "error: no test suites found under ${TEST_ROOT}/ (expected files named test_*.sh) — every shipped script needs tests per testing-standards" >&2

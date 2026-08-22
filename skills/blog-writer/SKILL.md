@@ -216,7 +216,7 @@ anti-pattern, structural, accuracy, and tightening checks.
 `skills/blog-writer/references/process.md` Phase 3 has the writing rules, the placeholder
 conventions, and the check procedure.
 
-Three rules bind this step and Step 11:
+Four rules bind this step and Step 11:
 
 **Persona adherence.** Re-read `persona/voice.md` before every writing action — before this
 draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. At
@@ -226,6 +226,38 @@ the profile; if you can't, read it again.
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
 procedure in order, and never invent a pattern the file does not define.
+
+**Mechanical sweep adherence.** The counting half of the Pass 1 anti-pattern check runs as
+a script, never by reading. Run it over the draft:
+
+```bash
+.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
+```
+
+Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`, `context`
+and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
+`patterns_total` and `note`. Route on the exit code:
+
+- **Exit 0** — `.hits` is empty. This is not a clean draft, and `.coverage.note` says how
+  many of the 39 patterns went unexamined. `.coverage.not_run_judgment` is not that list:
+  it names only the sweeps that look mechanical and are not, so they cannot be assumed
+  covered by a script that just reported nothing. Read for those, and for every remaining
+  pattern in `references/ai-anti-patterns.md`.
+- **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
+  of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
+  the script placed sentence boundaries: read its `context` before rewriting, and if a
+  "sentence" shown there is a split artifact rather than real prose, that hit is the
+  artifact and the prose stays. Re-run until it exits 0. Report findings to the author in
+  your own words; the object is for you, not for them.
+- **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
+  stdout. Report the diagnostic to the author and do not claim the sweep ran.
+
+Re-run it after every rewrite, including the rewrites made to fix its own findings and
+those from any other check. A clean draft plus one edit is an unchecked draft. Never report
+the sweep as clean without having run it. Never report the draft as clean from this sweep;
+it examines a minority of the 39 patterns and `.coverage.note` says how many it left.
+`references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
+you read for.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from
 `skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern

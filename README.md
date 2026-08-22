@@ -28,9 +28,9 @@ gates at each step.
 Drafts use five placeholder types with independent numbering per type: Screenshot,
 Code, Link, Fact, and Diagram. Code and Diagram placeholders include best-guess content
 (reconstructed code blocks and inline D2 diagram source) plus a VERIFY comment for the
-author to confirm. Diagrams earn their place when structure — architecture, request
-flow, state transitions — is the point; a screenshot of the real system wins when it
-can show the same thing with less abstraction.
+author to confirm. Diagrams earn their place when structure is the point (architecture,
+request flow, state transitions); a screenshot of the real system wins when it can show
+the same thing with less abstraction.
 
 ## Anti-pattern detection
 
@@ -38,13 +38,25 @@ Drafts are checked against 39 named AI writing anti-patterns, each with symptoms
 examples, and alternatives (plus structural variants where applicable). The check runs
 in three passes:
 
-- **Surface scan** — matches known pattern forms and their structural variants
-- **Skeleton scan** — compares grammatical structure of adjacent sentences to catch
+- Surface scan, matching known pattern forms and their structural variants
+- Skeleton scan, comparing the grammatical structure of adjacent sentences to catch
   patterns where the vocabulary differs but the grammar is identical
-- **Soul check** — holistic read for sterile, voiceless writing that passes pattern
-  checks but still reads as obviously AI
+- Soul check, a holistic read for sterile, voiceless writing that passes pattern checks
+  but still reads as obviously AI
 
-Every rewrite is re-audited against all 39 patterns before it's considered fixed.
+Six of the patterns are counted rather than read. Fragment chains, paired em-dashes,
+em-dash density, sentence-length uniformity, and unicode giveaways all have a verdict
+that falls out of arithmetic, and reading for them does not work: uniform sentence
+length is invisible when you read for content and obvious when you count. Those run as
+a script (`sweep.py`) over the draft, which reports the patterns it did not examine on
+every run, so a passing sweep can never be mistaken for a passing check.
+
+The rest stay with the model. Their check is a reading, not a match: whether deleting a
+filler word changes the meaning, whether a product claim still works with a competitor's
+name in it, whether two phrases in different sections name the same concept.
+
+Every rewrite is re-audited against all 39 patterns before it's considered fixed,
+including the script, which is re-run after every edit.
 
 At the start of each session the skill fetches
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
