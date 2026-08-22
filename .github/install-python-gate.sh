@@ -28,7 +28,7 @@
 # `0.9.5` and is a different release, and accepting it would defeat the pin.
 #
 # Exit codes:
-#   0  both engines are on PATH at the pinned version
+#   0  both engines are on PATH and REPORT the pinned version
 #   2  an installer is unavailable or the install failed
 
 # Shell options are set inside main() rather than at file scope: the entry-point
@@ -87,19 +87,31 @@ ensure_pyright() {
   fi
 }
 
+# The pin is only satisfied when the tool REPORTS the pinned version. An
+# installer can exit 0 while an older executable stays ahead on PATH — a
+# distro package, a stale virtualenv shim — and a presence check would call
+# that pinned tooling and hand the gate the wrong engine.
+verify_pinned() {
+  local tool=$1 want=$2 got
+  if ! command -v "$tool" >/dev/null; then
+    echo "error: ${tool} is still not on PATH after installing — check that the installer's bin directory is on PATH" >&2
+    return 2
+  fi
+  got=$(installed_version "$tool")
+  if [ "$got" != "$want" ]; then
+    echo "error: ${tool} reports ${got:-no version} after installing, not the pinned ${want} — another ${tool} is probably earlier on PATH; remove it or put the installer's bin directory first" >&2
+    return 2
+  fi
+}
+
 main() {
   set -euo pipefail
 
   ensure_ruff || return $?
   ensure_pyright || return $?
 
-  local tool
-  for tool in ruff pyright; do
-    if ! command -v "$tool" >/dev/null; then
-      echo "error: ${tool} is still not on PATH after installing — check that the installer's bin directory is on PATH" >&2
-      return 2
-    fi
-  done
+  verify_pinned ruff "$RUFF_VERSION" || return $?
+  verify_pinned pyright "$PYRIGHT_VERSION" || return $?
 
   echo "Python gate engines ready: $(ruff --version), $(pyright --version)"
 }

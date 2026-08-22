@@ -10,8 +10,10 @@
 #   4. Missing installer — no pipx, or no npm, exits 2 naming what to install.
 #   5. Installer failure — a non-zero pipx or npm exits 2 rather than continuing
 #      to a gate that would run whatever happens to be on PATH.
-#   6. Post-install verification — an installer that "succeeds" without putting
-#      the tool on PATH exits 2.
+#   6. Post-install verification — the pin is satisfied only when the tool
+#      REPORTS the pinned version. An installer that exits 0 while an older
+#      executable stays ahead on PATH, or that leaves nothing on PATH at all,
+#      exits 2.
 #   7. Entry-point guard — sourcing the script installs nothing and runs nothing.
 #
 # Approach: every engine and installer is a stub on a suite-owned PATH, so no
@@ -44,15 +46,33 @@ ok() {
   pass_count=$((pass_count + 1))
 }
 
-# Writes a stub named $1 that prints $2 and exits $3, recording its invocation.
-stub() {
-  local name=$1 output=$2 code=$3
+# Writes an engine stub reporting whatever sits in its version file, so an
+# installer stub can change what the engine reports mid-run — which is what
+# separates an install that took effect from one that silently did not.
+engine_stub() {
+  local name=$1 version=$2
+  echo "$version" >"${CASE_BIN}/${name}.version"
   cat >"${CASE_BIN}/${name}" <<STUB
 #!/usr/bin/env bash
 echo "${name} \$*" >>"${CASE_LOG}"
-[ -n "${output}" ] && echo "${output}"
-exit ${code}
+echo "${name} \$(cat "${CASE_BIN}/${name}.version")"
 STUB
+  chmod +x "${CASE_BIN}/${name}"
+}
+
+# Writes an installer stub exiting $2. When $3 names an engine, the installer
+# takes effect by writing $4 as that engine's reported version; omitting it
+# models an installer that reports success without changing what is on PATH.
+installer_stub() {
+  local name=$1 code=$2 engine=${3:-} version=${4:-}
+  {
+    echo '#!/usr/bin/env bash'
+    echo "echo \"${name} \$*\" >>\"${CASE_LOG}\""
+    if [ -n "$engine" ]; then
+      echo "echo '${version}' >'${CASE_BIN}/${engine}.version'"
+    fi
+    echo "exit ${code}"
+  } >"${CASE_BIN}/${name}"
   chmod +x "${CASE_BIN}/${name}"
 }
 
@@ -125,10 +145,10 @@ main() {
 
   # 1. Both engines already pinned — nothing installs
   new_case
-  stub ruff "ruff ${ruff_pin}" 0
-  stub pyright "pyright ${pyright_pin}" 0
-  stub pipx "" 0
-  stub npm "" 0
+  engine_stub ruff "$ruff_pin"
+  engine_stub pyright "$pyright_pin"
+  installer_stub pipx 0
+  installer_stub npm 0
   run_script
   if assert_rc "already pinned" 0; then
     assert_not_ran "already pinned" "pipx install"
@@ -143,22 +163,22 @@ main() {
 
   # 2. Exact matching — a longer version sharing the pin as a prefix is NOT it
   new_case
-  stub ruff "ruff ${ruff_pin}0" 0
-  stub pyright "pyright ${pyright_pin}" 0
-  stub pipx "" 0
-  stub npm "" 0
+  engine_stub ruff "${ruff_pin}0"
+  engine_stub pyright "$pyright_pin"
+  installer_stub pipx 0 ruff "$ruff_pin"
+  installer_stub npm 0
   run_script
   if assert_rc "substring near-miss" 0; then
     assert_ran "substring near-miss" "pipx install"
   fi
   echo "  ${ruff_pin}0 does not satisfy the ${ruff_pin} pin"
 
-  # 3. A plainly different version installs
+  # 3. A plainly different version installs, and the install takes effect
   new_case
-  stub ruff "ruff 0.1.0" 0
-  stub pyright "pyright 1.0.0" 0
-  stub pipx "" 0
-  stub npm "" 0
+  engine_stub ruff "0.1.0"
+  engine_stub pyright "1.0.0"
+  installer_stub pipx 0 ruff "$ruff_pin"
+  installer_stub npm 0 pyright "$pyright_pin"
   run_script
   if assert_rc "version mismatch" 0; then
     assert_ran "version mismatch" "pipx install"
@@ -166,11 +186,30 @@ main() {
   fi
   echo "  a differing version installs both engines"
 
-  # 4. Missing installers
+  # 4. The installer exits 0 but the pinned version is not what runs. An older
+  # executable ahead on PATH does this, and a presence-only check called it
+  # pinned tooling and handed the gate the wrong engine.
   new_case
-  stub ruff "ruff 0.1.0" 0
-  stub pyright "pyright ${pyright_pin}" 0
-  stub npm "" 0
+  engine_stub ruff "0.1.0"
+  engine_stub pyright "$pyright_pin"
+  installer_stub pipx 0
+  installer_stub npm 0
+  run_script
+  if assert_rc "install does not take effect" 2; then
+    assert_ran "install does not take effect" "pipx install"
+    if ! grep -q "not the pinned ${ruff_pin}" <<<"$CASE_ERR"; then
+      fail "install does not take effect: stderr does not name the pin mismatch, got: ${CASE_ERR}"
+    else
+      ok
+    fi
+  fi
+  echo "  an install that leaves the old version exits 2"
+
+  # 5. Missing installers
+  new_case
+  engine_stub ruff "0.1.0"
+  engine_stub pyright "$pyright_pin"
+  installer_stub npm 0
   run_script
   if assert_rc "pipx missing" 2; then
     if ! grep -q "pipx not found" <<<"$CASE_ERR"; then
@@ -182,9 +221,9 @@ main() {
   echo "  a missing pipx exits 2 naming pipx"
 
   new_case
-  stub ruff "ruff ${ruff_pin}" 0
-  stub pyright "pyright 1.0.0" 0
-  stub pipx "" 0
+  engine_stub ruff "$ruff_pin"
+  engine_stub pyright "1.0.0"
+  installer_stub pipx 0
   run_script
   if assert_rc "npm missing" 2; then
     if ! grep -q "npm not found" <<<"$CASE_ERR"; then
@@ -195,12 +234,12 @@ main() {
   fi
   echo "  a missing npm exits 2 naming npm"
 
-  # 5. Installer failures
+  # 6. Installer failures
   new_case
-  stub ruff "ruff 0.1.0" 0
-  stub pyright "pyright ${pyright_pin}" 0
-  stub pipx "" 1
-  stub npm "" 0
+  engine_stub ruff "0.1.0"
+  engine_stub pyright "$pyright_pin"
+  installer_stub pipx 1
+  installer_stub npm 0
   run_script
   if assert_rc "pipx fails" 2; then
     if ! grep -q "could not install ruff" <<<"$CASE_ERR"; then
@@ -212,10 +251,10 @@ main() {
   echo "  a failing pipx exits 2"
 
   new_case
-  stub ruff "ruff ${ruff_pin}" 0
-  stub pyright "pyright 1.0.0" 0
-  stub pipx "" 0
-  stub npm "" 1
+  engine_stub ruff "$ruff_pin"
+  engine_stub pyright "1.0.0"
+  installer_stub pipx 0
+  installer_stub npm 1
   run_script
   if assert_rc "npm fails" 2; then
     if ! grep -q "could not install pyright" <<<"$CASE_ERR"; then
@@ -226,11 +265,11 @@ main() {
   fi
   echo "  a failing npm exits 2"
 
-  # 6. An installer that reports success without putting the tool on PATH
+  # 7. An installer that reports success without putting the tool on PATH
   new_case
-  stub pyright "pyright ${pyright_pin}" 0
-  stub pipx "" 0
-  stub npm "" 0
+  engine_stub pyright "$pyright_pin"
+  installer_stub pipx 0
+  installer_stub npm 0
   run_script
   if assert_rc "install leaves nothing on PATH" 2; then
     if ! grep -q "still not on PATH" <<<"$CASE_ERR"; then
@@ -241,7 +280,7 @@ main() {
   fi
   echo "  an install that leaves nothing on PATH exits 2"
 
-  # 7. Entry-point guard
+  # 8. Entry-point guard
   new_case
   local sourced_out
   sourced_out=$(PATH="${CASE_BIN}:/usr/bin:/bin" bash -c "source '$SCRIPT'" 2>&1)
