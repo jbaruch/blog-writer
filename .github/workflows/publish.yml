@@ -25,11 +25,14 @@ jobs:
     secrets:
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
     with:
-      # The runtimes .github/install-python-gate.sh installs onto: pipx for
-      # ruff, npm for pyright. The reusable workflow sets up neither unless
-      # asked, and the pre-publish gate below needs both.
+      # The interpreter .github/install-python-gate.sh installs ruff onto via
+      # pipx. Node is NOT requested: the reusable workflow gained its
+      # `node-version` input after the SHA pinned below, and passing an input
+      # the pinned revision does not declare fails the run at startup, before
+      # any job is scheduled. ubuntu-latest ships Node and npm, which is what
+      # the installer needs for pyright; pinning the Node version here waits on
+      # the Dependabot bump of that ref.
       python-version: '3.11'
-      node-version: '22'
       skill-review-credit-outage: skip
       # Runs every skills/**/test_*.sh suite after checkout and before publish,
       # so a shipped script whose tests fail never reaches the registry. The
