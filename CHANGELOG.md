@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.29 — 2026-08-22
+
 ### Fixed
 
 - **The publish pipeline can run the Python gate it was given** — 1.1.28's `.github/lint-python.sh` needed `ruff` and `pyright`, and only `test.yml` installed them. `publish.yml` calls the reusable publish workflow, whose `pre-publish-script` runs `.github/pre-publish.sh` on a runner that installs nothing, so the gate exited 2 on the missing engines and the publish step skipped. The gate behaved correctly — it failed loudly and shipped nothing rather than publishing unverified, and the registry never advanced — but no merge to `main` could publish while it stood. `publish.yml` now requests the Python and Node runtimes from the reusable workflow, and `.github/pre-publish.sh` provisions the engines on top of them when running in CI.
