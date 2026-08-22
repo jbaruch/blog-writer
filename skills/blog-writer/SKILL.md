@@ -238,9 +238,11 @@ Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` 
 `context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
 `patterns_total` and `note`. Route on the exit code:
 
-- **Exit 0** — `.hits` is empty. This is not a clean draft: read `.coverage.note`, which
-  states how many of the 39 patterns went unexamined, and continue with the contextual
-  read for every pattern in `.coverage.not_run_judgment`.
+- **Exit 0** — `.hits` is empty. This is not a clean draft, and `.coverage.note` says how
+  many of the 39 patterns went unexamined. `.coverage.not_run_judgment` is not that list:
+  it names only the sweeps that look mechanical and are not, so they cannot be assumed
+  covered by a script that just reported nothing. Read for those, and for every remaining
+  pattern in `references/ai-anti-patterns.md`.
 - **Exit 1** — `.hits` is non-empty. Every predicate in the script is arithmetic, so each
   hit is a finding, not a candidate to weigh. Fix them all, then re-run until it exits 0.
   Report findings to the author in your own words; the object is for you, not for them.
@@ -250,7 +252,7 @@ Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` 
 Re-run it after every rewrite, including the rewrites made to fix its own findings and
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
 the sweep as clean without having run it. Never report the draft as clean from this sweep;
-the patterns it does not examine are listed in `.coverage.not_run_judgment`.
+it examines a minority of the 39 patterns and `.coverage.note` says how many it left.
 `references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
 you read for.
 
