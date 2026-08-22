@@ -20,14 +20,22 @@ permissions:
 
 jobs:
   publish:
-    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@af116ebf18a7c46a672bf176064908736bc8ac28
+    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@f96cd07fb093073ce818c767fd4fd55abfb9c249
     # Forward only the token the reusable workflow declares (not `inherit`).
     secrets:
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
     with:
-      # The runtimes .github/install-python-gate.sh installs onto: pipx for
-      # ruff, npm for pyright. The reusable workflow sets up neither unless
-      # asked, and the pre-publish gate below needs both.
+      # The runtimes .github/install-python-gate.sh installs onto: pipx needs an
+      # interpreter for ruff, npm needs Node for pyright. Both are pinned rather
+      # than taken from whatever ubuntu-latest happens to ship, per
+      # dependency-management Pinning.
+      #
+      # Every input here must be declared by the revision pinned in `uses:`
+      # above, not merely by the reusable workflow's default branch. A caller
+      # passing an undeclared input fails the run at startup, before any job is
+      # scheduled — so there is no step log to read and it presents as an
+      # Actions outage. `node-version` arrived upstream after the previously
+      # pinned revision, which is why the ref bump and this input move together.
       python-version: '3.11'
       node-version: '22'
       skill-review-credit-outage: skip
