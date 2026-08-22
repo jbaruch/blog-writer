@@ -261,20 +261,45 @@ class Block:
         self.numbered = numbered if numbered is not None else [(line, text)]
 
 
-def classify(group):
-    """Name the kind of a block from its lines."""
-    first = group[0]
-    if _HEADING.match(first):
+def line_kind(line):
+    """The structural kind of a single line."""
+    if _HEADING.match(line):
         return "heading"
-    if any(_LIST_ITEM.match(line) for line in group):
+    if _LIST_ITEM.match(line):
         return "list"
-    if _TABLE_ROW.match(first):
+    if _TABLE_ROW.match(line):
         return "list"
-    if _BLOCKQUOTE.match(first):
+    if _BLOCKQUOTE.match(line):
         return "quote"
-    if _PLACEHOLDER.fullmatch(first.strip()):
+    if _PLACEHOLDER.fullmatch(line.strip()):
         return "placeholder"
     return "prose"
+
+
+def segment(group):
+    """Split one blank-line-delimited group into runs of a single kind.
+
+    Markdown lets prose run straight into a list with no blank line between
+    them. Labelling the whole group by whether any line looked like a list item
+    put that prose in a list block, and the sentence sweeps skip lists — so a
+    real fragment chain sitting immediately above a list went unreported.
+
+    A prose line following a list, table, or quote is the opposite case: markdown
+    reads it as a lazy continuation of the item above, so it stays with its
+    segment rather than opening a new one. That keeps a wrapped list item whole.
+
+    Yields (kind, [(line number, text), ...]).
+    """
+    segments = []
+    for number, text in group:
+        kind = line_kind(text)
+        if segments and (
+            kind == segments[-1][0] or (kind == "prose" and segments[-1][0] != "prose")
+        ):
+            segments[-1][1].append((number, text))
+            continue
+        segments.append((kind, [(number, text)]))
+    return segments
 
 
 def frontmatter_end(source):
@@ -452,10 +477,10 @@ def parse(raw):
         nonlocal pending, pending_line
         if not pending:
             return
-        text = "\n".join(line for _, line in pending).strip()
-        if text:
-            raw_lines = [line for _, line in pending]
-            blocks.append(Block(classify(raw_lines), pending_line, text, list(pending)))
+        for kind, lines in segment(pending):
+            text = "\n".join(line for _, line in lines).strip()
+            if text:
+                blocks.append(Block(kind, lines[0][0], text, list(lines)))
         pending = []
 
     for index, text, role in read_lines(raw.split("\n")):

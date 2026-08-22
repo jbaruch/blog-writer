@@ -501,6 +501,33 @@ echo "this — has — paired dashes and must be ignored"
 The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
     0 no "PAIRED EM-DASH"
 
+  # Regression: a group was labelled a list if ANY line in it looked like a list
+  # item, so prose running straight into a list (valid markdown, no blank line)
+  # was swept as a list — and the sentence sweeps skip lists.
+  assert_sweep "prose running straight into a list is still swept" \
+    'It failed. We knew. Nobody cared.
+- one thing
+- another thing' \
+    1 yes "fragment chain"
+
+  assert_hit_line "the transition reports the prose line, not the list" \
+    '# Title
+
+It failed. We knew. Nobody cared.
+- one thing
+- another thing' \
+    "#3/#4" 3
+
+  # The control: a wrapped list item is a lazy continuation, so it stays with
+  # its list rather than opening a prose segment of one-line fragments.
+  assert_sweep "a wrapped list item is still one list" \
+    '- one item that wraps
+  onto a second line
+- two
+- three
+- four' \
+    0 no "fragment chain"
+
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
 In todays landscape, it is important to note that this is, of course, pivotal.'
