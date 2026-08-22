@@ -16,20 +16,25 @@
 
 set -euo pipefail
 
-readonly TEST_ROOT="skills"
+# Both trees hold suites: the plugin's own scripts under skills/, and the CI
+# gate scripts under .github/. A suite in either place is discovered by glob, so
+# one added later needs no edit here.
+readonly TEST_ROOTS=(skills .github)
 
-if [ ! -d "$TEST_ROOT" ]; then
-  echo "error: ${TEST_ROOT}/ not found — run this from the repository root" >&2
-  exit 1
-fi
+for root in "${TEST_ROOTS[@]}"; do
+  if [ ! -d "$root" ]; then
+    echo "error: ${root}/ not found — run this from the repository root" >&2
+    exit 1
+  fi
+done
 
 # Discovery runs in its own command substitution so its exit status is checked.
 # Reading it through a process substitution discards that status, so a `find`
 # that failed part-way — an unreadable directory, a bad predicate — would yield
 # a short list the gate then reports clean, which is the silent under-checking
 # these gates exist to prevent.
-if ! discovered=$(find "$TEST_ROOT" -type f -name 'test_*.sh' | sort); then
-  echo "error: could not enumerate test suites under ${TEST_ROOT}/ — re-run from the repository root and check the search paths are readable" >&2
+if ! discovered=$(find "${TEST_ROOTS[@]}" -type f -name 'test_*.sh' | sort); then
+  echo "error: could not enumerate test suites under ${TEST_ROOTS[*]} — re-run from the repository root and check the search paths are readable" >&2
   exit 2
 fi
 
@@ -41,7 +46,7 @@ while IFS= read -r suite; do
 done <<<"$discovered"
 
 if [ "${#suites[@]}" -eq 0 ]; then
-  echo "error: no test suites found under ${TEST_ROOT}/ (expected files named test_*.sh) — every shipped script needs tests per testing-standards" >&2
+  echo "error: no test suites found under ${TEST_ROOTS[*]} (expected files named test_*.sh) — every shipped script needs tests per testing-standards" >&2
   exit 1
 fi
 

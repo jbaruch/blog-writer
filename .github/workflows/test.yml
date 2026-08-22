@@ -61,24 +61,13 @@ jobs:
 
       # The Python gate's engines, per language-diagnostics (pyright is the
       # engine that rule names for Python) and code-formatting (ruff runs the
-      # format check and the lint). Both come from their package managers at a
-      # pinned version, which ubuntu-latest preinstalls — pipx keeps ruff out of
-      # the runner's externally-managed system Python.
-      #
-      # Renewal cadence for RUFF_VERSION and PYRIGHT_VERSION: reviewed on the
-      # first Monday of each quarter, alongside SHELLCHECK_VERSION above,
-      # against https://github.com/astral-sh/ruff/releases and
-      # https://github.com/microsoft/pyright/releases. No scanner tracks a
-      # version embedded in a workflow step, so this cadence is the renewal
-      # mechanism dependency-management Freshness requires.
+      # format check and the lint). The pinned versions and the install itself
+      # live in the script, which .github/pre-publish.sh also calls — the
+      # publish pipeline runs on a runner that installs nothing, and two copies
+      # of the pins would let the two paths gate the same code with different
+      # engines.
       - name: Install Python gate tooling
-        env:
-          RUFF_VERSION: 0.9.5
-          PYRIGHT_VERSION: 1.1.408
-        run: |
-          set -euo pipefail
-          pipx install "ruff==${RUFF_VERSION}"
-          npm install --global "pyright@${PYRIGHT_VERSION}"
+        run: bash .github/install-python-gate.sh
 
       # A tool that failed to install must stop the run here rather than surface
       # later as a confusing gate failure.
