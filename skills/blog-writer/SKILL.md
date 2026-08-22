@@ -243,9 +243,14 @@ Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` 
   it names only the sweeps that look mechanical and are not, so they cannot be assumed
   covered by a script that just reported nothing. Read for those, and for every remaining
   pattern in `references/ai-anti-patterns.md`.
-- **Exit 1** — `.hits` is non-empty. Every predicate in the script is arithmetic, so each
-  hit is a finding, not a candidate to weigh. Fix them all, then re-run until it exits 0.
-  Report findings to the author in your own words; the object is for you, not for them.
+- **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
+  of taste, but two of the sweeps rest on where the script found sentence boundaries.
+  `#7`, `#8` and `#18` count punctuation and characters: they are definitive, so fix them.
+  `#3/#4` and `#14` count sentences, and where a boundary is ambiguous the script splits
+  rather than merges — read the hit's `context` first. A "sentence" in it that is an
+  artifact of an abbreviation or an initial the splitter did not know is that artifact,
+  and the prose stays. Fix everything else, then re-run until it exits 0. Report findings
+  to the author in your own words; the object is for you, not for them.
 - **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
   stdout. Report the diagnostic to the author and do not claim the sweep ran.
 

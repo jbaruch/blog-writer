@@ -16,7 +16,9 @@
 #   6. #14 low burstiness — fires on a monotone run, not on varied lengths.
 #   7. #18 unicode giveaways — an opening and closing curly quote report as one
 #      finding with the combined count, not as two identical lines.
-#   8. Markdown exclusions — fenced code, frontmatter, HTML comments, headings
+#   8. Markdown exclusions — a region is excluded only when it closes, so an
+#      unterminated fence or a leading thematic break cannot sweep the draft
+#      clean. Fenced code, frontmatter, HTML comments, headings
 #      and asset placeholders do not contribute hits, for #18 as well as for the
 #      sentence sweeps, with a control proving the sweep still fires in prose.
 #   9. Abbreviation guard — "e.g." does not end a sentence, so it cannot
@@ -398,6 +400,40 @@ The prose itself carries nothing else wrong at all in any way whatsoever.' \
   assert_sweep "#7 finds a pair spanning more than 80 characters" \
     'The system — a Rails monolith running on three boxes in a colo nobody remembers renting — finally fell over.' \
     1 yes "PAIRED EM-DASH"
+
+  # Regression: an opener with no closer made every later line transparent, so a
+  # draft with no blocks swept clean. A false clean is the worst outcome this
+  # script can produce, and it exited 0 while examining nothing.
+  assert_sweep "unclosed frontmatter does not swallow the draft" \
+    '---
+It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  assert_sweep "an unterminated code fence does not swallow the draft" \
+    '# Title
+
+```bash
+echo hi
+
+It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  # A leading thematic break is valid markdown, not an unclosed frontmatter.
+  assert_sweep "a leading thematic break is content" \
+    '---
+
+It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  # The control: closed regions are still excluded, so the fixes above widened
+  # the input rather than disabling the exclusions.
+  assert_sweep "closed frontmatter is still excluded" \
+    '---
+title: It failed. We knew. Nobody cared.
+---
+
+The body itself carries nothing wrong at all, so the sweep must stay quiet.' \
+    0 no "fragment chain"
 
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.

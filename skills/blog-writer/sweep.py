@@ -269,6 +269,47 @@ def classify(group):
     return "prose"
 
 
+def closed_region(source, index, marker):
+    """Index of the line closing a region opened at `index`, or None.
+
+    A region is only a region when it closes. An unclosed opener that still
+    swallowed the rest of the file would make every later line transparent, and
+    a draft with no blocks sweeps clean — the false-clean this script exists to
+    prevent. A leading `---` that never closes is a thematic break, and an
+    unterminated fence is a typo; both leave their content readable.
+    """
+    for candidate in range(index + 1, len(source)):
+        if marker(source[candidate]):
+            return candidate
+    return None
+
+
+def excluded_spans(source):
+    """Line indices inside frontmatter or a closed fenced block."""
+    spans = set()
+    index = 0
+
+    if source and source[0].strip() == "---":
+        close = closed_region(source, 0, lambda line: line.strip() == "---")
+        if close is not None:
+            spans.update(range(0, close + 1))
+            index = close + 1
+
+    while index < len(source):
+        if index not in spans and _FENCE.match(source[index]):
+            close = closed_region(source, index, lambda line: _FENCE.match(line))
+            if close is None:
+                # An unterminated fence is not a fence; read its content.
+                index += 1
+                continue
+            spans.update(range(index, close + 1))
+            index = close + 1
+            continue
+        index += 1
+
+    return spans
+
+
 def read_lines(source):
     """Label every source line content, blank, or transparent.
 
@@ -283,15 +324,12 @@ def read_lines(source):
     A transparent line therefore holds its number without being either content
     or a separator: block assembly skips it and does not flush on it.
     """
+    excluded = excluded_spans(source)
     records = []
-    in_fence = False
     in_comment = False
-    in_frontmatter = bool(source) and source[0].strip() == "---"
 
     for index, line in enumerate(source, start=1):
-        if in_frontmatter:
-            if index > 1 and line.strip() == "---":
-                in_frontmatter = False
+        if index - 1 in excluded:
             records.append((index, "", "transparent"))
             continue
 
@@ -315,14 +353,6 @@ def read_lines(source):
                 in_comment = True
                 break
             line = line[:start] + line[close + 3 :]
-
-        if _FENCE.match(line):
-            in_fence = not in_fence
-            records.append((index, "", "transparent"))
-            continue
-        if in_fence:
-            records.append((index, "", "transparent"))
-            continue
 
         if not line.strip():
             # A line the author left empty separates paragraphs; a line left
