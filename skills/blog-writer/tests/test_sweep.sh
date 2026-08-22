@@ -23,7 +23,9 @@
 #      sentence sweeps, with a control proving the sweep still fires in prose.
 #   9. Abbreviation guard — "e.g." does not end a sentence, so it cannot
 #      manufacture a fragment chain.
-#  10. --json — valid JSON carrying each hit's pattern, line, and detail.
+#  10. Output shape — valid JSON carrying each hit's documented fields, and
+#      `verify_context` set on the sentence-counting sweeps only, since that is
+#      the flag SKILL.md routes on.
 #  11. Judgment patterns are never reported — the watchlist families stay with
 #      the agent, so no hit may carry #1, #10, #12, #17, #32, #35 or #36.
 #  12. Entry-point guard — importing the module runs nothing.
@@ -528,6 +530,21 @@ It failed. We knew. Nobody cared.
 - four' \
     0 no "fragment chain"
 
+  # `verify_context` is the routing signal SKILL.md acts on, so which sweeps set
+  # it is part of the emitted contract rather than something the skill restates.
+  # Sentence-counting sweeps rest on segmentation; character-counting ones do not.
+  sweep_fixture verify_flag 'It failed. We knew. Nobody cared. Then it broke.
+
+Three facilities — Austin, Berlin, Osaka — ran the nightly job without complaint.'
+  if ! jq -e '[.hits[] | select(.pattern == "#3/#4" or .pattern == "#14") | .verify_context] | length > 0 and all' <<<"$CASE_OUT" >/dev/null; then
+    fail "sentence-counting hits do not carry verify_context true"
+  elif ! jq -e '[.hits[] | select(.pattern == "#7" or .pattern == "#8" or .pattern == "#18") | .verify_context] | all(. == false)' <<<"$CASE_OUT" >/dev/null; then
+    fail "character-counting hits carry verify_context true"
+  else
+    ok
+    echo "  verify_context marks the segmentation-dependent hits only"
+  fi
+
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
 In todays landscape, it is important to note that this is, of course, pivotal.'
@@ -550,7 +567,7 @@ In todays landscape, it is important to note that this is, of course, pivotal.'
     fail "object shape: expected exit 1 on a hit, got ${json_rc}"
   elif ! jq -e '.ok == true and (.hits | length) >= 1 and (.path | length) > 0' <<<"$json_out" >/dev/null; then
     fail "object shape: output is not the promised object"
-  elif ! jq -e '.hits[0] | has("pattern") and has("label") and has("line") and has("detail") and has("context")' <<<"$json_out" >/dev/null; then
+  elif ! jq -e '.hits[0] | has("pattern") and has("label") and has("line") and has("detail") and has("context") and has("verify_context")' <<<"$json_out" >/dev/null; then
     fail "object shape: a hit is missing a documented field"
   else
     ok

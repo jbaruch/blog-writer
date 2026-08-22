@@ -234,8 +234,8 @@ a script, never by reading. Run it over the draft:
 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
 ```
 
-Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` and
-`context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
+Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`, `context`
+and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
 `patterns_total` and `note`. Route on the exit code:
 
 - **Exit 0** — `.hits` is empty. This is not a clean draft, and `.coverage.note` says how
@@ -244,13 +244,11 @@ Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail` 
   covered by a script that just reported nothing. Read for those, and for every remaining
   pattern in `references/ai-anti-patterns.md`.
 - **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
-  of taste, but two of the sweeps rest on where the script found sentence boundaries.
-  `#7`, `#8` and `#18` count punctuation and characters: they are definitive, so fix them.
-  `#3/#4` and `#14` count sentences, and where a boundary is ambiguous the script splits
-  rather than merges — read the hit's `context` first. A "sentence" in it that is an
-  artifact of an abbreviation or an initial the splitter did not know is that artifact,
-  and the prose stays. Fix everything else, then re-run until it exits 0. Report findings
-  to the author in your own words; the object is for you, not for them.
+  of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
+  the script placed sentence boundaries: read its `context` before rewriting, and if a
+  "sentence" shown there is a split artifact rather than real prose, that hit is the
+  artifact and the prose stays. Re-run until it exits 0. Report findings to the author in
+  your own words; the object is for you, not for them.
 - **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
   stdout. Report the diagnostic to the author and do not claim the sweep ran.
 

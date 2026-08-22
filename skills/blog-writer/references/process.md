@@ -402,39 +402,20 @@ halves fail. Keep them apart.
 
 #### The counting half — the script does this, not you
 
-Six patterns, across five sweeps, have a verdict that falls out of an arithmetic
-result: word counts per
-sentence, occurrences per section, character presence, runs and windows. Reading for them
-does not work. Uniform sentence length is invisible when reading for content and obvious
-when counting; a paired em-dash hides in a sentence you wrote yourself an hour ago.
+Some of the 39 patterns have a verdict that falls out of an arithmetic result: word counts
+per sentence, occurrences per section, character presence, runs and windows. Reading for
+them does not work. Uniform sentence length is invisible when reading for content and
+obvious when counting; a paired em-dash hides in a sentence you wrote yourself an hour ago.
 
 Run `sweep.py` over the draft. `SKILL.md` Step 10 carries the invocation and the exit-code
-routing — that is the only place they live. The script covers:
+routing, and that is the only place they live. Which patterns it covers, and with what
+figures, is the script's own contract — the run reports them in `.coverage.ran`, and the
+named constants under "Decision contract" at the top of `skills/blog-writer/sweep.py` hold
+the numbers. Do not reproduce either here or by reading. The fix for each pattern it
+reports is in `references/ai-anti-patterns.md` under that pattern's number.
 
-- **Fragment chains (#3, #4)** — a run of consecutive very short sentences. Fold them back
-  into the surrounding prose, or give one of them real content.
-- **Parenthetical em-dashes (#7)** — an aside fenced by a pair of em-dashes. A usage check,
-  not a density check, so a passing #8 count never clears it. Convert to parentheses,
-  restructure the sentence, or promote the aside to its own clause.
-- **Em-dash density (#8)** — too many em-dashes in one section. The density check only;
-  individual paired em-dashes are #7's job, and a section that passes the count can still
-  carry one.
-- **Low burstiness (#14)** — a run of consecutive sentences whose lengths sit too close
-  together. The fix is genuine variety — a mix of short, medium, and long sentences — not
-  merging everything into one compound sentence, which trades seven monotone beats for one
-  run-on.
-- **Unicode giveaways (#18)** — curly quotes, ellipsis and bullet characters, en dashes,
-  non-breaking spaces, where the ASCII form is what belongs in the file.
-
-What counts as "very short", "too many", and "too close" is the script's call, not yours to
-re-derive: the figures are the named constants under "Decision contract" at the top of
-`skills/blog-writer/sweep.py`. The patterns those constants implement are defined in
-`references/ai-anti-patterns.md`.
-
-Do not reproduce these counts by reading, and do not report them as checked without having
-run the script. Re-run it after every rewrite: a clean draft plus one edit is an unchecked
-draft, and the most common way a tell ships is being introduced by the fix for something
-else.
+Re-run it after every rewrite: a clean draft plus one edit is an unchecked draft, and the
+most common way a tell ships is being introduced by the fix for something else.
 
 **A clean sweep is not a clean draft.** The script reports its own coverage on every run,
 including a run with no findings. It cannot speak for the patterns it did not examine, and
@@ -442,7 +423,7 @@ its silence about them is not a pass.
 
 #### The judging half — no script does this, you do
 
-For the seven below the string match is the trivial part and the call is the work. Search
+For the patterns below the string match is the trivial part and the call is the work. Search
 literally where a watchlist is named, then read every hit and decide. A hit is a candidate,
 not a finding.
 

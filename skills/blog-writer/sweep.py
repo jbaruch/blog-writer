@@ -562,13 +562,24 @@ def sentence_units(block):
         yield number, sentence
 
 
-def hit(pattern, label, line, detail, context=""):
+def hit(pattern, label, line, detail, context="", verify_context=False):
+    """One finding.
+
+    `verify_context` says whether the finding rests on where this script placed
+    sentence boundaries. Counting characters or punctuation does not; counting
+    sentences does, and where a boundary is ambiguous the splitter splits rather
+    than merges, so a rare hit is the artifact of a split and not a real run.
+    The flag travels with the hit so the consuming skill routes on emitted data
+    instead of carrying its own copy of which sweeps are which
+    (`jbaruch/coding-policy: script-as-black-box`).
+    """
     return {
         "pattern": pattern,
         "label": label,
         "line": line,
         "detail": detail,
         "context": " ".join(context.split())[:90],
+        "verify_context": verify_context,
     }
 
 
@@ -588,6 +599,7 @@ def sweep_fragments(blocks):
                     f"{len(run)} consecutive sentences under "
                     f"{FRAGMENT_MAX_WORDS} words",
                     " ".join(sentence for _, sentence in run),
+                    verify_context=True,
                 )
             )
 
@@ -671,6 +683,7 @@ def sweep_burstiness(blocks):
                         units[index][0],
                         f"{window} of {lengths}",
                         block.text,
+                        verify_context=True,
                     )
                 )
                 break  # one hit per paragraph; the fix is the paragraph
