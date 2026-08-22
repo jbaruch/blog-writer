@@ -6,12 +6,13 @@
 #   2. Coverage is always stated — the report names what ran and what did not on
 #      a zero-hit run too, and never prints a bare "clean". This is the contract
 #      that stops a passing sweep from displacing the contextual read.
-#   3. #7 paired em-dash — fires on a real pair, and does NOT pair across a
-#      sentence boundary or across two list items.
+#   3. #7 paired em-dash — fires on a real pair of any interior length, and does
+#      NOT pair across a sentence boundary or across two list items.
 #   4. #8 em-dash density — fires above the per-section limit, not at it, and
 #      counts per section rather than per document.
 #   5. #3/#4 fragment chains — fires on a run of short sentences, not on a
-#      shorter run, and not on a list of short items.
+#      shorter run, and not on a list of short items. Blockquotes count as
+#      prose; sentence boundaries survive a trailing capital.
 #   6. #14 low burstiness — fires on a monotone run, not on varied lengths.
 #   7. #18 unicode giveaways — an opening and closing curly quote report as one
 #      finding with the combined count, not as two identical lines.
@@ -358,6 +359,42 @@ The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
 
 The prose itself carries nothing else wrong at all in any way whatsoever.' \
     1 yes "unicode giveaway"
+
+  # Regression: every sentence ending in a lone capital was read as an initial,
+  # so an ordinary sentence merged with the next and took the chain with it.
+  assert_sweep "a sentence ending in a capital still ends" \
+    'Pick A. Go. Stop. Then the pager went off at three in the morning and woke us.' \
+    1 yes "fragment chain"
+
+  # The narrow guard it was replaced by: a genuine run of initials does not
+  # shatter into one-word sentences.
+  assert_sweep "a run of initials is not a fragment chain" \
+    'The copy on the shelf was J. R. R. Tolkien, and nobody had opened it in years.' \
+    0 no "fragment chain"
+
+  # Regression: blockquotes were classified, handled by the splitter, and then
+  # silently dropped from both sentence sweeps.
+  assert_sweep "#3/#4 covers a blockquote" \
+    '> It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  assert_sweep "#14 covers a blockquote" \
+    '> The system indexes every file on disk. It writes results to a local cache.
+> The cache is invalidated on each commit.' \
+    1 yes "low burstiness"
+
+  # A wrapped blockquote is one sentence across two lines, not two sentences,
+  # and its markers are not words.
+  assert_sweep "a wrapped blockquote is not cut at the line break" \
+    '> This quoted sentence wraps across two source lines without ending
+> anywhere near the first of them, so it must not read as two.' \
+    0 no "fragment chain"
+
+  # Regression: the span cap silently exempted the long asides that are the most
+  # characteristic form of #7.
+  assert_sweep "#7 finds a pair spanning more than 80 characters" \
+    'The system — a Rails monolith running on three boxes in a colo nobody remembers renting — finally fell over.' \
+    1 yes "PAIRED EM-DASH"
 
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.

@@ -79,11 +79,20 @@ BURSTINESS_SPREAD = 5
 EMDASH_PER_SECTION = 2
 
 # #7 — a paired em-dash is an aside inside one sentence, so the pair is matched
-# per sentence. The span cap keeps two unrelated asides in a long sentence from
-# reading as one pair.
-PAIRED_EMDASH_MAX_SPAN = 80
+# per sentence. There is deliberately no cap on how much text may sit between
+# the two dashes: the pattern's rule is that every pair is a finding, and a cap
+# silently exempted the long asides ("The system — a Rails monolith running in a
+# colo nobody remembers renting — fell over") that are the most characteristic
+# form of it. Per-sentence matching, not a length limit, is what keeps two
+# unrelated asides from reading as one pair.
 
 EM_DASH = "—"
+
+# Blocks whose sentences the fragment and burstiness sweeps read. A blockquote
+# is reader-visible prose the author most often wrote, so excluding it narrowed
+# the sweep without saying so. A quoted passage that is genuinely someone else's
+# words is a finding the agent dismisses, which is the safe direction.
+PROSE_KINDS = ("prose", "quote")
 
 # #18 — characters a human keyboard does not produce by accident in a draft.
 # The ASCII form is what belongs in the file; the curly and composed forms are
@@ -145,6 +154,12 @@ ABBREVIATIONS = frozenset(
 
 _SENTENCE_END = re.compile(r"([.!?])([\"')\]]*)(\s+)")
 
+# A single capital letter standing as its own token, ending the text so far.
+_LONE_INITIAL = re.compile(r"(?:^|\s)[A-Z]\.$")
+
+# The same shape opening the text that follows.
+_LONE_INITIAL_NEXT = re.compile(r"[A-Z]\.(?:\s|$)")
+
 
 def split_sentences(text):
     """Split prose into sentences, guarding abbreviations and numeric periods."""
@@ -158,14 +173,24 @@ def split_sentences(text):
         if last_token in ABBREVIATIONS:
             continue
 
-        # A lone capital before the period is an initial ("J. R. R. Tolkien"),
-        # not a terminator. There is deliberately no digit guard here: the
-        # pattern above requires whitespace after the period, so a decimal
-        # ("v1.2", "0.3%") never matches in the first place, while "It failed at
-        # 4. 3 people knew." is two real sentences that a digit guard would
-        # merge — suppressing exactly the fragment-chain and burstiness findings
-        # this script exists to catch.
-        if re.search(r"\b[A-Z]\.$", head):
+        # An initial is only an initial inside a run of them: a lone capital
+        # AND another lone capital next ("J. R. R. Tolkien"). Treating every
+        # trailing capital as an initial swallowed the boundary in ordinary
+        # prose — "Pick A. Go. Stop." merged at "A." and took the fragment
+        # chain with it. The narrow form is enumerable; "detect an initial" in
+        # general is not (`script-delegation` The Regex Trap).
+        #
+        # There is deliberately no digit guard here: the pattern above requires
+        # whitespace after the period, so a decimal ("v1.2", "0.3%") never
+        # matches in the first place, while "It failed at 4. 3 people knew." is
+        # two real sentences a digit guard would merge.
+        #
+        # Both guards fail toward a false split rather than a merge. A false
+        # split inflates the count of short sentences, which the agent dismisses
+        # off a false #3/#4 hit; a merge silently removes a finding.
+        if _LONE_INITIAL.search(head) and _LONE_INITIAL_NEXT.match(
+            text[match.end(3) :]
+        ):
             continue
 
         sentence = head.strip()
@@ -188,6 +213,9 @@ _FENCE = re.compile(r"^\s*(```|~~~)")
 _HEADING = re.compile(r"^\s{0,3}#{1,6}\s")
 _LIST_ITEM = re.compile(r"^\s*(?:[-*+]\s+|\d+[.)]\s+)")
 _BLOCKQUOTE = re.compile(r"^\s*>")
+
+# The marker itself, stripped before a blockquote is read as prose.
+_BLOCKQUOTE_MARKER = re.compile(r"^\s*>\s?")
 _TABLE_ROW = re.compile(r"^\s*\|")
 
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
@@ -385,23 +413,30 @@ def sentence_units(block):
 
     A prose paragraph is one unit wrapped across source lines, so it is
     sentence-split whole and each sentence is mapped back to the line it starts
-    on. A list or table is a set of independent items that happen to be
-    adjacent, so each line is split separately — otherwise the trailing em-dash
-    of one item pairs with the leading em-dash of the next and reports an aside
-    that does not exist.
+    on. A blockquote is prose too — wrapped the same way, just marked — so it
+    takes the same path with the markers stripped; splitting it per line would
+    cut every wrapped sentence in half. A list or table is a set of independent
+    items that happen to be adjacent, so each line is split separately —
+    otherwise the trailing em-dash of one item pairs with the leading em-dash of
+    the next and reports an aside that does not exist.
     """
-    if block.kind in ("list", "quote"):
+    if block.kind == "list":
         for number, text in block.numbered:
             for sentence in split_sentences(text):
                 yield number, sentence
         return
 
+    sources = [
+        (number, _BLOCKQUOTE_MARKER.sub("", text) if block.kind == "quote" else text)
+        for number, text in block.numbered
+    ]
+
     starts = []
     cursor = 0
-    for number, text in block.numbered:
+    for number, text in sources:
         starts.append((cursor, number))
         cursor += len(text) + 1
-    whole = "\n".join(text for _, text in block.numbered)
+    whole = "\n".join(text for _, text in sources)
 
     searched = 0
     for sentence in split_sentences(whole):
@@ -431,7 +466,7 @@ def sweep_fragments(blocks):
     """#3/#4 — a run of consecutive short sentences in one paragraph."""
     hits = []
     for block in blocks:
-        if block.kind != "prose":
+        if block.kind not in PROSE_KINDS:
             continue
 
         def flag(run):
@@ -466,15 +501,8 @@ def sweep_paired_emdash(blocks):
     matching across the whole text would pair the dash of one sentence with the
     dash of the next.
     """
-    pattern = re.compile(
-        EM_DASH
-        + r"[^"
-        + EM_DASH
-        + r"]{1,"
-        + str(PAIRED_EMDASH_MAX_SPAN)
-        + r"}"
-        + EM_DASH
-    )
+    pattern = re.compile(EM_DASH + r"[^" + EM_DASH + r"]+" + EM_DASH)
+
     hits = []
     for block in blocks:
         if block.kind in ("heading", "placeholder"):
@@ -517,7 +545,7 @@ def sweep_burstiness(blocks):
     """#14 — a run of sentences whose lengths sit close to each other."""
     hits = []
     for block in blocks:
-        if block.kind != "prose":
+        if block.kind not in PROSE_KINDS:
             continue
         units = list(sentence_units(block))
         lengths = [count_words(sentence) for _, sentence in units]
