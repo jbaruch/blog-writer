@@ -435,6 +435,72 @@ title: It failed. We knew. Nobody cared.
 The body itself carries nothing wrong at all, so the sweep must stay quiet.' \
     0 no "fragment chain"
 
+  # Regression: any later `---` counted as the closing delimiter, so a document
+  # opening with a thematic break and carrying a second one hid every line
+  # between them from every sweep.
+  assert_sweep "two thematic breaks are not frontmatter" \
+    '---
+
+It failed. We knew. Nobody cared. Then the pager went off at three today.
+
+---
+
+More prose follows here.' \
+    1 yes "fragment chain"
+
+  # Regression: a fence closed by a different marker, or a shorter run of the
+  # same one, is not a close (CommonMark). Accepting either silently excluded
+  # the prose after it.
+  assert_sweep "a backtick fence is not closed by a tilde fence" \
+    '# Title
+
+```bash
+echo hi
+~~~
+
+It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  assert_sweep "a fence is not closed by a shorter run" \
+    '# Title
+
+````bash
+echo hi
+```
+
+It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  # Regression: an unterminated comment made every later line transparent, so
+  # the sweep exited 0 after examining no prose.
+  assert_sweep "an unterminated HTML comment does not swallow the draft" \
+    '# Title
+
+<!-- VERIFY: this comment never closes
+
+It failed. We knew. Nobody cared. Then the pager went off at three today.' \
+    1 yes "fragment chain"
+
+  # The control for all four: a real closed region is still excluded, so the
+  # fixes widened the input rather than disabling the exclusions.
+  assert_json "real frontmatter is still excluded" \
+    '---
+title: It failed. We knew. Nobody cared.
+---
+
+The body carries nothing wrong at all so the sweep must stay entirely quiet.' \
+    0 '(.hits | length) == 0'
+
+  assert_sweep "a matched fence is still excluded" \
+    '# Title
+
+````bash
+echo "this — has — paired dashes and must be ignored"
+````
+
+The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
+    0 no "PAIRED EM-DASH"
+
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
 In todays landscape, it is important to note that this is, of course, pivotal.'

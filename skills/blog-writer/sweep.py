@@ -211,7 +211,15 @@ def split_sentences(text):
 _PLACEHOLDER = re.compile(
     r"\[(?:Screenshot|Code|Link|Fact|Diagram)\s+\d+:[^\]]*\]", re.IGNORECASE
 )
-_FENCE = re.compile(r"^\s*(```|~~~)")
+_FENCE = re.compile(r"^(\s{0,3})(`{3,}|~{3,})(.*)$")
+
+# A YAML key line, and a continuation or list item under one. Together they are
+# the bounded grammar that separates real frontmatter from a thematic break.
+_YAML_KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_.-]*\s*:")
+_YAML_CONTINUATION = re.compile(r"^(?:\s+\S|-\s+\S)")
+
+# Only a comment that closes. A stray `<!--` stays ordinary content.
+_CLOSED_COMMENT = re.compile(r"<!--.*?-->", re.DOTALL)
 _HEADING = re.compile(r"^\s{0,3}#{1,6}\s")
 _LIST_ITEM = re.compile(r"^\s*(?:[-*+]\s+|\d+[.)]\s+)")
 _BLOCKQUOTE = re.compile(r"^\s*>")
@@ -269,45 +277,110 @@ def classify(group):
     return "prose"
 
 
-def closed_region(source, index, marker):
-    """Index of the line closing a region opened at `index`, or None.
+def frontmatter_end(source):
+    """Index of the line closing YAML frontmatter, or None when there is none.
 
-    A region is only a region when it closes. An unclosed opener that still
-    swallowed the rest of the file would make every later line transparent, and
-    a draft with no blocks sweeps clean — the false-clean this script exists to
-    prevent. A leading `---` that never closes is a thematic break, and an
-    unterminated fence is a typo; both leave their content readable.
+    Frontmatter is recognised by a bounded grammar, not by "a `---` followed by
+    another `---`. A document that opens with a thematic break and carries a
+    second one later would otherwise hide every line between them from every
+    sweep, and a draft with no blocks sweeps clean. So the delimiter must be
+    followed by a YAML key, and every non-blank line up to the closer must keep
+    looking like YAML; the first line that does not means this was never
+    frontmatter.
     """
+    if not source or source[0].strip() != "---":
+        return None
+    if len(source) < 2 or not _YAML_KEY.match(source[1]):
+        return None
+
+    for index in range(1, len(source)):
+        stripped = source[index].strip()
+        if stripped == "---":
+            return index
+        if not stripped:
+            continue
+        if not (
+            _YAML_KEY.match(source[index]) or _YAML_CONTINUATION.match(source[index])
+        ):
+            return None
+    return None
+
+
+def fence_end(source, index, marker):
+    """Index of the line closing the fence opened at `index`, or None.
+
+    Per CommonMark the closer uses the same character, runs at least as long as
+    the opener, and carries no info string. Accepting any fence-looking line let
+    a ``` block be closed by ~~~, or by a shorter run, which silently excluded
+    the prose in between.
+    """
+    char = marker[0]
     for candidate in range(index + 1, len(source)):
-        if marker(source[candidate]):
+        found = _FENCE.match(source[candidate])
+        if not found:
+            continue
+        closer = found.group(2)
+        if (
+            closer[0] == char
+            and len(closer) >= len(marker)
+            and not found.group(3).strip()
+        ):
             return candidate
     return None
 
 
 def excluded_spans(source):
-    """Line indices inside frontmatter or a closed fenced block."""
+    """Line indices inside frontmatter or a closed fenced block.
+
+    Every region here must close. An opener with no closer that still swallowed
+    the rest of the file would leave the sweep with nothing to examine and an
+    exit code that reads as clean — the failure this script exists to prevent.
+    An unterminated fence is a typo whose content still reads.
+    """
     spans = set()
     index = 0
 
-    if source and source[0].strip() == "---":
-        close = closed_region(source, 0, lambda line: line.strip() == "---")
-        if close is not None:
-            spans.update(range(0, close + 1))
-            index = close + 1
+    close = frontmatter_end(source)
+    if close is not None:
+        spans.update(range(0, close + 1))
+        index = close + 1
 
     while index < len(source):
-        if index not in spans and _FENCE.match(source[index]):
-            close = closed_region(source, index, lambda line: _FENCE.match(line))
-            if close is None:
-                # An unterminated fence is not a fence; read its content.
+        found = _FENCE.match(source[index])
+        if found:
+            fence_close = fence_end(source, index, found.group(2))
+            if fence_close is None:
                 index += 1
                 continue
-            spans.update(range(index, close + 1))
-            index = close + 1
+            spans.update(range(index, fence_close + 1))
+            index = fence_close + 1
             continue
         index += 1
 
     return spans
+
+
+def strip_closed_comments(source):
+    """Blank the characters inside closed HTML comments, keeping every line.
+
+    Only a comment with a closing marker is a comment. Tracking `<!--` as state
+    meant an unterminated one made every later line transparent, so the sweep
+    exited 0 having examined no prose. Matching the closed form leaves a stray
+    `<!--` as ordinary content instead.
+
+    Characters are replaced one for one and newlines are left alone, so line
+    numbers and the columns around the comment survive untouched.
+    """
+    text = "\n".join(source)
+    if "<!--" not in text:
+        return list(source)
+
+    out = list(text)
+    for found in _CLOSED_COMMENT.finditer(text):
+        for position in range(found.start(), found.end()):
+            if out[position] != "\n":
+                out[position] = " "
+    return "".join(out).split("\n")
 
 
 def read_lines(source):
@@ -325,38 +398,18 @@ def read_lines(source):
     or a separator: block assembly skips it and does not flush on it.
     """
     excluded = excluded_spans(source)
+    stripped = strip_closed_comments(source)
     records = []
-    in_comment = False
 
-    for index, line in enumerate(source, start=1):
+    for index, line in enumerate(stripped, start=1):
         if index - 1 in excluded:
             records.append((index, "", "transparent"))
             continue
 
-        was_blank = not line.strip()
-
-        if in_comment:
-            close = line.find("-->")
-            if close < 0:
-                records.append((index, "", "transparent"))
-                continue
-            in_comment = False
-            line = line[close + 3 :]
-
-        while True:
-            start = line.find("<!--")
-            if start < 0:
-                break
-            close = line.find("-->", start)
-            if close < 0:
-                line = line[:start]
-                in_comment = True
-                break
-            line = line[:start] + line[close + 3 :]
-
         if not line.strip():
             # A line the author left empty separates paragraphs; a line left
             # empty by removing a comment does not.
+            was_blank = not source[index - 1].strip()
             records.append((index, "", "blank" if was_blank else "transparent"))
             continue
 
