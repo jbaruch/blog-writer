@@ -21,6 +21,17 @@ set -euo pipefail
 
 gate_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
+# The publish runner installs nothing of its own, so the gate provisions the
+# engines it is about to run. Only in CI: on a developer's machine an unasked
+# global install is intrusive, and lint-python.sh already fails there with the
+# command to run. Skipping the engines is never an option in either place
+# (`ci-safety` Install, Don't Skip).
+if [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  echo "== Python gate engines =="
+  bash "${gate_dir}/install-python-gate.sh"
+  echo
+fi
+
 echo "== Shell diagnostics =="
 bash "${gate_dir}/lint-shell.sh"
 

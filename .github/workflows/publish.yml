@@ -25,6 +25,11 @@ jobs:
     secrets:
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
     with:
+      # The runtimes .github/install-python-gate.sh installs onto: pipx for
+      # ruff, npm for pyright. The reusable workflow sets up neither unless
+      # asked, and the pre-publish gate below needs both.
+      python-version: '3.11'
+      node-version: '22'
       skill-review-credit-outage: skip
       # Runs every skills/**/test_*.sh suite after checkout and before publish,
       # so a shipped script whose tests fail never reaches the registry. The
