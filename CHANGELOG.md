@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.31 — 2026-08-30
+
 ### Changed
 
 - **The pattern count lives in the pattern file, and nowhere else** — `39` was written into 22 places: `PATTERNS_TOTAL` in `sweep.py`, a literal assertion in `tests/test_sweep.sh`, and 20 prose statements across `SKILL.md`, `README.md`, `process.md`, `structural-audits.md`, `tone-guide.md` and `ai-anti-patterns.md` itself. Adding a pattern meant editing all of them, and the one that mattered most was the one nobody would think to check: `.coverage.note` tells the agent how much of the check went unexamined, so a stale total there understates the gap in the exact sentence written to prevent that. `sweep.py` now counts the `## <n>. ` headings in `references/ai-anti-patterns.md` on every run, and the prose says "every pattern" or "the catalog" instead of a number. Adding a pattern is now one edit to one file.
