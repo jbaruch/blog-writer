@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.33 — 2026-08-30
+
 ### Fixed
 
 - **The freshness check reports its findings instead of writing them into a file that gets overwritten** (#41) — Step 5 ended with "update the file to incorporate them", naming `references/ai-anti-patterns.md`. In a consumer that path resolves inside the installed plugin, which `tessl install` re-materializes: the edit is erased on the next update, never reaches `jbaruch/blog-writer`, and never reaches any other consumer. Confirmed against the 1.1.29 install in a consumer repo, where the mount is committed to that repo's own git, so the edit would have landed in the wrong repository and still been clobbered. The instruction and the practice had already disagreed — #22 was a real finding from this step, and it arrived as an issue filed here and fixed here, which is the path that works.
