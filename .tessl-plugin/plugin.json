@@ -1,6 +1,6 @@
 {
   "name": "jbaruch/blog-writer",
-  "version": "1.1.29",
+  "version": "1.1.30",
   "private": false,
   "description": "Write developer blog posts from video transcripts, meeting notes, or rough ideas — extracting narrative, structuring hooks and technical sections, formatting code placeholders, learning the author's voice through interactive onboarding, and checking drafts against 39 AI anti-patterns with three-pass scanning, craft sweep, and rewrite auditing — whenever the user wants to write a blog post, draft a blog, turn a transcript into a blog, work on blog content, or continue a blog series.",
   "skills": [
