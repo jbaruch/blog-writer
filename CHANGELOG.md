@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.32 — 2026-08-30
+
 ### Changed
 
 - **`tone-guide.md` points at the pattern list instead of carrying its own copy of it** — the "Quick index for scanning" restated all 39 patterns as one-liners, a second catalog with the same drift exposure the hardcoded count had, and one the 1.1.31 derivation could not protect: a pattern added to `ai-anti-patterns.md` leaves the index quietly short, and the agent reads both files. Verified nothing was lost before deleting — every term in the index resolves in the canonical file, including the one entry that looked unique (`the cursor blinked mockingly`, which is in #39's tell line and its examples). The section now names the canonical file and states that this one carries no copy, so the index does not grow back.
