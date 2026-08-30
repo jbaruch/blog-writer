@@ -60,9 +60,10 @@ including the script, which is re-run after every edit.
 
 At the start of each session the skill fetches
 [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
-and compares it against the anti-pattern list, adding anything the list doesn't already
-cover. The refresh is a step the agent runs, not a background process — the file changes
-only when a session finds something new in the article.
+and compares it against the anti-pattern list, then reports anything the list doesn't
+already cover. The refresh reads and reports; it never edits the list. A finding becomes a
+change to the skill through its own review, not a silent rewrite inside whichever session
+happened to notice it.
 
 ## Structural audits
 

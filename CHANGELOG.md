@@ -1,5 +1,12 @@
 # Changelog
 
+### Fixed
+
+- **The freshness check reports its findings instead of writing them into a file that gets overwritten** (#41) — Step 5 ended with "update the file to incorporate them", naming `references/ai-anti-patterns.md`. In a consumer that path resolves inside the installed plugin, which `tessl install` re-materializes: the edit is erased on the next update, never reaches `jbaruch/blog-writer`, and never reaches any other consumer. Confirmed against the 1.1.29 install in a consumer repo, where the mount is committed to that repo's own git, so the edit would have landed in the wrong repository and still been clobbered. The instruction and the practice had already disagreed — #22 was a real finding from this step, and it arrived as an issue filed here and fixed here, which is the path that works.
+- **What the report has to carry** — a bare "the article has something new" is not actionable, so each finding names three things: the article's own wording for the tell, the closest existing pattern or that there is none, and whether its verdict is a count or a judgment. The third is what routes the work, since the counting half belongs in `sweep.py` and the judging half in the catalog (#35). A refresh that finds nothing says so rather than going quiet.
+- **The session continues on the current file either way** — a finding changes the skill through its own review; it never changes the draft being written in the session that noticed it.
+- **The two other options were dropped**: a local overlay in the persona directory adds a second source of truth for the check to reconcile, and having the skill open an issue upstream puts issue-filing inside a writing workflow and runs into `jbaruch/coding-policy: external-repo-contributions` for anyone who is not the owner.
+
 ## 1.1.32 — 2026-08-30
 
 ### Changed
