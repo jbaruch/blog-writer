@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.30 — 2026-08-30
+
 ### Fixed
 
 - **Every script invocation in `SKILL.md` names its interpreter** — tessl materializes a plugin's files without the executable bit. The scripts are `rwxr-xr-x` in this repo and `rw-r--r--` under `.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/` in a consumer, so all six invocations, each printed as a bare path in a `bash` fence, came back `permission denied` when an agent ran the command exactly as written. The symptom reported was the Step 5 Wikipedia refresh failing, but that step is only the first one an agent reaches after onboarding; the same break covered the persona probe (Steps 2 and 3), the shape-convergence audit (Step 8), the counting sweep (Step 10), and the shape record (Step 12). Reproduced against a 1.1.29 install in a consumer repo, where `bash <mount-path>` and `python3 <mount-path>` both run clean. Each invocation now carries `bash` or `python3`, and the preamble states the rule so a later edit does not drop a prefix back to a bare path.
