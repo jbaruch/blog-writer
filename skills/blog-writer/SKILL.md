@@ -18,6 +18,10 @@ Write developer blog posts for practitioners who build things, break things, and
 opinions about their tools. The voice is the author's own — configured through persona
 files that capture their style, rhetorical devices, and personality.
 
+**Script invocation.** Run every script this skill calls through its interpreter: `bash`
+for a `.sh`, `python3` for a `.py`. The installed plugin's files carry no executable bit.
+Never invoke one by bare path.
+
 ## Step 1 — Resolve the Persona Path
 
 **Persona path:** `~/.claude/blog-writer-persona/`
@@ -35,7 +39,7 @@ Ask the script what state the persona is in. Do not inspect the filesystem yours
 script decides whether the directory exists and whether the voice profile has content:
 
 ```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh --probe
+bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh --probe
 ```
 
 It changes nothing and prints
@@ -64,7 +68,7 @@ Then run the same script to establish it. Pass the author's chosen path for opti
 no argument for option 1:
 
 ```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh [target-path]
+bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh [target-path]
 ```
 
 An `action` of `created` or `linked` means the directory is now in place. An `action` of
@@ -86,7 +90,7 @@ Fetch Wikipedia's "Signs of AI writing" article and compare it against
 `skills/blog-writer/references/ai-anti-patterns.md`.
 
 ```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/fetch-signs-of-ai-writing.sh
+bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/fetch-signs-of-ai-writing.sh
 ```
 
 The script writes the raw wikitext to a file and prints `{"ok": true, "path": ..., "bytes": ...}`.
@@ -170,7 +174,7 @@ at a time. `skills/blog-writer/references/process.md` section 2f has the procedu
 For audit 6, ask the script for the verdict rather than reading the shape history yourself:
 
 ```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-shape-convergence.sh \
+bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-shape-convergence.sh \
   <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
 ```
 
@@ -231,7 +235,7 @@ procedure in order, and never invent a pattern the file does not define.
 a script, never by reading. Run it over the draft:
 
 ```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
+python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
 ```
 
 Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`, `context`
@@ -287,7 +291,7 @@ Append the finished post's skeleton to the shape history so the next post's audi
 something to compare against. Do not write the file yourself. Run:
 
 ```bash
-.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \
+bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \
   <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
   "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
 ```
