@@ -87,7 +87,7 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**Read `references/ai-anti-patterns.md` for the full list.** It contains 39 named patterns
+**Read `references/ai-anti-patterns.md` for the full list.** It names every pattern,
 with symptoms, examples, and alternatives. Scan the draft against every one of them during
 Phase 3 and Phase 4. Zero tolerance.
 
@@ -435,7 +435,7 @@ Before submitting a draft, check:
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
   (holistic read for sterile, voiceless writing). Rewrite any hits, then re-check each
-  rewrite against all 39 patterns before considering it fixed.
+  rewrite against every pattern before considering it fixed.
 
 ---
 

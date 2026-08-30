@@ -3,7 +3,7 @@ name: blog-writer
 description: >
   Write developer blog posts from video transcripts, meeting notes, or rough ideas.
   Extracts narrative from source material, structures content with hooks and technical sections,
-  formats code examples with placeholders, and checks drafts against 39 AI anti-patterns.
+  formats code examples with placeholders, and checks drafts against a catalog of AI anti-patterns.
   Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript
   into a blog, work on blog content, or mentions "blog" in the context of content creation.
   Also trigger when the user provides a video transcript and wants written content derived from it,
@@ -123,7 +123,7 @@ Read these reference files in order:
    other reference file.
 3. `skills/blog-writer/references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-4. `skills/blog-writer/references/ai-anti-patterns.md` — 39 named AI writing patterns to never use. Each has
+4. `skills/blog-writer/references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
 5. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
@@ -243,7 +243,7 @@ and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`,
 `patterns_total` and `note`. Route on the exit code:
 
 - **Exit 0** — `.hits` is empty. This is not a clean draft, and `.coverage.note` says how
-  many of the 39 patterns went unexamined. `.coverage.not_run_judgment` is not that list:
+  many patterns went unexamined. `.coverage.not_run_judgment` is not that list:
   it names only the sweeps that look mechanical and are not, so they cannot be assumed
   covered by a script that just reported nothing. Read for those, and for every remaining
   pattern in `references/ai-anti-patterns.md`.
@@ -259,7 +259,7 @@ and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`,
 Re-run it after every rewrite, including the rewrites made to fix its own findings and
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
 the sweep as clean without having run it. Never report the draft as clean from this sweep;
-it examines a minority of the 39 patterns and `.coverage.note` says how many it left.
+it examines a minority of the catalog and `.coverage.note` says how many it left.
 `references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
 you read for.
 

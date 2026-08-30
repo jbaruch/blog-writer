@@ -1,8 +1,8 @@
 # Structural Audits
 
-The 39 anti-patterns in `references/ai-anti-patterns.md` work at the sentence and section
+The anti-patterns in `references/ai-anti-patterns.md` work at the sentence and section
 level. This file works at the level above: the shape of the whole post. A draft can pass
-every one of the 39 and still be identifiable as machine-written from its skeleton alone.
+every one of them and still be identifiable as machine-written from its skeleton alone.
 
 ## Why this layer exists
 
@@ -13,7 +13,7 @@ withheld. It reached 93.2% macro-F1. Then it ran the AI text through a professio
 span-level rewriting framework — the equivalent of a very good surface editing pass — and
 detection fell by 1.6 points.
 
-Surface editing is not the durable half. That does not make the 39 patterns less
+Surface editing is not the durable half. That does not make the anti-patterns less
 important; they are what makes a post readable. It means they are not sufficient, and the
 part they miss is the part that survives editing.
 

@@ -394,7 +394,7 @@ comments on reconstructed code and diagrams as open questions rather than resolv
 Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md` and scan
 the draft:
 
-**Pass 1 — Surface scan:** Read the draft against each of the 39 patterns, looking for
+**Pass 1 — Surface scan:** Read the draft against each pattern in the catalog, looking for
 the forms described in the examples and structural variants.
 
 Pass 1 is two different jobs, and running either one as if it were the other is how both
@@ -402,7 +402,7 @@ halves fail. Keep them apart.
 
 #### The counting half — the script does this, not you
 
-Some of the 39 patterns have a verdict that falls out of an arithmetic result: word counts
+Some patterns have a verdict that falls out of an arithmetic result: word counts
 per sentence, occurrences per section, character presence, runs and windows. Reading for
 them does not work. Uniform sentence length is invisible when reading for content and
 obvious when counting; a paired em-dash hides in a sentence you wrote yourself an hour ago.
@@ -519,7 +519,7 @@ not checking against specific patterns but reacting to the overall feel. Look fo
 - Uniform energy — every paragraph has the same emotional temperature
 - Press-release tone — sounds like it was written to impress rather than to communicate
 
-A draft can pass all 39 patterns and still read as obviously AI because it has no soul. If
+A draft can pass every pattern and still read as obviously AI because it has no soul. If
 Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite — it's going
 back to `persona/voice.md` and injecting the author's actual rhetorical devices, opinions,
 and attitude into the flat sections.
@@ -527,7 +527,7 @@ and attitude into the flat sections.
 Rewrite any hits. This is not optional.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
-in isolation and check it against ALL 39 patterns. Rewrites frequently introduce the same
+in isolation and check it against EVERY pattern. Rewrites frequently introduce the same
 pattern in a different surface form. This is especially true for:
 - #2 (Parallel Binary) — the most likely pattern to survive a rewrite, because describing
   a comparison naturally produces mirrored clauses. If you rewrote a parallel binary and the
@@ -536,7 +536,7 @@ pattern in a different surface form. This is especially true for:
 - #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
   question with a longer answer, but the structure is identical.
 
-Do not consider an anti-pattern fixed until the replacement passes a full 39-pattern scan
+Do not consider an anti-pattern fixed until the replacement passes a full-catalog scan
 on its own.
 
 **Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against
@@ -637,7 +637,7 @@ conversation — edit the file surgically.
 - Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — all
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
-  audit rule: every rewrite must pass a full 39-pattern scan on its own before it's
+  audit rule: every rewrite must pass a full-catalog scan on its own before it's
   considered fixed. Then run the voice check: re-read against `persona/voice.md` and
   redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or

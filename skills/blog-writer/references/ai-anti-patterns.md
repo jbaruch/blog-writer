@@ -13,7 +13,7 @@ specific patterns, symptoms, examples, structural variants, and alternatives —
 general knowledge of AI writing patterns.
 
 **Follow the three-pass procedure exactly as written in `references/process.md`.** Pass 1
-is the surface scan against all 39 patterns. Pass 2 is the skeleton scan on adjacent
+is the surface scan against every pattern in this file. Pass 2 is the skeleton scan on adjacent
 sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
 that passes pattern checks but still reads as AI. Then the rewrite audit. Then the voice
 check. Then the proportionality check — was the amount of rewriting proportional to the
@@ -21,7 +21,7 @@ slop found, and would the author still recognize the draft as their own voice. I
 order. Do not skip passes, do not merge them, do not substitute your own method.
 
 **Do not invent patterns that aren't in this file.** If something feels "AI-ish" but
-doesn't match any of the 39 defined patterns or their structural variants, leave it alone.
+doesn't match a pattern defined here or one of its structural variants, leave it alone.
 False positives from improvised rules damage the author's voice more than the pattern
 they're trying to fix.
 
