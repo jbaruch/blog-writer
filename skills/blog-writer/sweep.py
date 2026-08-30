@@ -17,8 +17,10 @@ kinds of work. This script owns one of them.
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script therefore covers 6 of the 39 patterns across 5 sweeps (#3 and #4
-share the fragment-chain sweep), and says so on every run.
+This script therefore covers 6 patterns across 5 sweeps (#3 and #4 share the
+fragment-chain sweep) out of every pattern `references/ai-anti-patterns.md`
+defines, and says so on every run. The total is counted from that file rather
+than restated here.
 Every result carries its coverage, including a result with no findings: silence
 about coverage is what lets a passing script displace the contextual read it
 never performed.
@@ -43,11 +45,14 @@ Output (stdout):
     "the counting half passed".
 
 Exit codes:
-    0  swept, no hits in the counting sweeps. NOT "the draft is clean" — 33 of
-       the 39 patterns were not examined by this script.
+    0  swept, no hits in the counting sweeps. NOT "the draft is clean" — most
+       of the patterns were not examined by this script, and `.coverage.note`
+       says how many.
     1  swept, at least one hit. Each is a real finding: every predicate here is
        arithmetic, so there is no judgment call left for the caller to make.
-    2  tool or usage error (no path given, file unreadable, not valid UTF-8).
+    2  tool or usage error (no path given, file unreadable, not valid UTF-8,
+       or references/ai-anti-patterns.md missing so the coverage total cannot
+       be counted).
 
 Re-run after every rewrite. Both misses that motivated this script were
 regressions introduced by edits made after a check had already reported clean.
@@ -112,7 +117,19 @@ UNICODE_GIVEAWAYS = [
 # Printed on every run, hits or not. The inverse failure this script is built to
 # avoid is a clean report displacing the read it never performed.
 
-PATTERNS_TOTAL = 39
+# The total is not a literal here. `references/ai-anti-patterns.md` defines the
+# patterns, so it is the thing that knows how many there are; a number copied
+# into this script is a second answer that goes stale the next time the
+# Wikipedia refresh adds a pattern, and it goes stale silently, inside the one
+# sentence whose job is to state honestly how much went unexamined.
+ANTI_PATTERNS_FILE = (
+    Path(__file__).resolve().parent / "references" / "ai-anti-patterns.md"
+)
+
+# A pattern is an H2 heading that opens with its number: "## 12. AI Vocabulary
+# Contamination". The "## Running the check" preamble carries no number and is
+# not a pattern.
+PATTERN_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 
 # Six, not five: #3 and #4 are two patterns sharing one fragment-chain sweep.
 PATTERNS_EXAMINED = 6
@@ -737,10 +754,41 @@ def run_sweeps(raw):
 # --- Result -----------------------------------------------------------------
 
 
-def result(path, hits):
+class PatternCountError(Exception):
+    """`ai-anti-patterns.md` could not be counted. Carries an actionable message."""
+
+
+def count_patterns(path=ANTI_PATTERNS_FILE):
+    """How many patterns `ai-anti-patterns.md` defines.
+
+    Raises PatternCountError rather than falling back to a guess: a coverage
+    note built on a wrong total understates what went unexamined, which is the
+    exact failure the note exists to prevent. A run that cannot count is a run
+    that reports nothing.
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise PatternCountError(
+            f"error: cannot read the pattern file at {path} ({exc.strerror}) — "
+            "it ships beside this script, so a missing or unreadable copy means "
+            "a broken install; reinstall the plugin"
+        ) from exc
+
+    total = len(PATTERN_HEADING.findall(text))
+    if total == 0:
+        raise PatternCountError(
+            f"error: {path} defines no numbered patterns — every pattern is an "
+            'H2 heading opening with its number ("## 12. AI Vocabulary '
+            'Contamination"); check the file was not truncated'
+        )
+    return total
+
+
+def result(path, hits, patterns_total):
     """The full result object.
 
-    `coverage` is not decoration. This script examines a minority of the 39
+    `coverage` is not decoration. This script examines a minority of the
     patterns, and an empty `hits` on its own reads as "the check passed" rather
     than "the counting half passed". Every consumer sees what was not examined
     in the same object that tells it what was.
@@ -756,9 +804,9 @@ def result(path, hits):
                 f"{number} {name}" for number, name in JUDGMENT_SWEEPS
             ],
             "patterns_examined": examined,
-            "patterns_total": PATTERNS_TOTAL,
+            "patterns_total": patterns_total,
             "note": (
-                f"{PATTERNS_TOTAL - examined} of the {PATTERNS_TOTAL} patterns "
+                f"{patterns_total - examined} of the {patterns_total} patterns "
                 "were not examined by this script. An empty hits list is not an "
                 "anti-pattern check: the judgment sweeps in not_run_judgment and "
                 "the rest of references/ai-anti-patterns.md still need a read."
@@ -804,8 +852,16 @@ def main(argv=None):
         )
         return 2
 
+    # Counted before the sweep runs: a report this script cannot state the
+    # coverage of is a report it must not print at all.
+    try:
+        patterns_total = count_patterns()
+    except PatternCountError as exc:
+        print(exc, file=sys.stderr)
+        return 2
+
     hits = run_sweeps(raw)
-    print(json.dumps(result(path, hits), indent=2))
+    print(json.dumps(result(path, hits, patterns_total), indent=2))
     return 1 if hits else 0
 
 

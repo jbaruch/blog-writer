@@ -1,5 +1,12 @@
 # Changelog
 
+### Changed
+
+- **The pattern count lives in the pattern file, and nowhere else** — `39` was written into 22 places: `PATTERNS_TOTAL` in `sweep.py`, a literal assertion in `tests/test_sweep.sh`, and 20 prose statements across `SKILL.md`, `README.md`, `process.md`, `structural-audits.md`, `tone-guide.md` and `ai-anti-patterns.md` itself. Adding a pattern meant editing all of them, and the one that mattered most was the one nobody would think to check: `.coverage.note` tells the agent how much of the check went unexamined, so a stale total there understates the gap in the exact sentence written to prevent that. `sweep.py` now counts the `## <n>. ` headings in `references/ai-anti-patterns.md` on every run, and the prose says "every pattern" or "the catalog" instead of a number. Adding a pattern is now one edit to one file.
+- **A total that cannot be counted is a run that reports nothing** — the count happens before the sweep, and a missing or heading-less pattern file exits 2 with a diagnostic naming the cause, rather than falling back to a guess. Falling back would produce the same silently-wrong coverage figure the change exists to remove.
+- **The suite reads the total the same way the script does** — `tests/test_sweep.sh` derives the expected figure from the shipped file rather than asserting `39`, so the assertion cannot rot into a second stale copy. Three new cases cover the derivation itself: a script running beside a three-pattern file reports three, a file with no numbered headings exits 2, and a missing file exits 2, each checked for the actionable half of its diagnostic. 67 assertions, up from 64.
+- **What stays a literal:** `PATTERNS_EXAMINED = 6`, which is this script's own coverage rather than a fact about the catalog, and every `#39`-style pattern reference in prose, which is an identifier and not a count.
+
 ## 1.1.30 — 2026-08-30
 
 ### Fixed

@@ -28,7 +28,10 @@
 #      the flag SKILL.md routes on.
 #  11. Judgment patterns are never reported — the watchlist families stay with
 #      the agent, so no hit may carry #1, #10, #12, #17, #32, #35 or #36.
-#  12. Entry-point guard — importing the module runs nothing.
+#  12. Coverage total — read from references/ai-anti-patterns.md on every run,
+#      never a literal, and a file that cannot be counted exits 2 rather than
+#      reporting a coverage figure it guessed.
+#  13. Entry-point guard — importing the module runs nothing.
 #
 # Approach: every fixture is written programmatically into a suite-owned temp
 # directory, so the suite touches no network, clock, randomness, or real draft.
@@ -180,7 +183,14 @@ We cut it.'
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
   assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
   assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 7'
-  assert_json "clean draft states partial coverage" "$clean_draft" 0 '.coverage.patterns_examined == 6 and .coverage.patterns_total == 39 and (.coverage.note | length) > 0'
+  # The total is read out of the pattern file, never restated here — a literal
+  # in the suite would be the same stale second copy the script stopped keeping.
+  local defined
+  defined=$(grep -cE '^## [0-9]+\. ' "${SCRIPT_DIR}/references/ai-anti-patterns.md")
+  if [ "$defined" -lt 2 ]; then
+    fail "could not count patterns in references/ai-anti-patterns.md (got ${defined})"
+  fi
+  assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
   # no consumer can read an empty hits list as "the check passed".
@@ -681,7 +691,53 @@ The third — an aside — is not.' \
     echo "  a missing argument exits 2"
   fi
 
-  # 12. Entry-point guard — importing runs nothing and prints nothing
+  # 12. Coverage total is derived from the pattern file, not carried as a
+  # literal. Each case runs a copy of the script beside its own pattern file, so
+  # the shipped one is never touched.
+  local iso="${SUITE_TMP}/isolated"
+  mkdir -p "${iso}/references"
+  cp "$SCRIPT" "${iso}/sweep.py"
+  local probe="${SUITE_TMP}/probe.md"
+  printf 'A sentence of ordinary length that trips none of the counting sweeps.\n' >"$probe"
+
+  printf '## 1. First\n\n## 2. Second\n\n## 3. Third\n' >"${iso}/references/ai-anti-patterns.md"
+  local iso_out iso_rc
+  iso_out=$("$PYTHON" "${iso}/sweep.py" "$probe" 2>"${SUITE_TMP}/iso_err")
+  iso_rc=$?
+  if [ "$iso_rc" -ne 0 ]; then
+    fail "isolated sweep expected exit 0, got ${iso_rc} ($(cat "${SUITE_TMP}/iso_err"))"
+  elif ! jq -e '.coverage.patterns_total == 3' <<<"$iso_out" >/dev/null; then
+    fail "the total ignores the pattern file: expected 3, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
+  else
+    ok
+    echo "  the total is counted from the pattern file"
+  fi
+
+  printf '## Running the check\n\nProse with no numbered pattern headings.\n' >"${iso}/references/ai-anti-patterns.md"
+  "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
+  iso_rc=$?
+  if [ "$iso_rc" -ne 2 ]; then
+    fail "a pattern file with no numbered headings expected exit 2, got ${iso_rc}"
+  elif ! grep -qF 'defines no numbered patterns' "${SUITE_TMP}/iso_err"; then
+    fail "the empty-pattern-file diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  else
+    ok
+    echo "  a pattern file with no numbered headings exits 2"
+  fi
+
+  rm -f "${iso}/references/ai-anti-patterns.md"
+  "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
+  iso_rc=$?
+  if [ "$iso_rc" -ne 2 ]; then
+    fail "a missing pattern file expected exit 2, got ${iso_rc}"
+  elif ! grep -qF 'cannot read the pattern file' "${SUITE_TMP}/iso_err"; then
+    fail "the missing-pattern-file diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  else
+    ok
+    echo "  a missing pattern file exits 2"
+  fi
+
+  # 13. Entry-point guard — importing runs nothing and prints nothing
   local import_out
   import_out=$(cd "$SCRIPT_DIR" && "$PYTHON" -c 'import sweep' 2>&1)
   if [ -n "$import_out" ]; then
