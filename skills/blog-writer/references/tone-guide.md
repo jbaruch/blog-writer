@@ -87,50 +87,10 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**Read `references/ai-anti-patterns.md` for the full list.** It names every pattern,
-with symptoms, examples, and alternatives. Scan the draft against every one of them during
-Phase 3 and Phase 4. Zero tolerance.
-
-Quick index for scanning:
-1. Rhetorical contrastive negation — "Not X. Y."
-2. Parallel binary comparisons — mirrored A/B clauses
-3. Asyndetic tricolon with a kicker — "X. Y. Z. And then..."
-4. Choppy fragment chains — noun-phrase fragments as drama
-5. Symmetrical LLM patterns — fortune-cookie balance
-6. Self-answering fragment questions — "The result? Great."; colon reveals — "The best part: it learns."
-7. Parenthetical em-dashes — paired dashes as fancy commas
-8. Excessive em-dashes — more than two per section
-9. Preamble announcements — "In this post, we'll explore..."
-10. Sycophantic hedging — "It's worth noting that..."
-11. Emojis — never
-12. AI vocabulary contamination — "delve", "tapestry", "leverage", "pivotal", "utilize"
-13. Copula avoidance and nominal style — "serves as" instead of "is"; "the implementation of" instead of "we implemented"
-14. Low burstiness — every sentence the same length
-15. Fabricated experience — simulating personal moments that never happened
-16. False ranges — "from beginners to experts"
-17. Synonym cycling — "the CLI" → "the tool" → "the interface"
-18. Unicode giveaways — curly quotes, ellipsis character, en dashes in source
-19. Participle-phrase filler — "-ing" clauses tacked on as fake analysis
-20. Significance inflation — mundane facts framed as pivotal moments; replace evaluations with facts
-21. Challenge-optimism sandwich — "Despite X, challenges... Despite these, thriving"
-22. Inline-header lists — bold term + colon + description bullet points
-23. Performed credentialism — unnecessary technical specificity to sound authoritative
-24. "Did nothing" constructions — stilted formal negation instead of idiomatic phrasing
-25. Vague attributions
-26. Boldface overuse
-27. Title case headings
-28. Labeling the device
-29. Restating the proven point
-30. Telegraphing transitions
-31. Incomplete assertions
-32. Stacked data points
-33. Amplifier intensifiers — "truly", "incredibly", "remarkably" + adjective; replace with the fact
-34. Unproven assessment adjectives — "robust", "elegant", "comprehensive" without supporting evidence
-35. Temporal filler (time parasites) — "In today's rapidly evolving landscape", "now more than ever"
-36. Corporate cliché phrases — "passionate team", "end-to-end solution", "trusted by industry leaders"
-37. Euphemistic smoothing — "encountered challenges" instead of "it broke"; softening failures
-38. Fake-profound kickers — mic-drop metaphor endings; delete, don't rewrite into a better metaphor
-39. Body-performance emotion — "my stomach dropped", "the cursor blinked mockingly"; name the feeling instead
+**`references/ai-anti-patterns.md` is the list.** It names every pattern, with symptoms,
+examples, structural variants, and alternatives. Read it there — this file carries no
+copy of it. Scan the draft against every pattern during Phase 3 and Phase 4. Zero
+tolerance.
 
 ---
 
