@@ -102,10 +102,17 @@ Read the file at `.path`.
 - **Exit 2** — a tool or usage error (curl missing, destination not writable). Report the
   script's stderr diagnostic, then proceed with the current anti-pattern file as-is.
 
-If the article contains new patterns, vocabulary, or structural variants not already
-covered in the anti-patterns file, update the file to incorporate them. Keep the same
-format: pattern number, the tell, symptoms, examples, structural variants (where
-applicable), why it's a tell, and instead.
+Report what the article carries and the anti-pattern file does not. Never edit
+`references/ai-anti-patterns.md` from this step. Give the author each finding in three
+parts:
+
+- what the article names, with its own wording for the tell
+- the closest pattern already in the file, or that there is none
+- whether its verdict is a count or a judgment, per the split in
+  `references/process.md` Phase 3 Pass 1
+
+Say so plainly when the article carries nothing new. Then continue the session with the
+current file either way — a finding changes the skill, never this run's draft.
 
 Proceed immediately to Step 6.
 
