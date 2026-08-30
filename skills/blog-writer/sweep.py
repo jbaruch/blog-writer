@@ -776,9 +776,15 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
         ) from exc
 
     total = len(PATTERN_HEADING.findall(text))
-    if total == 0:
+    # Below the examined count the catalog cannot be the one this script was
+    # written against, and the coverage arithmetic goes negative: a truncated
+    # file would report "-3 of the 3 patterns were not examined". Structured
+    # nonsense is worse than no report, so the floor is the sweep's own count,
+    # not zero.
+    if total < PATTERNS_EXAMINED:
         raise PatternCountError(
-            f"error: {path} defines no numbered patterns — every pattern is an "
+            f"error: {path} defines {total} numbered pattern(s), fewer than the "
+            f"{PATTERNS_EXAMINED} this script sweeps for — every pattern is an "
             'H2 heading opening with its number ("## 12. AI Vocabulary '
             'Contamination"); check the file was not truncated'
         )

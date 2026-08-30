@@ -29,8 +29,9 @@
 #  11. Judgment patterns are never reported — the watchlist families stay with
 #      the agent, so no hit may carry #1, #10, #12, #17, #32, #35 or #36.
 #  12. Coverage total — read from references/ai-anti-patterns.md on every run,
-#      never a literal, and a file that cannot be counted exits 2 rather than
-#      reporting a coverage figure it guessed.
+#      never a literal. A file that cannot be counted exits 2 rather than
+#      reporting a guessed figure, and so does a catalog smaller than the
+#      sweep's own examined count, which would drive the note negative.
 #  13. Entry-point guard — importing the module runs nothing.
 #
 # Approach: every fixture is written programmatically into a suite-owned temp
@@ -700,14 +701,14 @@ The third — an aside — is not.' \
   local probe="${SUITE_TMP}/probe.md"
   printf 'A sentence of ordinary length that trips none of the counting sweeps.\n' >"$probe"
 
-  printf '## 1. First\n\n## 2. Second\n\n## 3. Third\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n' >"${iso}/references/ai-anti-patterns.md"
   local iso_out iso_rc
   iso_out=$("$PYTHON" "${iso}/sweep.py" "$probe" 2>"${SUITE_TMP}/iso_err")
   iso_rc=$?
   if [ "$iso_rc" -ne 0 ]; then
     fail "isolated sweep expected exit 0, got ${iso_rc} ($(cat "${SUITE_TMP}/iso_err"))"
-  elif ! jq -e '.coverage.patterns_total == 3' <<<"$iso_out" >/dev/null; then
-    fail "the total ignores the pattern file: expected 3, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
+  elif ! jq -e '.coverage.patterns_total == 8' <<<"$iso_out" >/dev/null; then
+    fail "the total ignores the pattern file: expected 8, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
   else
     ok
     echo "  the total is counted from the pattern file"
@@ -718,11 +719,26 @@ The third — an aside — is not.' \
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a pattern file with no numbered headings expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'defines no numbered patterns' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'defines 0 numbered pattern(s)' "${SUITE_TMP}/iso_err"; then
     fail "the empty-pattern-file diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
     echo "  a pattern file with no numbered headings exits 2"
+  fi
+
+  # A truncated catalog is the dangerous case: fewer patterns than the sweep
+  # examines drives the coverage note negative, so it must fail rather than
+  # report "-3 of the 3 patterns were not examined".
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n' >"${iso}/references/ai-anti-patterns.md"
+  "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
+  iso_rc=$?
+  if [ "$iso_rc" -ne 2 ]; then
+    fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
+  elif ! grep -qF 'fewer than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+    fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  else
+    ok
+    echo "  a catalog smaller than the examined count exits 2"
   fi
 
   rm -f "${iso}/references/ai-anti-patterns.md"
