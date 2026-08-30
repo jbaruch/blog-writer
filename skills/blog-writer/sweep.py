@@ -769,10 +769,19 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
     try:
         text = path.read_text(encoding="utf-8")
     except OSError as exc:
+        # strerror is None on some OSError shapes, which would render the cause
+        # as "None"; the exception's own str is the fallback.
         raise PatternCountError(
-            f"error: cannot read the pattern file at {path} ({exc.strerror}) — "
+            f"error: cannot read the pattern file at {path} ({exc.strerror or exc}) — "
             "it ships beside this script, so a missing or unreadable copy means "
             "a broken install; reinstall the plugin"
+        ) from exc
+    except UnicodeDecodeError as exc:
+        # Not an OSError, so it needs its own branch or it escapes as a
+        # traceback — a crash where the contract promises exit 2.
+        raise PatternCountError(
+            f"error: the pattern file at {path} is not valid UTF-8 — its headings "
+            "are counted from decoded text; re-save it as UTF-8"
         ) from exc
 
     total = len(PATTERN_HEADING.findall(text))

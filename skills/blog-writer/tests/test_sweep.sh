@@ -186,12 +186,18 @@ We cut it.'
   assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 7'
   # The total is read out of the pattern file, never restated here — a literal
   # in the suite would be the same stale second copy the script stopped keeping.
-  local defined
-  defined=$(grep -cE '^## [0-9]+\. ' "${SCRIPT_DIR}/references/ai-anti-patterns.md")
-  if [ "$defined" -lt 2 ]; then
-    fail "could not count patterns in references/ai-anti-patterns.md (got ${defined})"
+  # grep's status is captured explicitly rather than discarded by the command
+  # substitution: an unreadable catalog exits 2 and no-match exits 1, and both
+  # would otherwise leave `defined` empty for a numeric test to choke on.
+  local defined="" grep_rc=0
+  defined=$(grep -cE '^## [0-9]+\. ' "${SCRIPT_DIR}/references/ai-anti-patterns.md") || grep_rc=$?
+  if [ "$grep_rc" -ne 0 ]; then
+    fail "could not count patterns in references/ai-anti-patterns.md (grep exit ${grep_rc})"
+  elif [ "$defined" -lt 2 ]; then
+    fail "references/ai-anti-patterns.md reported only ${defined} pattern(s)"
+  else
+    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
   fi
-  assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
   # no consumer can read an empty hits list as "the check passed".
@@ -739,6 +745,19 @@ The third — an aside — is not.' \
   else
     ok
     echo "  a catalog smaller than the examined count exits 2"
+  fi
+
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '\xff\xfe not utf-8\n' >>"${iso}/references/ai-anti-patterns.md"
+  "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
+  iso_rc=$?
+  if [ "$iso_rc" -ne 2 ]; then
+    fail "a non-UTF-8 pattern file expected exit 2, got ${iso_rc}"
+  elif ! grep -qF 'is not valid UTF-8' "${SUITE_TMP}/iso_err"; then
+    fail "the non-UTF-8 catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  else
+    ok
+    echo "  a non-UTF-8 pattern file exits 2"
   fi
 
   rm -f "${iso}/references/ai-anti-patterns.md"
