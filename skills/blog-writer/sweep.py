@@ -785,17 +785,20 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
         ) from exc
 
     total = len(PATTERN_HEADING.findall(text))
-    # Below the examined count the catalog cannot be the one this script was
-    # written against, and the coverage arithmetic goes negative: a truncated
-    # file would report "-3 of the 3 patterns were not examined". Structured
-    # nonsense is worse than no report, so the floor is the sweep's own count,
-    # not zero.
-    if total < PATTERNS_EXAMINED:
+    # The floor is strictly above the examined count, not zero. This script's
+    # whole contract is that it covers a minority: at six the note reports zero
+    # unexamined while `not_run_judgment` still names seven sweeps it did not
+    # run, and below six the arithmetic goes negative ("-3 of the 3 patterns
+    # were not examined"). Both are structured nonsense, which is worse than no
+    # report at all.
+    if total <= PATTERNS_EXAMINED:
         raise PatternCountError(
-            f"error: {path} defines {total} numbered pattern(s), fewer than the "
-            f"{PATTERNS_EXAMINED} this script sweeps for — every pattern is an "
-            'H2 heading opening with its number ("## 12. AI Vocabulary '
-            'Contamination"); check the file was not truncated'
+            f"error: {path} defines {total} numbered pattern(s), not more than "
+            f"the {PATTERNS_EXAMINED} this script sweeps for — the coverage note "
+            "reports how many patterns went unexamined, which is only meaningful "
+            "for a catalog larger than the sweep; every pattern is an H2 heading "
+            'opening with its number ("## 12. AI Vocabulary Contamination"), so '
+            "check the file was not truncated"
         )
     return total
 

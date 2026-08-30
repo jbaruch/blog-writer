@@ -30,8 +30,9 @@
 #      the agent, so no hit may carry #1, #10, #12, #17, #32, #35 or #36.
 #  12. Coverage total — read from references/ai-anti-patterns.md on every run,
 #      never a literal. A file that cannot be counted exits 2 rather than
-#      reporting a guessed figure, and so does a catalog smaller than the
-#      sweep's own examined count, which would drive the note negative.
+#      reporting a guessed figure, and so does a catalog no larger than the
+#      sweep's own examined count, which would report zero unexamined or drive
+#      the note negative.
 #  13. Entry-point guard — importing the module runs nothing.
 #
 # Approach: every fixture is written programmatically into a suite-owned temp
@@ -732,15 +733,27 @@ The third — an aside — is not.' \
     echo "  a pattern file with no numbered headings exits 2"
   fi
 
-  # A truncated catalog is the dangerous case: fewer patterns than the sweep
-  # examines drives the coverage note negative, so it must fail rather than
-  # report "-3 of the 3 patterns were not examined".
+  # A catalog no larger than the sweep is the dangerous case. At exactly six the
+  # note claims zero unexamined while not_run_judgment still names seven sweeps;
+  # below six the arithmetic goes negative. Both must fail rather than report.
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
+  "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
+  iso_rc=$?
+  if [ "$iso_rc" -ne 2 ]; then
+    fail "a catalog of exactly the examined count expected exit 2, got ${iso_rc}"
+  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+    fail "the exactly-six diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  else
+    ok
+    echo "  a catalog of exactly the examined count exits 2"
+  fi
+
   printf '## 1. A\n\n## 2. B\n\n## 3. C\n' >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'fewer than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
