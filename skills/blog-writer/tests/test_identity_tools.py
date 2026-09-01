@@ -212,13 +212,11 @@ class IdentityToolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
             state = home / "_blog-skill"
-            outside = home / "outside.md"
-            outside.write_text("outside\n", encoding="utf-8")
             corporate = make_identity(
                 state,
                 "corporate",
                 "acme",
-                resources=[{"role": "brand", "path": "../../../../outside.md"}],
+                resources=[{"role": "brand", "path": "../outside.md"}],
             )
 
             result = self.run_tool(RESOLVER, home, "--corporate", str(corporate))

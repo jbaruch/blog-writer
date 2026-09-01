@@ -4,7 +4,7 @@
 
 - `create-personal-identity` is the sole owner and writer. It reads every manifest and
   provenance field when it creates, updates, migrates, or audits a package.
-- `resolve-identities.py` is the validating reader for `blog-writer`. It accepts only
+- `resolve-identities.py` is the validating reader for `blog-writer`. It requires
   `schema_version: 1`, `type: personal`, a lowercase kebab-case `name`, `status` set to
   `draft` or `approved`, `entrypoint: identity.md`, and `sources: sources.md`.
 - A missing `resources` field defaults to an empty ordered list. Each present resource must
