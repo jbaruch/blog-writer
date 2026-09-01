@@ -70,7 +70,7 @@ exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
-run the approval loop and finish here.
+run the approval loop. Finish here.
 
 ## Step 3 — Audit a Personal Identity
 
