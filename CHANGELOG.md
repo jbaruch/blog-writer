@@ -2,6 +2,10 @@
 
 ### Added
 
+- **Personal identity creation is self-contained and correction-driven** — the creator now
+  carries the v1 manifest and provenance contract in its own instructions, recognizes
+  natural requests about tone and writing style, and re-presents corrected conclusions
+  beside their cited sources before approval.
 - **Corporate identity creation has an explicit correction loop** — consequential creates
   and updates stay in `draft` while the user reviews the summary, guidance, inferences, and
   unresolved items. Rejected or corrected conclusions are revised, traced back to their

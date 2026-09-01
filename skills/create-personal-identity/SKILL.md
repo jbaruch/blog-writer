@@ -1,16 +1,37 @@
 ---
 name: create-personal-identity
-description: Create, update, or audit a reusable personal writing identity from writing samples, transcripts, interviews, existing persona files, editorial feedback, or other user-supplied sources. Use whenever someone wants to capture, refresh, migrate, or check an individual author's voice and writing preferences without absorbing employer brand rules.
+description: Create, update, or audit a reusable personal writing identity from writing samples, transcripts, interviews, existing persona files, or editorial feedback. Use whenever someone wants to define, capture, refresh, migrate, or check an individual author's voice, tone, writing style, reasoning patterns, and writing preferences without absorbing employer brand rules.
 ---
 
 # Create Personal Identity
 
 This skill is an action router — pick the step that matches the user's intent and execute only that step. Do not run other steps; do not parallelize.
 
-Personal identity owns how an author sounds and reasons. It does not own employer
-positioning, product claims, or corporate editorial policy. Before any action, read
-`skills/blog-writer/references/identity-spec.md` completely and follow its package,
-provenance, strength, ownership, approval, and storage contracts.
+Personal identity owns how an author sounds and reasons, never employer positioning,
+product claims, or corporate editorial policy.
+
+Use this package contract:
+
+- Write `identity.json` with `schema_version: 1`, `type: personal`, a lowercase kebab-case
+  name, `status: draft|approved`, `entrypoint: identity.md`, `sources: sources.md`, and any
+  optional Markdown resources as `{role, path}` entries whose relative paths stay inside
+  the package.
+- Put concise shared guidance and routing in `identity.md`; add `voice`, `composition`,
+  `examples`, or `bio` resources only when evidence supports them.
+- In `sources.md`, record every source's location, date, scope, and authority. Trace each
+  consequential inference to evidence, label it Required, Preferred, Observed, Avoid, or
+  Unresolved, distinguish explicit preferences from observed patterns, and keep conflicts
+  visible.
+
+Use this approval loop for every consequential create or update:
+
+- Set `status` to `draft`.
+- Show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
+  unresolved items.
+- Ask one focused question at a time for consequential conflicts.
+- When the user rejects or corrects a conclusion, revise it, re-read it beside its cited
+  sources, and present it again.
+- Set `status` to `approved` only after explicit approval.
 
 ## Step 1 — Create a Personal Identity
 
@@ -25,15 +46,9 @@ rhetorical devices, humor, references, technical depth, recurring elements, deli
 variation, off-voice moves, and durable bio facts. Keep explicit preferences separate from
 observed patterns. Sample frequency is evidence, not a quota.
 
-Write the package to the user's selected directory, defaulting to
-`~/.claude/blog-writer-identities/personal/<name>/`. Put concise guidance and routing in
-`identity.md`; add roles such as `voice`, `composition`, `examples`, and `bio` only when the
-evidence supports them. Record every source and consequential inference in `sources.md`.
-Set `status` to `draft` first.
-
-Show the user the one-paragraph identity summary, Required and Avoid guidance, high-impact
-inferences, and unresolved items. Ask one focused question at a time for consequential
-conflicts. Set `status` to `approved` only after explicit approval. Finish here.
+Write the package through the contract above to the user's selected directory, defaulting
+to `~/.claude/blog-writer-identities/personal/<name>/`. Run the approval loop, then finish
+here.
 
 ## Step 2 — Update a Personal Identity
 
@@ -44,9 +59,7 @@ exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
-set `status` to `draft`, show the changed summary, Required and Avoid guidance, high-impact
-inferences, and unresolved items, then restore `approved` only after explicit approval.
-Finish here.
+run the approval loop and finish here.
 
 ## Step 3 — Audit a Personal Identity
 
