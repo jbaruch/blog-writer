@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.35 — 2026-09-01
+
 ### Publishing — keep local eval scenarios out of registry releases
 
 Plugin publishing now passes Tessl's supported `--skip-evals` control through the shared `coding-policy` workflow. The six local scenarios remain available for deliberate development runs, while routine releases neither upload them to the registry nor launch credit-consuming task evals. Changed-skill quality reviews remain enabled.
