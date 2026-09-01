@@ -243,6 +243,23 @@ class IdentityToolTests(unittest.TestCase):
             self.assertIn("voice path must be relative", result.stderr)
             self.assertEqual(result.stdout, "")
 
+    def test_tilde_resource_path_is_rejected_without_user_lookup(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            personal = make_identity(
+                state,
+                "personal",
+                "writer",
+                resources=[{"role": "voice", "path": "~missing-user/guide.md"}],
+            )
+
+            result = self.run_tool(RESOLVER, home, "--personal", str(personal))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice path must be relative", result.stderr)
+            self.assertEqual(result.stdout, "")
+
     def test_required_file_names_are_enforced(self):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)

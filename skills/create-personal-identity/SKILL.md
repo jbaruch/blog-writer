@@ -61,12 +61,12 @@ Write the package through the contract above to the user's selected directory, d
 to `~/.claude/blog-writer-identities/personal/<name>/`. Run the approval loop, then finish
 here.
 
-## Step 2 — Update a Personal Identity
+## Step 2 — Update or Migrate a Personal Identity
 
-Read the existing package and its provenance before reading new evidence. Preserve valid
-guidance and source history. Identify which conclusions the new sources confirm, weaken,
-replace, or leave unresolved; never regenerate the package as if prior decisions did not
-exist.
+Read the existing package and its provenance before reading new evidence or migrating it.
+Preserve valid guidance and source history. Identify which conclusions the new sources
+confirm, weaken, replace, or leave unresolved; never regenerate the package as if prior
+decisions did not exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
