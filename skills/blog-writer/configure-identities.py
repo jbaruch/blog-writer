@@ -14,6 +14,8 @@ from pathlib import Path
 CURRENT_USER_PREFIXES = tuple(
     f"~{separator}" for separator in (os.sep, os.altsep) if separator
 )
+CURRENT_SCHEMA = 2
+SUPPORTED_SCHEMAS = {1, CURRENT_SCHEMA}
 
 
 class ConfigError(ValueError):
@@ -22,6 +24,12 @@ class ConfigError(ValueError):
 
 class ToolError(RuntimeError):
     """The selection record could not be read or written."""
+
+
+def uses_named_user_path(raw: str) -> bool:
+    return (
+        raw.startswith("~") and raw != "~" and not raw.startswith(CURRENT_USER_PREFIXES)
+    )
 
 
 def inside(base: Path, candidate: Path) -> bool:
@@ -87,14 +95,36 @@ def load_config(path: Path) -> dict:
     if not isinstance(value, dict):
         raise ConfigError(f"expected a JSON object: {path}")
     errors = []
-    if value.get("schema_version") != 1:
-        errors.append("schema_version must be 1")
+    schema_version = value.get("schema_version")
+    if schema_version not in SUPPORTED_SCHEMAS:
+        errors.append("schema_version must be 1 or 2")
     for key in ("personal", "corporate"):
         if key in value and (not isinstance(value[key], str) or not value[key]):
             errors.append(f"{key} must be a non-empty path string when present")
+        elif (
+            schema_version == CURRENT_SCHEMA
+            and key in value
+            and uses_named_user_path(value[key])
+        ):
+            errors.append(f"{key} must not use named-user expansion")
     if errors:
         raise ConfigError(f"invalid identity config {path}: " + "; ".join(errors))
     return value
+
+
+def migrate_config(config: dict) -> dict[str, object]:
+    migrated: dict[str, object] = dict(config)
+    if migrated["schema_version"] == CURRENT_SCHEMA:
+        return migrated
+    for key in ("personal", "corporate"):
+        raw = migrated.get(key)
+        if isinstance(raw, str) and uses_named_user_path(raw):
+            try:
+                migrated[key] = str(Path(raw).expanduser())
+            except (RuntimeError, ValueError) as exc:
+                raise ConfigError(f"cannot migrate {key} path {raw!r}: {exc}") from exc
+    migrated["schema_version"] = CURRENT_SCHEMA
+    return migrated
 
 
 def write_config(config_path: Path, target: Path, config: dict) -> None:
@@ -139,18 +169,14 @@ def main() -> int:
         config_path = blog_home / "_blog-skill" / "identity.json"
         target = selection_target(config_path, blog_home)
         config: dict[str, object] = (
-            load_config(target) if target else {"schema_version": 1}
+            load_config(target) if target else {"schema_version": CURRENT_SCHEMA}
         )
 
         for key, raw in (("personal", args.personal), ("corporate", args.corporate)):
             if raw is None:
                 continue
             if raw:
-                if (
-                    raw.startswith("~")
-                    and raw != "~"
-                    and not raw.startswith(CURRENT_USER_PREFIXES)
-                ):
+                if uses_named_user_path(raw):
                     raise ConfigError(
                         f"{key} path must not use named-user expansion: {raw}"
                     )
@@ -164,6 +190,7 @@ def main() -> int:
                 "set another layer before clearing the final selection"
             )
 
+        config = migrate_config(config)
         write_config(config_path, target or config_path, config)
         print(
             json.dumps(

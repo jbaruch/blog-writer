@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import pwd
 import subprocess
 import tempfile
 import unittest
@@ -286,6 +288,28 @@ class IdentityToolTests(unittest.TestCase):
             state.joinpath("identity.json").write_text(
                 json.dumps(
                     {
+                        "schema_version": 2,
+                        "personal": "~blog-writer-missing-user/identity",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = self.run_tool(RESOLVER, home)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("personal must not use named-user expansion", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_v1_unknown_named_user_selection_uses_legacy_expansion_path(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            state.joinpath("identity.json").write_text(
+                json.dumps(
+                    {
                         "schema_version": 1,
                         "personal": "~blog-writer-missing-user/identity",
                     }
@@ -296,7 +320,8 @@ class IdentityToolTests(unittest.TestCase):
             result = self.run_tool(RESOLVER, home)
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("named-user expansion is not allowed", result.stderr)
+            self.assertIn("invalid path", result.stderr)
+            self.assertNotIn("named-user expansion is not allowed", result.stderr)
             self.assertNotIn("Traceback", result.stderr)
             self.assertEqual(result.stdout, "")
 
@@ -359,6 +384,7 @@ class IdentityToolTests(unittest.TestCase):
             config = json.loads(
                 (home / "_blog-skill/identity.json").read_text(encoding="utf-8")
             )
+            self.assertEqual(config["schema_version"], 2)
             self.assertNotIn("personal", config)
             self.assertEqual(config["corporate"], str(corporate))
 
@@ -380,6 +406,49 @@ class IdentityToolTests(unittest.TestCase):
             )
             self.assertEqual(config["personal"], "/personal")
             self.assertEqual(config["corporate"], "/corporate")
+            self.assertEqual(config["schema_version"], 2)
+
+    def test_configurer_migrates_v1_named_user_path_before_other_update(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            username = pwd.getpwuid(os.getuid()).pw_name
+            named_personal = f"~{username}/identity"
+            state.joinpath("identity.json").write_text(
+                json.dumps({"schema_version": 1, "personal": named_personal}),
+                encoding="utf-8",
+            )
+
+            result = self.run_tool(CONFIGURER, home, "--corporate", "/corporate")
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = json.loads(
+                state.joinpath("identity.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(config["schema_version"], 2)
+            self.assertEqual(config["personal"], str(Path(named_personal).expanduser()))
+            self.assertEqual(config["corporate"], "/corporate")
+
+    def test_configurer_does_not_rewrite_unmigratable_v1_named_user_path(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            config_path = state / "identity.json"
+            original = json.dumps(
+                {
+                    "schema_version": 1,
+                    "personal": "~blog-writer-missing-user/identity",
+                }
+            )
+            config_path.write_text(original, encoding="utf-8")
+
+            result = self.run_tool(CONFIGURER, home, "--corporate", "/corporate")
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("cannot migrate personal path", result.stderr)
+            self.assertEqual(config_path.read_text(encoding="utf-8"), original)
 
     def test_configurer_rejects_invalid_existing_config_without_rewriting(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -387,13 +456,13 @@ class IdentityToolTests(unittest.TestCase):
             state = home / "_blog-skill"
             state.mkdir()
             config_path = state / "identity.json"
-            original = '{"schema_version": 2}\n'
+            original = '{"schema_version": 3}\n'
             config_path.write_text(original, encoding="utf-8")
 
             result = self.run_tool(CONFIGURER, home, "--personal", "/personal")
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("schema_version must be 1", result.stderr)
+            self.assertIn("schema_version must be 1 or 2", result.stderr)
             self.assertEqual(config_path.read_text(encoding="utf-8"), original)
 
     def test_configurer_preserves_valid_symlink(self):

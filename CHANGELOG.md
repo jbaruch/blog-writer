@@ -14,7 +14,7 @@
   cited sources, and presented again before the identity can return to `approved`.
 - **Personal and corporate writing identities compose without collapsing into one persona** — personal identity owns expression, while an explicitly selected corporate identity owns audience, terminology, claims, evidence, positioning, and editorial constraints. Either layer can stand alone, and assignment instructions plus verified facts remain above both.
 - **Two creator skills compile heterogeneous sources into a shared, provenance-aware package** — `create-personal-identity` and `create-corporate-identity` preserve source authority, distinguish explicit rules from observed patterns, keep contradictions visible, and require user approval before an identity becomes reusable.
-- **A tested resolver and configuration writer own identity selection** — project configuration represents personal-only, corporate-only, and combined modes without accidentally activating a legacy persona. Resource roles survive shared-file declarations, paths stay inside each identity package, and the legacy `~/.claude/blog-writer-persona/` remains the fallback only when a project has no explicit selection.
+- **A tested resolver and configuration writer own identity selection** — project configuration represents personal-only, corporate-only, and combined modes without accidentally activating a legacy persona. Selection schema v2 rejects new named-user paths; the writer migrates resolvable v1 values to absolute paths while the resolver remains dual-read. Resource roles survive shared-file declarations, paths stay inside each identity package, and the legacy `~/.claude/blog-writer-persona/` remains the fallback only when a project has no explicit selection.
 
 ## 1.1.33 — 2026-08-30
 

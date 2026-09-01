@@ -121,7 +121,7 @@ A blog project selects one or both identities in `_blog-skill/identity.json`:
 
 ```json
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "personal": "identities/personal/author-name",
   "corporate": "identities/corporate/company-name"
 }
@@ -134,6 +134,12 @@ corporate-only projects stable on machines that also have a legacy persona.
 
 Selection paths may be relative, absolute, or use `~` for the current user's home. They
 must not use named-user forms such as `~other-user/identity`.
+
+`configure-identities.py` is the sole migrator from selection schema v1 to v2. On its next
+write, it expands each resolvable v1 named-user path to an absolute path, preserves every
+other selection, stamps v2, and writes the complete record atomically. It stops without
+rewriting when an account cannot be resolved. `resolve-identities.py` reads both versions
+during the rollout; it preserves v1 named-user expansion and enforces the v2 restriction.
 
 The selection record may be a symlink only when its resolved target is a regular file
 inside the blog home. The resolver and writer reject dangling, non-regular, and external

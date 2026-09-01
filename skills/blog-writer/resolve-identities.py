@@ -10,12 +10,14 @@ import re
 import stat
 import sys
 from pathlib import Path
+from typing import cast
 
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 ROLE_RE = NAME_RE
 CURRENT_USER_PREFIXES = tuple(
     f"~{separator}" for separator in (os.sep, os.altsep) if separator
 )
+SELECTION_SCHEMAS = {1, 2}
 
 
 class IdentityError(ValueError):
@@ -48,13 +50,15 @@ def load_json(path: Path) -> dict:
     return value
 
 
-def resolve_relative(raw: str, base: Path) -> Path:
+def uses_named_user_path(raw: str) -> bool:
+    return (
+        raw.startswith("~") and raw != "~" and not raw.startswith(CURRENT_USER_PREFIXES)
+    )
+
+
+def resolve_relative(raw: str, base: Path, *, allow_named_user: bool = False) -> Path:
     try:
-        if (
-            raw.startswith("~")
-            and raw != "~"
-            and not raw.startswith(CURRENT_USER_PREFIXES)
-        ):
+        if uses_named_user_path(raw) and not allow_named_user:
             raise IdentityError(
                 f"invalid path {raw!r}: named-user expansion is not allowed"
             )
@@ -70,8 +74,14 @@ def resolve_relative(raw: str, base: Path) -> Path:
         raise ToolError(f"cannot resolve path {raw!r}: {exc}") from exc
 
 
-def validate_identity(raw_path: str, expected_type: str, base: Path) -> dict:
-    root = resolve_relative(raw_path, base)
+def validate_identity(
+    raw_path: str,
+    expected_type: str,
+    base: Path,
+    *,
+    allow_named_user: bool = False,
+) -> dict:
+    root = resolve_relative(raw_path, base, allow_named_user=allow_named_user)
     manifest_path = root / "identity.json"
     manifest = load_json(manifest_path)
     errors: list[str] = []
@@ -179,11 +189,16 @@ def legacy_persona(path: Path) -> dict | None:
 def load_config(path: Path) -> dict:
     config = load_json(path)
     errors = []
-    if config.get("schema_version") != 1:
-        errors.append("schema_version must be 1")
+    schema_version = config.get("schema_version")
+    if schema_version not in SELECTION_SCHEMAS:
+        errors.append("schema_version must be 1 or 2")
     for key in ("personal", "corporate"):
         if key in config and (not isinstance(config[key], str) or not config[key]):
             errors.append(f"{key} must be a non-empty path string when present")
+        elif (
+            schema_version == 2 and key in config and uses_named_user_path(config[key])
+        ):
+            errors.append(f"{key} must not use named-user expansion")
     if errors:
         raise IdentityError(f"invalid identity config {path}: " + "; ".join(errors))
     return config
@@ -267,7 +282,8 @@ def main() -> int:
         config_path = state_dir / "identity.json"
         target = selection_target(config_path, blog_home)
         config_present = target is not None
-        config = load_config(target) if target else {}
+        config = load_config(target) if target else {"schema_version": 2}
+        config_version = config["schema_version"]
 
         personal_explicit = args.personal is not None
         corporate_explicit = args.corporate is not None
@@ -279,20 +295,31 @@ def main() -> int:
                 else None
             )
         elif config_present:
-            personal_raw = config.get("personal")
+            personal_raw = cast(str | None, config.get("personal"))
             personal = (
-                validate_identity(personal_raw, "personal", state_dir)
+                validate_identity(
+                    personal_raw,
+                    "personal",
+                    state_dir,
+                    allow_named_user=config_version == 1,
+                )
                 if personal_raw
                 else None
             )
         else:
             personal = legacy_persona(resolve_relative(args.legacy_persona, Path.cwd()))
 
-        corporate_raw = (
-            args.corporate if corporate_explicit else config.get("corporate")
+        corporate_raw = cast(
+            str | None,
+            args.corporate if corporate_explicit else config.get("corporate"),
         )
         corporate = (
-            validate_identity(corporate_raw, "corporate", state_dir)
+            validate_identity(
+                corporate_raw,
+                "corporate",
+                state_dir,
+                allow_named_user=not corporate_explicit and config_version == 1,
+            )
             if corporate_raw
             else None
         )
