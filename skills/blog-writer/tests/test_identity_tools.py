@@ -488,7 +488,8 @@ class IdentityToolTests(unittest.TestCase):
             result = self.run_tool(CONFIGURER, home, "--personal", str(missing))
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("missing file", result.stderr)
+            self.assertIn("required identity file is missing", result.stderr)
+            self.assertIn("restore it or select a different identity", result.stderr)
             self.assertFalse(home.joinpath("_blog-skill/identity.json").exists())
 
     def test_configurer_validates_preserved_selection_before_writing(self):

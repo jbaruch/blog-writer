@@ -53,6 +53,7 @@ class IdentityOnboardingTests(unittest.TestCase):
             capture_output=True,
             check=False,
             env=environment,
+            cwd=home,
         )
 
     def run_tool(self, script: Path, *args: str) -> subprocess.CompletedProcess[str]:
@@ -135,6 +136,23 @@ class IdentityOnboardingTests(unittest.TestCase):
             self.assertFalse(home.joinpath(".claude").exists())
             self.assertFalse(canonical.exists())
             self.assertFalse(nested.exists())
+
+    def test_custom_setup_rejects_unknown_named_user_before_creating(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw) / "home"
+            home.mkdir()
+            literal_target = home / "~blog-writer-missing-user/identities"
+
+            result = self.run_setup(
+                home,
+                "--target",
+                "~blog-writer-missing-user/identities",
+            )
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("invalid shared identity directory", result.stderr)
+            self.assertFalse(home.joinpath(".claude").exists())
+            self.assertFalse(literal_target.exists())
 
     def test_existing_directory_is_prepared_then_left_unchanged(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -314,6 +332,18 @@ class IdentityOnboardingTests(unittest.TestCase):
             )
             self.assertEqual(len(parsed["invalid"]), 1)
             self.assertEqual(parsed["invalid"][0]["path"], str(invalid.resolve()))
+
+    def test_discovery_missing_root_reports_setup_action(self):
+        with tempfile.TemporaryDirectory() as raw:
+            missing = Path(raw) / "missing"
+
+            result = self.run_tool(DISCOVER, "--root", str(missing))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("identity root does not exist", result.stderr)
+            self.assertIn("run setup-identity-root.py", result.stderr)
+            self.assertIn("--root", result.stderr)
+            self.assertFalse(missing.exists())
 
     def test_discovery_handles_zero_one_and_multiple_candidates(self):
         with tempfile.TemporaryDirectory() as raw:

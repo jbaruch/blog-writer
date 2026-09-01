@@ -37,7 +37,10 @@ def load_json(path: Path) -> dict:
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError as exc:
-        raise IdentityError(f"missing file: {path}") from exc
+        raise IdentityError(
+            f"required identity file is missing: {path}; restore it or select a "
+            "different identity, then re-run"
+        ) from exc
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise IdentityError(f"invalid JSON {path}: {exc}") from exc
     except OSError as exc:

@@ -101,7 +101,10 @@ def main() -> int:
         try:
             root_mode = root.stat().st_mode
         except FileNotFoundError:
-            raise IdentityError(f"identity root does not exist: {root}") from None
+            raise IdentityError(
+                f"identity root does not exist: {root}; run setup-identity-root.py "
+                "to establish it or pass an existing directory with --root"
+            ) from None
         except OSError as exc:
             raise ToolError(f"cannot inspect identity root {root}: {exc}") from exc
         if not stat.S_ISDIR(root_mode):
