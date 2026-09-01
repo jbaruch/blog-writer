@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.36 — 2026-09-01
+
 ### Fixed
 
 - **Shared writing identities are established and discovered before first-use selection**
