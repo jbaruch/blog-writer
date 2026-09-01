@@ -1589,7 +1589,8 @@ missing fact or a missing CTA, not a missing aphorism.
 - ✅ "We added input validation. The error rate dropped from twelve per hour to zero." (End
   there. No lesson about what error rates teach us about ourselves.)
 
-**Carve-out:** The author bio ends with a deliberate kicker (see `persona/bio.md`) — that's
+**Carve-out:** The author bio may end with a deliberate kicker when the personal identity's
+`bio` resource defines one — that's
 a schema element, a joke connected to the post's content, not a profundity claim. This
 pattern is about body prose endings. The bio kicker stays.
 

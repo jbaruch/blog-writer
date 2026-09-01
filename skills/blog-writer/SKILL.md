@@ -15,74 +15,66 @@ description: >
 Process steps in order. Do not skip ahead.
 
 Write developer blog posts for practitioners who build things, break things, and have
-opinions about their tools. The voice is the author's own — configured through persona
-files that capture their style, rhetorical devices, and personality.
+opinions about their tools. Compose the author's personal identity with an optional,
+explicitly selected corporate identity. Personal identity supplies expression; corporate
+identity supplies audience, terminology, evidence, positioning, and editorial constraints.
 
 **Script invocation.** Run every script this skill calls through its interpreter: `bash`
 for a `.sh`, `python3` for a `.py`. The installed plugin's files carry no executable bit.
 Never invoke one by bare path.
 
-## Step 1 — Resolve the Persona Path
+## Step 1 — Resolve Writing Identities
 
-**Persona path:** `~/.claude/blog-writer-persona/`
+Ask for or infer the blog home from the current project, then read
+`skills/blog-writer/references/identity-composition.md`. Run its resolver with any
+assignment-specific identity paths the author supplied. Personal and corporate identities
+are independently optional, but at least one must resolve. Corporate identity is active
+only when explicitly selected for the assignment or configured by the project. Never infer
+corporate identity from the author, employer, topic, product, source URL, or personal
+identity contents.
 
-Throughout this document and all reference files, **`persona/`** is shorthand for this
-absolute path. When you see "read `persona/voice.md`", that means read
-`~/.claude/blog-writer-persona/voice.md`. Always resolve `persona/` to this absolute path
-when reading or writing files.
+The resolver's JSON defines `personal/`, optional `corporate/`, and the exact `read_order`
+for this session. These labels refer to resolved directories, not fixed paths.
 
 Proceed immediately to Step 2.
 
-## Step 2 — Probe the Persona State
+## Step 2 — Route Identity Selection
 
-Ask the script what state the persona is in. Do not inspect the filesystem yourself — the
-script decides whether the directory exists and whether the voice profile has content:
+On resolver exit 0, follow the draft-status and reading rules in
+`skills/blog-writer/references/identity-composition.md`. If every identity the author
+explicitly requested resolved, skip to Step 5. If a requested personal identity is absent,
+proceed to Step 3. If a persistent combined selection was requested and the resolved
+personal identity is legacy, proceed to Step 3 to migrate it. If only a requested corporate
+identity is absent, proceed to Step 4.
 
-```bash
-bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh --probe
-```
+If exit 1 reports that no identity or ready legacy persona exists, proceed to Step 4 for an
+explicitly corporate-only assignment; otherwise proceed to Step 3. For any other exit 1,
+report the diagnostic and ask the author to repair or select the identity; do not silently
+fall back. On exit 2, report the diagnostic and stop.
 
-It changes nothing and prints
-`{"ok": true, "path": ..., "exists": bool, "kind": ..., "target": ..., "voice_ready": bool, "action": "probed"}`.
+## Step 3 — Create a Personal Identity
 
-Route on the result:
+If the author requests an interview or the supplied evidence is insufficient, read
+`skills/blog-writer/references/setup.md` and collect that interview as another source. Do
+not force the interview when representative sources already support an identity. Then
+invoke `Skill(skill: "create-personal-identity")` with all supplied and collected sources.
 
-| Result | Where to go |
-|--------|-------------|
-| `exists: true`, `voice_ready: true` | Persona is ready — skip to Step 5 |
-| `exists: true`, `voice_ready: false` | Onboarding is incomplete — skip to Step 4 |
-| `exists: false` | First-time setup — proceed to Step 3 |
+After approval, configure the returned directory through `configure-identities.py` as
+described in `skills/blog-writer/references/identity-composition.md`. Preserve an existing
+corporate selection. Rerun the resolver. If an explicitly requested corporate identity is
+still absent, proceed immediately to Step 4; otherwise proceed immediately to Step 5.
 
-On **exit 1** the canonical path is occupied by a regular file, or is a symlink whose
-target is missing. Report the script's stderr diagnostic and ask the author how to resolve
-it; do not remove or replace what is there. On **exit 2** report the diagnostic and stop.
+## Step 4 — Create a Corporate Identity
 
-## Step 3 — Establish the Persona Directory
+Invoke `Skill(skill: "create-corporate-identity")` with the sources the author supplies.
+Corporate-only configuration passes an empty personal value to `configure-identities.py`;
+combined configuration preserves the selected v1 personal path. When the current personal
+identity is legacy, keep the corporate path as an assignment-only resolver override. Step 2
+routes persistent combined configuration through personal migration first. Never silently
+replace the legacy personal layer.
 
-Ask the author where to store persona files:
-
-> 1. `~/.claude/blog-writer-persona/` ← **default** (recommended)
-> 2. A custom path — I'll create a symlink so the skill always finds them
-
-Then run the same script to establish it. Pass the author's chosen path for option 2, and
-no argument for option 1:
-
-```bash
-bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-persona-dir.sh [target-path]
-```
-
-An `action` of `created` or `linked` means the directory is now in place. An `action` of
-`unchanged` means one was already established and the script left it alone rather than
-repointing it. The exit-1 and exit-2 handling is the same as Step 2.
-
-Proceed immediately to Step 4.
-
-## Step 4 — Run the Onboarding Flow
-
-Read `skills/blog-writer/references/setup.md` and run the interactive onboarding that
-produces the author's voice profile. Do not proceed until it is complete.
-
-Proceed immediately to Step 5.
+After approval, configure the returned directory when the selection is persistent, rerun
+the resolver, and proceed immediately to Step 5.
 
 ## Step 5 — Refresh the Anti-Pattern File
 
@@ -120,29 +112,31 @@ Proceed immediately to Step 6.
 
 Read these reference files in order:
 
-1. `persona/voice.md` — The author's voice. Read this first, every time. It contains the
-   tone, rhetorical devices, and voice-specific examples.
-2. `persona/framework.md` — (If it exists and has content) Post-level architecture: opening
-   modes, argument shape by post type, density philosophy, first-person rules, closing modes,
-   and off-voice moves. **When this file exists and has content, it overrides
-   `skills/blog-writer/references/blog-anatomy.md` and the narrative-density doctrine in
-   `skills/blog-writer/references/tone-guide.md`.** Read it immediately after `persona/voice.md`, before any
-   other reference file.
-3. `skills/blog-writer/references/tone-guide.md` — The generic writing framework. Narrative density rules,
+1. Every personal identity file in the resolver's `read_order`, stopping before the first
+   corporate file. Read its entry point first and follow its routing. For a legacy identity,
+   this starts with `persona/voice.md`. If there is no personal identity, use the generic
+   tone guide for expression without inventing an individual persona.
+2. Every corporate identity file in `read_order`, if selected. Read its entry point first
+   and follow its routing. Record any explicit conflict the assignment does not resolve.
+3. `persona/framework.md` for a legacy identity, if it exists and has content. It defines
+   post-level architecture and overrides `skills/blog-writer/references/blog-anatomy.md`
+   and the narrative-density doctrine in `skills/blog-writer/references/tone-guide.md`.
+4. `skills/blog-writer/references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-4. `skills/blog-writer/references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
+5. `skills/blog-writer/references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
-5. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
+6. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
    sentence: theme explicitness, structural tidiness, emotion mode, reference specificity,
    reader engagement, and shape convergence. Audits 1, 2, and 6 run on the outline in Phase 2;
    audits 3, 4, and 5 run on the prose in Phase 3 and 4.
-6. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
-7. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
-   series handling. Fallback only — `persona/framework.md` overrides it when present.
-8. `persona/product.md` — (If it exists and has content) Index of product docs and
-   terminology. Do NOT read the whole thing upfront. Scan it to know what's available, then
-   fetch only the specific pages relevant to the post's topic during Phase 0.
+7. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
+8. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
+   series handling. Fallback only — a selected personal `composition` resource, including
+   legacy `persona/framework.md`, overrides it.
+9. Product-context resources from selected identities. Scan an index to know what is
+   available, then fetch only relevant sources during Phase 0. A legacy
+   `persona/product.md` remains available but does not activate corporate identity.
 
 Proceed immediately to Step 7.
 
@@ -227,12 +221,14 @@ anti-pattern, structural, accuracy, and tightening checks.
 `skills/blog-writer/references/process.md` Phase 3 has the writing rules, the placeholder
 conventions, and the check procedure.
 
-Four rules bind this step and Step 11:
+Five rules bind this step and Step 11:
 
-**Persona adherence.** Re-read `persona/voice.md` before every writing action — before this
-draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. At
-the start of this step and Step 11, confirm you can name at least 3 rhetorical devices from
-the profile; if you can't, read it again.
+**Identity adherence.** When personal identity is selected, re-read its entry point and
+voice resource before every writing action — before this draft, before every Step 11 revision, and before the
+anti-pattern rewrite voice check. If corporate identity is selected, re-read its entry
+point too. At the start of this step and Step 11, confirm you can name at least 3 personal
+rhetorical devices when a personal identity exists, plus the consequential corporate
+requirements when a corporate identity exists; if you cannot, read the relevant resources again.
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
@@ -272,9 +268,13 @@ you read for.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from
 `skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern
-passes. Read `persona/voice.md` first. Where the profile already prescribes the human-side
+passes. Read the personal voice resource first when selected. Where the profile already prescribes the human-side
 behavior, the audit is a drift check rather than a new rule. Never apply more than two
 interventions from the menu to one post.
+
+**Corporate review adherence.** If the selected corporate identity declares an
+`editorial-review` resource, run it after the generic structural checks. Apply its scoped
+requirements and rerun the mechanical sweep after every resulting prose edit.
 
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
