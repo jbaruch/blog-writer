@@ -240,7 +240,7 @@ class IdentityToolTests(unittest.TestCase):
             result = self.run_tool(RESOLVER, home, "--personal", str(personal))
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("voice path must be relative", result.stderr)
+            self.assertIn("voice path must be relative:", result.stderr)
             self.assertEqual(result.stdout, "")
 
     def test_tilde_resource_path_is_rejected_without_user_lookup(self):
@@ -257,7 +257,47 @@ class IdentityToolTests(unittest.TestCase):
             result = self.run_tool(RESOLVER, home, "--personal", str(personal))
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("voice path must be relative", result.stderr)
+            self.assertIn("voice path must not start with '~':", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_nul_resource_path_is_reported_as_invalid_identity(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            personal = make_identity(
+                state,
+                "personal",
+                "writer",
+                resources=[{"role": "voice", "path": "bad\x00path.md"}],
+            )
+
+            result = self.run_tool(RESOLVER, home, "--personal", str(personal))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice path must not contain a NUL byte", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_unknown_tilde_user_in_selection_is_reported_as_invalid_identity(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            state.joinpath("identity.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "personal": "~blog-writer-missing-user/identity",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = self.run_tool(RESOLVER, home)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("invalid path", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
             self.assertEqual(result.stdout, "")
 
     def test_required_file_names_are_enforced(self):

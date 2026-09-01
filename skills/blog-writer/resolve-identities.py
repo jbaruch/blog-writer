@@ -45,13 +45,15 @@ def load_json(path: Path) -> dict:
 
 
 def resolve_relative(raw: str, base: Path) -> Path:
-    path = Path(raw).expanduser()
-    if not path.is_absolute():
-        path = base / path
     try:
+        path = Path(raw).expanduser()
+        if not path.is_absolute():
+            path = base / path
         return path.resolve()
+    except (RuntimeError, ValueError) as exc:
+        raise IdentityError(f"invalid path {raw!r}: {exc}") from exc
     except OSError as exc:
-        raise ToolError(f"cannot resolve path {path}: {exc}") from exc
+        raise ToolError(f"cannot resolve path {raw!r}: {exc}") from exc
 
 
 def validate_identity(raw_path: str, expected_type: str, base: Path) -> dict:
@@ -79,8 +81,14 @@ def validate_identity(raw_path: str, expected_type: str, base: Path) -> dict:
         if not isinstance(raw, str) or not raw:
             errors.append(f"{role} path must be a non-empty string")
             return
-        if raw.startswith("~") or Path(raw).is_absolute():
-            errors.append(f"{role} path must be relative and not start with '~': {raw}")
+        if "\x00" in raw:
+            errors.append(f"{role} path must not contain a NUL byte")
+            return
+        if raw.startswith("~"):
+            errors.append(f"{role} path must not start with '~': {raw}")
+            return
+        if Path(raw).is_absolute():
+            errors.append(f"{role} path must be relative: {raw}")
             return
         candidate = resolve_relative(raw, root)
         if not inside(root, candidate):
@@ -240,7 +248,7 @@ def main() -> int:
     args = parser.parse_args()
 
     try:
-        blog_home = Path(args.blog_home).expanduser().resolve()
+        blog_home = resolve_relative(args.blog_home, Path.cwd())
         state_dir = blog_home / "_blog-skill"
         config_path = state_dir / "identity.json"
         target = selection_target(config_path, blog_home)
@@ -264,7 +272,7 @@ def main() -> int:
                 else None
             )
         else:
-            personal = legacy_persona(Path(args.legacy_persona).expanduser())
+            personal = legacy_persona(resolve_relative(args.legacy_persona, Path.cwd()))
 
         corporate_raw = (
             args.corporate if corporate_explicit else config.get("corporate")
