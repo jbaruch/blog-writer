@@ -296,8 +296,24 @@ class IdentityToolTests(unittest.TestCase):
             result = self.run_tool(RESOLVER, home)
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("invalid path", result.stderr)
+            self.assertIn("named-user expansion is not allowed", result.stderr)
             self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_configurer_rejects_named_user_selection(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+
+            result = self.run_tool(
+                CONFIGURER,
+                home,
+                "--personal",
+                "~blog-writer-missing-user/identity",
+            )
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must not use named-user expansion", result.stderr)
+            self.assertFalse(home.joinpath("_blog-skill", "identity.json").exists())
             self.assertEqual(result.stdout, "")
 
     def test_required_file_names_are_enforced(self):

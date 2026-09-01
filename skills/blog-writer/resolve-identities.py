@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import stat
 import sys
@@ -12,6 +13,9 @@ from pathlib import Path
 
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 ROLE_RE = NAME_RE
+CURRENT_USER_PREFIXES = tuple(
+    f"~{separator}" for separator in (os.sep, os.altsep) if separator
+)
 
 
 class IdentityError(ValueError):
@@ -46,10 +50,20 @@ def load_json(path: Path) -> dict:
 
 def resolve_relative(raw: str, base: Path) -> Path:
     try:
+        if (
+            raw.startswith("~")
+            and raw != "~"
+            and not raw.startswith(CURRENT_USER_PREFIXES)
+        ):
+            raise IdentityError(
+                f"invalid path {raw!r}: named-user expansion is not allowed"
+            )
         path = Path(raw).expanduser()
         if not path.is_absolute():
             path = base / path
         return path.resolve()
+    except IdentityError:
+        raise
     except (RuntimeError, ValueError) as exc:
         raise IdentityError(f"invalid path {raw!r}: {exc}") from exc
     except OSError as exc:

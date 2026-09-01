@@ -132,6 +132,9 @@ Relative paths resolve from `_blog-skill/`. In an existing selection file, an om
 different: it permits the legacy personal fallback described below. This distinction makes
 corporate-only projects stable on machines that also have a legacy persona.
 
+Selection paths may be relative, absolute, or use `~` for the current user's home. They
+must not use named-user forms such as `~other-user/identity`.
+
 The selection record may be a symlink only when its resolved target is a regular file
 inside the blog home. The resolver and writer reject dangling, non-regular, and external
 targets so repository-controlled links cannot read or overwrite files outside the project.

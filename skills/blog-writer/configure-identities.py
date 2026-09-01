@@ -11,6 +11,10 @@ import sys
 import tempfile
 from pathlib import Path
 
+CURRENT_USER_PREFIXES = tuple(
+    f"~{separator}" for separator in (os.sep, os.altsep) if separator
+)
+
 
 class ConfigError(ValueError):
     """The existing selection record is invalid."""
@@ -134,12 +138,22 @@ def main() -> int:
         blog_home = Path(args.blog_home).expanduser().resolve()
         config_path = blog_home / "_blog-skill" / "identity.json"
         target = selection_target(config_path, blog_home)
-        config = load_config(target) if target else {"schema_version": 1}
+        config: dict[str, object] = (
+            load_config(target) if target else {"schema_version": 1}
+        )
 
         for key, raw in (("personal", args.personal), ("corporate", args.corporate)):
             if raw is None:
                 continue
             if raw:
+                if (
+                    raw.startswith("~")
+                    and raw != "~"
+                    and not raw.startswith(CURRENT_USER_PREFIXES)
+                ):
+                    raise ConfigError(
+                        f"{key} path must not use named-user expansion: {raw}"
+                    )
                 config[key] = raw
             else:
                 config.pop(key, None)
