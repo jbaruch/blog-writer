@@ -88,16 +88,15 @@ Read the entire source material. Build a mental model of the narrative. Identify
 - What was shown on screen that the transcript references but you can't see
 - Jokes, asides, and cultural references that surfaced naturally
 
-**Gather product context (if configured):** If `persona/product.md` exists and contains
-content, list every product feature, command, or concept mentioned in the source material.
-Consult `persona/product.md` and use WebFetch to pull the relevant docs pages directly —
-don't ask the author to provide them. Fetch as many pages as the post needs to be accurate
-(the 1M context window can handle it). If the source material references a feature that
-doesn't appear in any docs page, flag it for the author in Phase 1. If no product context
-is configured, skip this step.
+**Gather product context (if configured):** If a resolved identity declares a
+`product-context` resource, list every product feature, command, or concept mentioned in
+the source material. Consult it and fetch relevant authoritative pages directly. If a
+feature is absent from available sources, flag it in Phase 1. A legacy
+`persona/product.md` can still supply context but does not activate corporate identity.
 
 **Fetch previous posts in the series:** If this post belongs to a series, use WebFetch to
-read the previously published posts (URLs are in `persona/examples.md`). This ensures
+read the previously published posts (URLs are in the personal identity's `examples`
+resource). This ensures
 continuity of callbacks, running jokes, character dynamics, and narrative arc. You have the
 context budget for it — use it.
 
@@ -256,9 +255,10 @@ audits exist to prevent.
 
 **Purpose:** Write the post. Use the approved structure. Follow the tone guide religiously.
 
-**Re-read `persona/voice.md` now.** Actually re-read the file — do not rely on memory from
-earlier in the conversation. Confirm you can name at least 3 rhetorical devices from the
-profile before writing a single sentence.
+**If personal identity is selected, re-read its voice resource now.** Do not rely on memory
+from earlier in the conversation. Confirm you can name at least 3 rhetorical devices from
+the profile before writing. With corporate-only writing, use the generic tone guide for
+expression and do not invent an individual persona.
 
 ### Writing rules:
 
@@ -315,7 +315,7 @@ profile before writing a single sentence.
    provocation — something that makes the reader think "wait, really?" The TLDR sells the
    journey, it doesn't summarize the destination.
 
-10. **End with the author bio.** Follow the schema in `persona/bio.md`. The kicker
+10. **End with the author bio when one is configured.** Follow the personal identity's `bio` resource. The kicker
    must connect to something specific in THIS post. Propose a kicker and confirm with the
    author — don't reuse the same one across posts unless nothing better fits.
 
@@ -520,9 +520,10 @@ not checking against specific patterns but reacting to the overall feel. Look fo
 - Press-release tone — sounds like it was written to impress rather than to communicate
 
 A draft can pass every pattern and still read as obviously AI because it has no soul. If
-Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite — it's going
-back to `persona/voice.md` and injecting the author's actual rhetorical devices, opinions,
-and attitude into the flat sections.
+Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite. With a
+personal identity, return to its voice and restore the author's actual rhetorical devices,
+opinions, and attitude. With corporate-only writing, restore human specificity and point of
+view using the generic tone and corporate identity without inventing a named persona.
 
 Rewrite any hits. This is not optional.
 
@@ -539,10 +540,10 @@ pattern in a different surface form. This is especially true for:
 Do not consider an anti-pattern fixed until the replacement passes a full-catalog scan
 on its own.
 
-**Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against
-`persona/voice.md`. Does it still sound like the author? If the rewrite is correct but
-flat, redo it using the author's rhetorical devices. A mechanically clean sentence that
-sounds like a different person is not a fix.
+**Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against the
+personal voice resource when selected. If it is correct but flat, redo it using the
+author's documented devices. For corporate-only writing, check human readability against
+the generic tone guide and corporate identity instead.
 
 **Proportionality check:** After all rewrites are done, compare the edited draft against
 the pre-scan version and ask two questions at the draft level:
@@ -557,9 +558,9 @@ the pre-scan version and ask two questions at the draft level:
   scan didn't actually flag.
 
 Run the prose-level structural audits. Open `references/structural-audits.md` and run audits
-3, 4, and 5 **one at a time**, after the anti-pattern check is complete. Read
-`persona/voice.md` first: where the profile already prescribes the human-side behavior, the
-audit is a drift check — "did this draft wander off the profile" — not a new rule to impose.
+3, 4, and 5 **one at a time**, after the anti-pattern check is complete. Read the personal
+voice resource first when selected: where it already prescribes the human-side behavior,
+the audit is a drift check — "did this draft wander off the profile" — not a new rule.
 
 - **Audit 3 — Emotion mode.** Pattern #39 catches the individual hits during Pass 1. This
   audit asks the document-level question: across the whole post, how many emotional beats
@@ -571,7 +572,7 @@ audit is a drift check — "did this draft wander off the profile" — not a new
   is a placeholder nobody flagged. Pattern #25 covers the "experts say" shape; this is
   broader.
 - **Audit 5 — Reader engagement.** One moment per post that acknowledges the writing
-  situation, or none. Check `persona/voice.md` before adding any: a profile that already
+  situation, or none. Check the personal voice resource, when selected, before adding any: a profile that already
   lists asides or direct address as devices satisfies this natively, and adding more doubles
   the dose.
 
@@ -579,12 +580,10 @@ Apply at most two interventions from the file's menu to any one post, and vary t
 posts. Uniform application of the whole menu is the convergence trap the file opens with —
 it trades one detectable shape for another.
 
-Run the product accuracy check (if configured). If `persona/product.md` exists and contains
-content, verify every claim the draft makes about the product — feature names, CLI commands,
-behavior, terminology — against the docs pages fetched in Phase 0. If the draft references
-something you didn't fetch, fetch that specific page from `persona/product.md` now. Do not
-guess. Flag anything that contradicts the docs or isn't covered by them. If no product
-context is configured, skip this check.
+Run the product accuracy check when a selected identity declares `product-context`. Verify
+every claim about the product — feature names, CLI commands, behavior, and terminology —
+against authoritative pages fetched in Phase 0. Fetch any newly needed page through the
+routed product context. Do not guess. Flag contradictions and unsupported claims.
 
 Run the tightening pass. Re-read the draft sentence by sentence with fresh eyes:
 - For every sentence, ask: "would the reader miss this if it vanished?" If not, cut it.
@@ -616,8 +615,9 @@ count, placeholder counts by type, and any open questions or flags.
 **Purpose:** Iterate based on author feedback. This phase loops until the author declares
 the post done.
 
-**Re-read `persona/voice.md` now.** Every time you enter Phase 4 or return to it after
-author feedback, re-read the file. Long revision cycles are where voice drift happens.
+**If personal identity is selected, re-read its voice resource now.** Every time you enter
+Phase 4 or return after author feedback, re-read it. Long revision cycles are where voice
+drift happens.
 
 **Draft is a file.** All revisions happen in `blog-draft-[slug].md` using the Edit tool.
 This gives the author a persistent artifact they can review in their editor, diff against
@@ -638,10 +638,10 @@ conversation — edit the file surgically.
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
   audit rule: every rewrite must pass a full-catalog scan on its own before it's
-  considered fixed. Then run the voice check: re-read against `persona/voice.md` and
-  redo any rewrite that's clean but flat. New writing can introduce new patterns
+  considered fixed. Then run the applicable personal-identity or corporate-only voice
+  check and redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or
-  terminology were added or changed (only if `persona/product.md` is configured) — use
+  terminology were added or changed (only if product context is configured) — use
   WebFetch against docs pages as needed
 - If a change conflicts with the tone guide, flag it but defer to the author
 - When replacing placeholders with actual content, integrate smoothly — don't just drop

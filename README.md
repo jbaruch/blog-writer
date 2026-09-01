@@ -8,7 +8,9 @@ Write developer blog posts from video transcripts, meeting notes, or rough ideas
 
 | Skill | What it does |
 |-------|--------------|
-| [`blog-writer`](skills/blog-writer/SKILL.md) | Turns a transcript, meeting notes, or a rough idea into a drafted blog post in the author's voice, then checks it against the catalog of named AI writing anti-patterns |
+| [`blog-writer`](skills/blog-writer/SKILL.md) | Composes optional personal and corporate identities while drafting and reviewing a blog post |
+| [`create-personal-identity`](skills/create-personal-identity/SKILL.md) | Compiles a reusable personal writing identity from supplied samples, interviews, personas, and feedback |
+| [`create-corporate-identity`](skills/create-corporate-identity/SKILL.md) | Compiles a reusable corporate identity from supplied guides, skills, examples, product context, and feedback |
 
 ## Installation
 
@@ -74,8 +76,8 @@ convergence.
 
 Three of them run on the outline during editorial planning, where structure is still cheap
 to change. The other three run on the prose alongside the anti-pattern check. Each audit
-reads the persona's voice profile first. Where the profile already prescribes the human-side
-behavior, the audit is a drift check rather than a new rule.
+reads the selected personal identity first. Where that identity already prescribes the
+human-side behavior, the audit is a drift check rather than a new rule.
 
 They are grounded in [StoryScope](https://arxiv.org/abs/2604.03136) (Russell et al. 2026),
 which classified 61,608 stories using only discourse-level features at 93.2% macro-F1 and
@@ -90,14 +92,14 @@ never read as "no history yet".
 The deliberate non-goal: applying every audit to every post trades one detectable shape for
 another, so the guidance is one or two changes per post, varied across posts.
 
-## Persona system
+## Identity system
 
-The skill learns the author's voice through an interactive onboarding flow that analyzes
-2-5 writing samples. Voice profile, bio template, product context, and example posts are
-stored in `~/.claude/blog-writer-persona/` and read fresh each session. On first run, the
-skill creates this directory (or lets you point it at a custom location like Google Drive
-via symlink). After setup (or when new posts are added), you can optionally save the voice
-profile to your global Claude Code user memory so it applies across all projects.
+The two identity creators compile any user-supplied sources into a common, provenance-aware
+format. Personal identity governs an author's expression. Corporate identity governs brand,
+audience, terminology, claims, evidence, and editorial review. `blog-writer` can use either
+identity alone or compose both, and corporate identity is never inferred from employer,
+topic, or product mentions. Existing `~/.claude/blog-writer-persona/` profiles remain a
+compatibility fallback.
 
 ## Series support
 
@@ -112,7 +114,6 @@ Install via [Tessl](https://tessl.io):
 tessl install jbaruch/blog-writer
 ```
 
-On first use, the skill creates `~/.claude/blog-writer-persona/` and runs the setup flow
-(or lets you symlink it to a custom location for backup). Clarification questions are asked
-one at a time with numbered options — no question dumps. After that, just tell it what you
-want to write about.
+On first use, create or select at least one writing identity. Clarification questions are
+asked one at a time with numbered options. Existing persona users continue through the
+legacy fallback until they migrate to a v1 personal identity.

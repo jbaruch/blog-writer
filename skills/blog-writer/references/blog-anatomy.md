@@ -5,9 +5,9 @@ Phase 3 draft and Phase 4 revisions.
 
 ## Quick Reference: Blog Anatomy
 
-> **Fallback only.** If `persona/framework.md` exists and has content, that file governs
-> post-level architecture (opening modes, argument shape, density philosophy, closing modes)
-> and overrides this entire section. Read it instead.
+> **Fallback only.** If the personal identity declares a `composition` resource, that file
+> governs post-level architecture and overrides this section. A legacy
+> `persona/framework.md` has that role.
 
 Posts are stories about real problems that happen to involve a technology (and optionally a
 product). The reader should learn something even if they never touch the author's stack.
@@ -46,11 +46,11 @@ most distinctive fingerprint of the model doing the drafting (see `references/st
 A post that ends on its strongest concrete moment does not need one.
 
 **CTA** — Practical, specific, low-friction. Usually: install something, try something, read
-the next post. If the author has product context configured, suggest a product-related CTA
+the next post. If a selected identity has product context, suggest a product-related CTA
 and confirm.
 
 **Author bio** — Fixed schema, rotating kicker. The kicker is a dry joke that connects
-to the post's content. See the bio format in `persona/bio.md`.
+to the post's content. Use the selected personal identity's `bio` resource when available.
 
 ## Varying the Shape
 
@@ -79,7 +79,7 @@ Read it at the start of every session; update it when a post is published.
 
 - Maintain consistent title patterns
 - Reference previous posts naturally in the opening
-- Keep recurring characters consistent (personality, running jokes, callbacks) — see
-  `persona/voice.md` for any established characters
+- Keep recurring characters consistent (personality, running jokes, callbacks) — see the
+  personal voice resource for any established characters
 - Each post must stand alone — a reader hitting part 2 first should not be lost
 - End with a teaser for the next installment when applicable

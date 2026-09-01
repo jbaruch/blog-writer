@@ -35,12 +35,13 @@ So: **pick one or two structural interventions per post, vary them across posts,
 able to say why this post got this shape.** Never run the whole menu. An audit that finds
 nothing is a valid result.
 
-## Calibrate against the persona, not a generic human
+## Calibrate against personal identity, not a generic human
 
 Every rate below compares "humans in general" to "AI in general." The author is not humans
 in general.
 
-Before applying any audit, read `persona/voice.md`. If the profile already prescribes the
+Before applying any audit, read the selected personal voice resource. If none is selected,
+use the generic tone guide without inventing a persona. If the profile already prescribes the
 human-side behavior, **the audit is a drift check, not a new rule** — the question becomes
 "did this draft wander off the profile," not "should the author start doing this."
 
@@ -49,8 +50,9 @@ satisfied by the voice; enforcing it again would double the dose. For a persona 
 named cultural references, audit 4 is already satisfied. Check the profile first, then
 decide whether the audit has anything to say.
 
-Where `persona/framework.md` exists and has content, it governs post architecture and
-overrides `references/blog-anatomy.md`. Audits 2 and 6 read the framework's declared
+Where the personal identity declares a `composition` resource, it governs post architecture
+and overrides `references/blog-anatomy.md`. A legacy `persona/framework.md` has that role.
+Audits 2 and 6 read its declared
 opening and closing modes as the menu to vary across, rather than the generic one below.
 
 ## Run one audit at a time
@@ -166,7 +168,7 @@ situation* — "I know how this sounds", "skip this section if you already run K
 "you're probably skimming, so here's the number".
 
 **Dosage:** this is a spice. One moment per post, maybe none. Most personas that have a
-conversational voice already do this natively — check `persona/voice.md` before adding
+conversational voice already do this natively — check the personal voice resource before adding
 any, and if the profile lists asides or direct address as a device, this audit is a drift
 check only.
 
@@ -229,5 +231,5 @@ distinctive of the five models:
 
 It does not fix vocabulary, punctuation, or sentence craft — that is
 `references/ai-anti-patterns.md` and `references/tone-guide.md`. It does not impose a
-voice — that is `persona/voice.md`. And it does not make a post undetectable. Nothing
+voice — that is the personal identity when selected. And it does not make a post undetectable. Nothing
 does. It makes the post better shaped, which is the part that was worth doing anyway.

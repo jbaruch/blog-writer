@@ -4,8 +4,9 @@ This document defines the writing framework for blog posts. It covers narrative 
 rules, anti-pattern references, tone calibration, and structural conventions. Read it
 before every draft.
 
-The author's personal voice, rhetorical devices, and bio format are in `persona/voice.md`
-and `persona/bio.md`. Read those too.
+The author's personal voice, rhetorical devices, and bio format come from the selected
+personal identity. Read its routed resources when one is selected; otherwise this guide is
+the expression fallback.
 
 ---
 
@@ -78,7 +79,7 @@ moment the reader experiences.
 ### Voice consistency across sections
 
 The author's voice doesn't turn off when the content gets technical. The rhetorical devices
-from `persona/voice.md` — parenthetical asides, cultural references, self-deprecation,
+from the personal voice resource — parenthetical asides, cultural references, self-deprecation,
 whatever is characteristic — should continue into the code examples and the architecture
 discussion. A technical section should still sound like a person telling you about it at a
 conference afterparty, not a whitepaper.
