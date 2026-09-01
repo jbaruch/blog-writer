@@ -44,16 +44,16 @@ routing in `identity.md`; add roles such as `brand`, `terminology`, `editorial-r
 `product-context` only when the evidence supports them. Record every source and
 consequential inference in `sources.md`. Run the approval loop, then finish here.
 
-## Step 2 — Update a Corporate Identity
+## Step 2 — Update or Migrate a Corporate Identity
 
-Read the existing package and its provenance before reading new evidence. Preserve valid
-guidance and source history. Identify which conclusions the new sources confirm, weaken,
-replace, or leave unresolved; never regenerate the package as if prior decisions did not
-exist.
+Read the existing package and its provenance before reading new evidence or migrating it.
+Preserve valid guidance and source history. Identify which conclusions the new sources
+confirm, weaken, replace, or leave unresolved; never regenerate the package as if prior
+decisions did not exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
-run the approval loop and finish here.
+run the approval loop. Finish here.
 
 ## Step 3 — Audit a Corporate Identity
 

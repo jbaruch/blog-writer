@@ -8,9 +8,9 @@
   `schema_version: 1`, `type: personal`, a lowercase kebab-case `name`, `status` set to
   `draft` or `approved`, `entrypoint: identity.md`, and `sources: sources.md`.
 - A missing `resources` field defaults to an empty ordered list. Each present resource must
-  be an object with a lowercase kebab-case `role` and a non-empty relative `path` that stays
-  inside the package. No other required field has a default; a missing or malformed value
-  makes resolution fail.
+  be an object with a lowercase kebab-case `role` and a non-empty `path`. The path must not
+  start with `~`; it must be relative and stay inside the package. No other required field
+  has a default; a missing or malformed value makes resolution fail.
 - `blog-writer` reads only the files returned by a successful resolver result. It may inspect
   a draft but asks before using one for publishable content. It never writes the package or
   invents missing fields.

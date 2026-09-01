@@ -80,7 +80,7 @@ def validate_identity(raw_path: str, expected_type: str, base: Path) -> dict:
             errors.append(f"{role} path must be a non-empty string")
             return
         if raw.startswith("~") or Path(raw).is_absolute():
-            errors.append(f"{role} path must be relative: {raw}")
+            errors.append(f"{role} path must be relative and not start with '~': {raw}")
             return
         candidate = resolve_relative(raw, root)
         if not inside(root, candidate):

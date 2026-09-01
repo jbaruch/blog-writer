@@ -39,8 +39,8 @@ declared role remains significant even when paths repeat.
 - `status`: `draft` or `approved`. Consumers may inspect drafts but must ask before using
   them to produce publishable content.
 - `entrypoint`: the required literal path `identity.md`.
-- `resources`: optional ordered list of `{role, path}` entries. Paths are relative to the
-  identity directory and must stay inside it.
+- `resources`: optional ordered list of `{role, path}` entries. Paths do not start with `~`,
+  are relative to the identity directory, and stay inside it.
 - `sources`: the required literal path `sources.md`.
 
 Useful personal roles include `voice`, `composition`, `examples`, and `bio`. Useful

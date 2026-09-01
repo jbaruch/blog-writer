@@ -23,8 +23,8 @@ Use this package contract:
   `name`, `status` set to `draft` or `approved`, `entrypoint: identity.md`, and
   `sources: sources.md`.
 - When supporting files exist, add `resources` as an ordered array of `{role, path}`
-  objects. Each `role` is lowercase kebab-case; each `path` is a non-empty relative path
-  that stays inside the package.
+  objects. Each `role` is lowercase kebab-case. Each `path` is non-empty, does not start
+  with `~`, is relative, and stays inside the package.
 - Put concise shared guidance and routing in `identity.md`; add `voice`, `composition`,
   `examples`, or `bio` resources only when evidence supports them.
 - In `sources.md`, record every source's location, date, scope, and authority.
