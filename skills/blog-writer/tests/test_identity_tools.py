@@ -111,6 +111,22 @@ class IdentityToolTests(unittest.TestCase):
             self.assertEqual(parsed["personal"]["mode"], "legacy")
             self.assertIsNone(parsed["corporate"])
 
+    def test_uninspectable_config_path_is_a_tool_error(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            home.joinpath("_blog-skill").write_text(
+                "not a directory\n", encoding="utf-8"
+            )
+            legacy = home / "legacy"
+            legacy.mkdir()
+            legacy.joinpath("voice.md").write_text("legacy voice", encoding="utf-8")
+
+            result = self.run_tool(RESOLVER, home, "--legacy-persona", str(legacy))
+
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("cannot inspect", result.stderr)
+            self.assertNotIn("legacy-persona", result.stdout)
+
     def test_combined_flow_orders_personal_before_corporate(self):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)

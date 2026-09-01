@@ -163,6 +163,17 @@ def load_config(path: Path) -> dict:
     return config
 
 
+def path_present(path: Path) -> bool:
+    """Return whether path exists without hiding inspection failures."""
+    try:
+        path.lstat()
+    except FileNotFoundError:
+        return False
+    except OSError as exc:
+        raise ToolError(f"cannot inspect {path}: {exc}") from exc
+    return True
+
+
 def read_paths(*identities: dict | None) -> list[str]:
     ordered: list[str] = []
     seen: set[str] = set()
@@ -192,7 +203,7 @@ def main() -> int:
         blog_home = Path(args.blog_home).expanduser().resolve()
         state_dir = blog_home / "_blog-skill"
         config_path = state_dir / "identity.json"
-        config_present = config_path.exists() or config_path.is_symlink()
+        config_present = path_present(config_path)
         config = load_config(config_path) if config_present else {}
 
         personal_explicit = args.personal is not None
