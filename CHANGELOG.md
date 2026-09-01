@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.34 — 2026-09-01
+
 ### Added
 
 - **Personal identity creation is self-contained and correction-driven** — the creator now
