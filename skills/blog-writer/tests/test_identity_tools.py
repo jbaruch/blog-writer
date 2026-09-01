@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import pwd
 import subprocess
 import tempfile
 import unittest
@@ -212,19 +214,131 @@ class IdentityToolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
             state = home / "_blog-skill"
-            outside = home / "outside.md"
-            outside.write_text("outside\n", encoding="utf-8")
             corporate = make_identity(
                 state,
                 "corporate",
                 "acme",
-                resources=[{"role": "brand", "path": str(outside)}],
+                resources=[{"role": "brand", "path": "../outside.md"}],
             )
 
             result = self.run_tool(RESOLVER, home, "--corporate", str(corporate))
 
             self.assertEqual(result.returncode, 1)
             self.assertIn("escapes identity directory", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_absolute_resource_path_inside_identity_is_rejected(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            guide = state / "identities" / "personal" / "writer" / "guide.md"
+            personal = make_identity(
+                state,
+                "personal",
+                "writer",
+                resources=[{"role": "voice", "path": str(guide)}],
+            )
+
+            result = self.run_tool(RESOLVER, home, "--personal", str(personal))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice path must be relative:", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_tilde_resource_path_is_rejected_without_user_lookup(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            personal = make_identity(
+                state,
+                "personal",
+                "writer",
+                resources=[{"role": "voice", "path": "~missing-user/guide.md"}],
+            )
+
+            result = self.run_tool(RESOLVER, home, "--personal", str(personal))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice path must not start with '~':", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_nul_resource_path_is_reported_as_invalid_identity(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            personal = make_identity(
+                state,
+                "personal",
+                "writer",
+                resources=[{"role": "voice", "path": "bad\x00path.md"}],
+            )
+
+            result = self.run_tool(RESOLVER, home, "--personal", str(personal))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice path must not contain a NUL byte", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_unknown_tilde_user_in_selection_is_reported_as_invalid_identity(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            state.joinpath("identity.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 2,
+                        "personal": "~blog-writer-missing-user/identity",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = self.run_tool(RESOLVER, home)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("personal must not use named-user expansion", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_v1_unknown_named_user_selection_uses_legacy_expansion_path(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            state.joinpath("identity.json").write_text(
+                json.dumps(
+                    {
+                        "schema_version": 1,
+                        "personal": "~blog-writer-missing-user/identity",
+                    }
+                ),
+                encoding="utf-8",
+            )
+
+            result = self.run_tool(RESOLVER, home)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("invalid path", result.stderr)
+            self.assertNotIn("named-user expansion is not allowed", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_configurer_rejects_named_user_selection(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+
+            result = self.run_tool(
+                CONFIGURER,
+                home,
+                "--personal",
+                "~blog-writer-missing-user/identity",
+            )
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must not use named-user expansion", result.stderr)
+            self.assertFalse(home.joinpath("_blog-skill", "identity.json").exists())
             self.assertEqual(result.stdout, "")
 
     def test_required_file_names_are_enforced(self):
@@ -270,6 +384,7 @@ class IdentityToolTests(unittest.TestCase):
             config = json.loads(
                 (home / "_blog-skill/identity.json").read_text(encoding="utf-8")
             )
+            self.assertEqual(config["schema_version"], 2)
             self.assertNotIn("personal", config)
             self.assertEqual(config["corporate"], str(corporate))
 
@@ -291,6 +406,49 @@ class IdentityToolTests(unittest.TestCase):
             )
             self.assertEqual(config["personal"], "/personal")
             self.assertEqual(config["corporate"], "/corporate")
+            self.assertEqual(config["schema_version"], 2)
+
+    def test_configurer_migrates_v1_named_user_path_before_other_update(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            username = pwd.getpwuid(os.getuid()).pw_name
+            named_personal = f"~{username}/identity"
+            state.joinpath("identity.json").write_text(
+                json.dumps({"schema_version": 1, "personal": named_personal}),
+                encoding="utf-8",
+            )
+
+            result = self.run_tool(CONFIGURER, home, "--corporate", "/corporate")
+
+            self.assertEqual(result.returncode, 0, result.stderr)
+            config = json.loads(
+                state.joinpath("identity.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(config["schema_version"], 2)
+            self.assertEqual(config["personal"], str(Path(named_personal).expanduser()))
+            self.assertEqual(config["corporate"], "/corporate")
+
+    def test_configurer_does_not_rewrite_unmigratable_v1_named_user_path(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            config_path = state / "identity.json"
+            original = json.dumps(
+                {
+                    "schema_version": 1,
+                    "personal": "~blog-writer-missing-user/identity",
+                }
+            )
+            config_path.write_text(original, encoding="utf-8")
+
+            result = self.run_tool(CONFIGURER, home, "--corporate", "/corporate")
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("cannot migrate personal path", result.stderr)
+            self.assertEqual(config_path.read_text(encoding="utf-8"), original)
 
     def test_configurer_rejects_invalid_existing_config_without_rewriting(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -298,13 +456,13 @@ class IdentityToolTests(unittest.TestCase):
             state = home / "_blog-skill"
             state.mkdir()
             config_path = state / "identity.json"
-            original = '{"schema_version": 2}\n'
+            original = '{"schema_version": 3}\n'
             config_path.write_text(original, encoding="utf-8")
 
             result = self.run_tool(CONFIGURER, home, "--personal", "/personal")
 
             self.assertEqual(result.returncode, 1)
-            self.assertIn("schema_version must be 1", result.stderr)
+            self.assertIn("schema_version must be 1 or 2", result.stderr)
             self.assertEqual(config_path.read_text(encoding="utf-8"), original)
 
     def test_configurer_preserves_valid_symlink(self):

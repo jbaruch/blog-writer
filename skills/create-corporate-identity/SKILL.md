@@ -1,6 +1,6 @@
 ---
 name: create-corporate-identity
-description: Create, update, or audit a reusable corporate writing identity from brand and style guides, tone-of-voice guidance, corporate skills, published content, product messaging, examples, or editorial feedback. Use whenever someone wants to define, capture, refresh, migrate, or check a company voice, house style, corporate tone, audience, terminology, evidence, positioning, or editorial constraints without prescribing an individual author's personality.
+description: Create, update, or audit a reusable corporate writing identity from brand and style guides, tone-of-voice guidance, corporate skills, published content, product messaging, examples, or editorial feedback. Use whenever someone wants to define, capture, refresh, or check a company voice, house style, corporate tone, audience, terminology, evidence, positioning, or editorial constraints without prescribing an individual author's personality.
 ---
 
 # Create Corporate Identity
@@ -53,7 +53,7 @@ exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
-run the approval loop and finish here.
+run the approval loop. Finish here.
 
 ## Step 3 — Audit a Corporate Identity
 
