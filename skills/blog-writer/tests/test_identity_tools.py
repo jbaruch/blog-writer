@@ -218,13 +218,31 @@ class IdentityToolTests(unittest.TestCase):
                 state,
                 "corporate",
                 "acme",
-                resources=[{"role": "brand", "path": str(outside)}],
+                resources=[{"role": "brand", "path": "../../../../outside.md"}],
             )
 
             result = self.run_tool(RESOLVER, home, "--corporate", str(corporate))
 
             self.assertEqual(result.returncode, 1)
             self.assertIn("escapes identity directory", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_absolute_resource_path_inside_identity_is_rejected(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            guide = state / "identities" / "personal" / "writer" / "guide.md"
+            personal = make_identity(
+                state,
+                "personal",
+                "writer",
+                resources=[{"role": "voice", "path": str(guide)}],
+            )
+
+            result = self.run_tool(RESOLVER, home, "--personal", str(personal))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("voice path must be relative", result.stderr)
             self.assertEqual(result.stdout, "")
 
     def test_required_file_names_are_enforced(self):

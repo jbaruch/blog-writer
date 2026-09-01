@@ -39,8 +39,8 @@ Use this approval loop for every consequential create or update:
 - Show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
   unresolved items.
 - Ask one focused question at a time for consequential conflicts.
-- When the user rejects or corrects a conclusion, revise it and re-read it beside its cited
-  sources.
+- When the user rejects or corrects a conclusion, revise it.
+- Re-read each revised conclusion beside its cited sources.
 - Present each corrected conclusion with its cited sources.
 - Set `status` to `approved` only after explicit approval.
 

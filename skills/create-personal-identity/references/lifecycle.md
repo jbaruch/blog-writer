@@ -6,8 +6,7 @@
   provenance field when it creates, updates, migrates, or audits a package.
 - `resolve-identities.py` is the validating reader for `blog-writer`. It accepts only
   `schema_version: 1`, `type: personal`, a lowercase kebab-case `name`, `status` set to
-  `draft` or `approved`, the literal `identity.md` entry point, and the literal `sources.md`
-  provenance path.
+  `draft` or `approved`, `entrypoint: identity.md`, and `sources: sources.md`.
 - A missing `resources` field defaults to an empty ordered list. Each present resource must
   be an object with a lowercase kebab-case `role` and a non-empty relative `path` that stays
   inside the package. No other required field has a default; a missing or malformed value

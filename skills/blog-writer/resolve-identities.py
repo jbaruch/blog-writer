@@ -79,6 +79,9 @@ def validate_identity(raw_path: str, expected_type: str, base: Path) -> dict:
         if not isinstance(raw, str) or not raw:
             errors.append(f"{role} path must be a non-empty string")
             return
+        if Path(raw).expanduser().is_absolute():
+            errors.append(f"{role} path must be relative: {raw}")
+            return
         candidate = resolve_relative(raw, root)
         if not inside(root, candidate):
             errors.append(f"{role} path escapes identity directory: {raw}")
