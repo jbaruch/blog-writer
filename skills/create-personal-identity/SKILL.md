@@ -10,8 +10,12 @@ This skill is an action router — pick the step that matches the user's intent 
 Personal identity owns how an author sounds and reasons, never employer positioning,
 product claims, or corporate editorial policy.
 
-Before any action, read `references/lifecycle.md` completely and follow its ownership and
-migration contract.
+Before any action, read the lifecycle reference completely and follow its ownership and
+migration contract:
+
+```text
+skills/create-personal-identity/references/lifecycle.md
+```
 
 Use this package contract:
 
