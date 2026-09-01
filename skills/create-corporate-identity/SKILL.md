@@ -13,15 +13,15 @@ author's personality. Before any action, read
 `skills/blog-writer/references/identity-spec.md` completely and follow its package,
 provenance, strength, ownership, approval, and storage contracts.
 
-Every package has a validated `identity.json` manifest, concise shared guidance and routing
-in `identity.md`, and source authority, dates, contradictions, and consequential inferences
-in `sources.md`; optional Markdown resources are declared by role in the manifest.
+Every package has an `identity.json` manifest, concise shared guidance and routing in
+`identity.md`, and source authority, dates, contradictions, and consequential inferences in
+`sources.md`; optional Markdown resources are declared by role in the manifest.
 
 Use one approval loop for every consequential create or update: set `status` to `draft`,
 show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
 unresolved items, then ask one focused question at a time. If the user rejects or corrects
-anything, revise the package, revalidate it against the sources and package contract, and
-present it again. Set `status` to `approved` only after explicit approval.
+anything, revise the package, trace each changed conclusion to its cited sources, and present
+it again. Set `status` to `approved` only after explicit approval.
 
 ## Step 1 — Create a Corporate Identity
 
@@ -38,7 +38,7 @@ format-specific conventions, editorial checks, and stated legal or reputational
 constraints. Keep explicit policy separate from patterns observed in examples. Compile the
 identity and review guidance from source skills without copying their workflow.
 
-Write and validate the package in the user's selected directory, defaulting to
+Write the package to the user's selected directory, defaulting to
 `~/.claude/blog-writer-identities/corporate/<name>/`. Put concise shared guidance and
 routing in `identity.md`; add roles such as `brand`, `terminology`, `editorial-review`, and
 `product-context` only when the evidence supports them. Record every source and
