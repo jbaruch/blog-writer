@@ -20,7 +20,7 @@ permissions:
 
 jobs:
   publish:
-    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@f96cd07fb093073ce818c767fd4fd55abfb9c249
+    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@0ba4f4b0b0441101978ea28fff3af218055303ba
     # Forward only the token the reusable workflow declares (not `inherit`).
     secrets:
       TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
@@ -39,6 +39,10 @@ jobs:
       python-version: '3.11'
       node-version: '22'
       skill-review-credit-outage: skip
+      # Tessl discovers evals/ as a separate publish input, outside the normal
+      # plugin archive controlled by .tesslignore. Keep the local harness while
+      # preventing publish-time scenario upload and execution.
+      skip-evals: true
       # Runs every skills/**/test_*.sh suite after checkout and before publish,
       # so a shipped script whose tests fail never reaches the registry. The
       # same gate runs on pull requests via .github/workflows/test.yml.
