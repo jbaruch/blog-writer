@@ -16,9 +16,11 @@ migration contract.
 Use this package contract:
 
 - Write `identity.json` with `schema_version: 1`, `type: personal`, a lowercase kebab-case
-  name, `status: draft|approved`, `entrypoint: identity.md`, `sources: sources.md`, and any
-  optional Markdown resources as `{role, path}` entries whose relative paths stay inside
-  the package.
+  `name`, `status` set to `draft` or `approved`, `entrypoint: identity.md`, and
+  `sources: sources.md`.
+- When supporting files exist, add `resources` as an ordered array of `{role, path}`
+  objects. Each `role` is lowercase kebab-case; each `path` is a non-empty relative path
+  that stays inside the package.
 - Put concise shared guidance and routing in `identity.md`; add `voice`, `composition`,
   `examples`, or `bio` resources only when evidence supports them.
 - In `sources.md`, record every source's location, date, scope, and authority.
@@ -33,8 +35,9 @@ Use this approval loop for every consequential create or update:
 - Show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
   unresolved items.
 - Ask one focused question at a time for consequential conflicts.
-- When the user rejects or corrects a conclusion, revise it, re-read it beside its cited
-  sources, and present it again.
+- When the user rejects or corrects a conclusion, revise it and re-read it beside its cited
+  sources.
+- Present each corrected conclusion with its cited sources.
 - Set `status` to `approved` only after explicit approval.
 
 ## Step 1 — Create a Personal Identity

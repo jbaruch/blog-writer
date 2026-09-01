@@ -1,7 +1,24 @@
 # Personal Identity Ownership and Migration
 
-`create-personal-identity` is the sole owner and writer of personal identity packages.
-Other skills may read a supported package but must not migrate, substitute, or rewrite it.
+## Owners and readers
+
+- `create-personal-identity` is the sole owner and writer. It reads every manifest and
+  provenance field when it creates, updates, migrates, or audits a package.
+- `resolve-identities.py` is the validating reader for `blog-writer`. It accepts only
+  `schema_version: 1`, `type: personal`, a lowercase kebab-case `name`, `status` set to
+  `draft` or `approved`, the literal `identity.md` entry point, and the literal `sources.md`
+  provenance path.
+- A missing `resources` field defaults to an empty ordered list. Each present resource must
+  be an object with a lowercase kebab-case `role` and a non-empty relative `path` that stays
+  inside the package. No other required field has a default; a missing or malformed value
+  makes resolution fail.
+- `blog-writer` reads only the files returned by a successful resolver result. It may inspect
+  a draft but asks before using one for publishable content. It never writes the package or
+  invents missing fields.
+
+No reader may migrate, substitute, or rewrite a personal identity package.
+
+## Migration
 
 Before updating or migrating a package, inspect its `schema_version` and provenance. Handle
 version 1 through the current package contract. Migrate an older version only when this
