@@ -17,6 +17,12 @@ migration contract:
 skills/create-personal-identity/references/lifecycle.md
 ```
 
+For Step 1 or Step 2, also read the shared storage contract before writing:
+
+```text
+skills/blog-writer/references/identity-storage.md
+```
+
 Use this package contract:
 
 - Write `identity.json` with `schema_version: 1`, `type: personal`, a lowercase kebab-case
@@ -57,15 +63,14 @@ rhetorical devices, humor, references, technical depth, recurring elements, deli
 variation, off-voice moves, and durable bio facts. Keep explicit preferences separate from
 observed patterns. Sample frequency is evidence, not a quota.
 
-Write the package through the contract above to the user's selected directory, defaulting
-to `~/.claude/blog-writer-identities/personal/<name>/`. Run the approval loop, then finish
-here.
+Resolve the destination through the shared storage contract. Write the package through the
+contract above, run the approval loop, then finish here.
 
 ## Step 2 — Migrate a Legacy Personal Identity
 
-Read the source directory and run the exact v0-to-v1 rewrite in the lifecycle reference.
-Stop unless the directory matches that reference's legacy v0 shape. Run the approval loop
-and finish here.
+Read the source directory and run the exact v0-to-v1 migration in the lifecycle reference.
+Stop unless the directory matches that reference's legacy v0 shape. Resolve the destination
+through the shared storage contract. Run the approval loop and finish here.
 
 ## Step 3 — Update a Personal Identity
 

@@ -48,10 +48,12 @@ python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/configure-identiti
 
 At least one layer argument is required. A non-empty value sets that layer; an empty value
 removes it while preserving the other layer. Clearing the final selected layer is invalid;
-set its replacement in the same command or leave the selection unchanged. Exit 0 prints
+set its replacement in the same command or leave the selection unchanged. The writer
+resolves every resulting identity before it writes. Exit 0 prints
 `{"ok": true, "config": ..., "personal": ..., "corporate": ...}`. Exit 1 means the
-existing selection record is invalid and remains untouched. Exit 2 means invocation or I/O
-failed and the record remains untouched. Never hand-edit `_blog-skill/identity.json`.
+existing selection or a resulting identity is invalid and the record remains untouched.
+Exit 2 means an I/O failure and the record remains untouched. Never hand-edit
+`_blog-skill/identity.json`.
 
 A present selection file is authoritative. An omitted key disables that layer, so a file
 containing only `corporate` stays corporate-only even when a legacy persona exists. When no

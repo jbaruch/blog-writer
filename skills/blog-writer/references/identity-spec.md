@@ -112,10 +112,17 @@ packages remain errors when their paths were explicitly selected.
 
 ## Storage and selection
 
-Identity creators write to a user-selected directory. Recommended defaults are:
+The canonical shared root is `~/.claude/blog-writer-identities/`. It is a real directory or
+a symlink to a user-selected shared directory. The shared storage lifecycle is defined in
+`skills/blog-writer/references/identity-storage.md`.
+
+Identity creators write default packages beneath the resolved root:
 
 - personal: `~/.claude/blog-writer-identities/personal/<name>/`
 - corporate: `~/.claude/blog-writer-identities/corporate/<name>/`
+
+An identity may use another package directory only when the user supplies it as an explicit
+custom path. Project-local placement is never a fallback for a missing canonical root.
 
 A blog project selects one or both identities in `_blog-skill/identity.json`:
 
@@ -155,6 +162,6 @@ when `_blog-skill/identity.json` is absent and no personal override was supplied
 `voice.md`, `framework.md`, `examples.md`, `bio.md`, and `product.md` remain readable, but
 `product.md` may mix personal and corporate context. New identity creation must not add
 corporate material to a personal identity. `create-personal-identity` alone may treat a
-directory with no manifest and a non-empty `voice.md` as legacy v0 and perform the
-owner-defined in-place rewrite in its lifecycle reference. No legacy corporate schema
-exists.
+directory with no manifest and a non-empty `voice.md` as legacy v0 and compile a new package
+from it. Migration leaves the legacy directory, symlink, and files unchanged. No legacy
+corporate schema exists.

@@ -1,5 +1,26 @@
 # Changelog
 
+### Fixed
+
+- **Shared writing identities are established and discovered before first-use selection**
+  ([#51](https://github.com/jbaruch/blog-writer/issues/51)) — v1 creators named
+  `~/.claude/blog-writer-identities/{personal,corporate}/<name>/` as a default but owned no
+  lifecycle for the shared root. On a machine whose legacy persona already lived in Google
+  Drive, a Port corporate identity fell back into the first blog project's `_blog-skill/`
+  directory. A tested setup tool now probes or establishes the canonical directory or its
+  user-selected symlink, reports dangling links and occupying files without replacing them,
+  prepares both package directories, and discovers a legacy persona without modifying it.
+- **A clean blog project offers validated shared packages instead of silently taking the
+  legacy fallback** — first use enumerates manifest-valid personal and corporate candidates,
+  rejects malformed and escaping entries, asks for personal selection at every candidate
+  count, and keeps corporate selection explicit. Confirmed selection is written only after
+  every resulting package resolves. The next session treats that schema-v2 project record
+  as authoritative and performs no rediscovery.
+- **Legacy migration now compiles into shared storage without rewriting its source** — the
+  former migration contract added v1 files directly to the legacy directory, including
+  through an established legacy symlink. The legacy package is now a read-only source for a
+  new personal identity, preserving its path, target, and original files.
+
 ## 1.1.35 — 2026-09-01
 
 ### Publishing — keep local eval scenarios out of registry releases

@@ -101,6 +101,18 @@ identity alone or compose both, and corporate identity is never inferred from em
 topic, or product mentions. Existing `~/.claude/blog-writer-persona/` profiles remain a
 compatibility fallback.
 
+Reusable packages live by default under the shared
+`~/.claude/blog-writer-identities/{personal,corporate}/` root. The root may be a directory or
+a symlink to a synced location selected during setup. An explicit custom package path stays
+custom; a missing root never sends an identity into the current blog project.
+
+Each blog project stores only its confirmed personal and corporate selections in
+`_blog-skill/identity.json`. First use in an unconfigured project discovers and validates
+shared packages before offering them. Personal selection always requires confirmation.
+Corporate selection is separate and explicit. Later sessions reuse the project selection
+without rediscovery. Legacy personas are offered as read-only migration sources; migration
+does not repoint or rewrite the legacy path.
+
 ## Series support
 
 Blog series state (episode numbers, callbacks, open threads) is tracked across posts in
@@ -114,6 +126,7 @@ Install via [Tessl](https://tessl.io):
 tessl install jbaruch/blog-writer
 ```
 
-On first use, create or select at least one writing identity. Clarification questions are
-asked one at a time with numbered options. Existing persona users continue through the
-legacy fallback until they migrate to a v1 personal identity.
+On first use, establish or select the shared identity root, then create or select at least
+one writing identity. Clarification questions are asked one at a time with numbered options.
+Existing persona users may continue through the legacy fallback or migrate into a v1
+personal package under the shared root.
