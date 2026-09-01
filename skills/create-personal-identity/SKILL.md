@@ -61,18 +61,24 @@ Write the package through the contract above to the user's selected directory, d
 to `~/.claude/blog-writer-identities/personal/<name>/`. Run the approval loop, then finish
 here.
 
-## Step 2 — Update or Migrate a Personal Identity
+## Step 2 — Migrate a Legacy Personal Identity
 
-Read the existing package and its provenance before reading new evidence or migrating it.
-Preserve valid guidance and source history. Identify which conclusions the new sources
-confirm, weaken, replace, or leave unresolved; never regenerate the package as if prior
-decisions did not exist.
+Read the source directory and run the exact v0-to-v1 rewrite in the lifecycle reference.
+Stop unless the directory matches that reference's legacy v0 shape. Run the approval loop
+and finish here.
+
+## Step 3 — Update a Personal Identity
+
+Read the existing v1 package and its provenance before reading new evidence. Preserve valid
+guidance and source history. Identify which conclusions the new sources confirm, weaken,
+replace, or leave unresolved; never regenerate the package as if prior decisions did not
+exist. Stop on a non-v1 package; Step 2 owns the only supported older shape.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
 run the approval loop. Finish here.
 
-## Step 3 — Audit a Personal Identity
+## Step 4 — Audit a Personal Identity
 
 Compare the package and its provenance against the representative sources the user names.
 Report stale, unsupported, contradictory, overfit, and missing guidance with the evidence
@@ -80,4 +86,4 @@ for each finding. Pay special attention to employer language misclassified as pe
 voice and observed patterns promoted into requirements.
 
 Do not modify the identity during an audit. If the user later asks to apply accepted
-findings, that follow-up request routes to Step 2. Finish here.
+findings, that follow-up request routes to Step 3. Finish here.

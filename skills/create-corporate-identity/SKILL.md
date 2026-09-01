@@ -1,6 +1,6 @@
 ---
 name: create-corporate-identity
-description: Create, update, or audit a reusable corporate writing identity from brand and style guides, tone-of-voice guidance, corporate skills, published content, product messaging, examples, or editorial feedback. Use whenever someone wants to define, capture, refresh, migrate, or check a company voice, house style, corporate tone, audience, terminology, evidence, positioning, or editorial constraints without prescribing an individual author's personality.
+description: Create, update, or audit a reusable corporate writing identity from brand and style guides, tone-of-voice guidance, corporate skills, published content, product messaging, examples, or editorial feedback. Use whenever someone wants to define, capture, refresh, or check a company voice, house style, corporate tone, audience, terminology, evidence, positioning, or editorial constraints without prescribing an individual author's personality.
 ---
 
 # Create Corporate Identity
@@ -44,12 +44,12 @@ routing in `identity.md`; add roles such as `brand`, `terminology`, `editorial-r
 `product-context` only when the evidence supports them. Record every source and
 consequential inference in `sources.md`. Run the approval loop, then finish here.
 
-## Step 2 — Update or Migrate a Corporate Identity
+## Step 2 — Update a Corporate Identity
 
-Read the existing package and its provenance before reading new evidence or migrating it.
-Preserve valid guidance and source history. Identify which conclusions the new sources
-confirm, weaken, replace, or leave unresolved; never regenerate the package as if prior
-decisions did not exist.
+Read the existing package and its provenance before reading new evidence. Preserve valid
+guidance and source history. Identify which conclusions the new sources confirm, weaken,
+replace, or leave unresolved; never regenerate the package as if prior decisions did not
+exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,

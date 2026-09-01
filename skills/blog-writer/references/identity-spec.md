@@ -145,4 +145,7 @@ The legacy `~/.claude/blog-writer-persona/` directory is a personal identity fal
 when `_blog-skill/identity.json` is absent and no personal override was supplied. Its
 `voice.md`, `framework.md`, `examples.md`, `bio.md`, and `product.md` remain readable, but
 `product.md` may mix personal and corporate context. New identity creation must not add
-corporate material to a personal identity.
+corporate material to a personal identity. `create-personal-identity` alone may treat a
+directory with no manifest and a non-empty `voice.md` as legacy v0 and perform the
+owner-defined in-place rewrite in its lifecycle reference. No legacy corporate schema
+exists.

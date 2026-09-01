@@ -5,7 +5,9 @@
 - **Personal identity creation is self-contained and correction-driven** — the creator now
   carries the v1 manifest and provenance contract in its own instructions, recognizes
   natural requests about tone and writing style, and re-presents corrected conclusions
-  beside their cited sources before approval.
+  beside their cited sources before approval. It also owns an explicit legacy v0-to-v1
+  rewrite that preserves the old files, excludes mixed product context from personal
+  resources, and requires approval before selection.
 - **Corporate identity creation has an explicit correction loop** — consequential creates
   and updates stay in `draft` while the user reviews the summary, guidance, inferences, and
   unresolved items. Rejected or corrected conclusions are revised, traced back to their

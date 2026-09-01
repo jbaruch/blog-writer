@@ -17,13 +17,28 @@
 
 No reader may migrate, substitute, or rewrite a personal identity package.
 
-## Migration
+## Supported legacy migration
 
-Before updating or migrating a package, inspect its `schema_version` and provenance. Handle
-version 1 through the current package contract. Migrate an older version only when this
-creator defines that migration; preserve valid guidance, source history, unresolved
-conflicts, and approval state unless a consequential change requires `draft` review.
+For migration only, legacy v0 is a directory with no `identity.json` and a non-empty
+`voice.md`. It may also contain `framework.md`, `examples.md`, `bio.md`, and `product.md`.
+No other pre-v1 shape is supported.
 
-Stop on an unsupported schema and ask for an updated plugin or an owner-defined migration.
-Never silently downgrade the schema, discard the selected identity, substitute another
-identity, or rewrite an unsupported manifest into version 1.
+Only `create-personal-identity` upgrades v0. Rewrite the directory in place:
+
+1. Inspect every legacy file and ask the user for a lowercase kebab-case identity name.
+2. Preserve `voice.md`; declare it as the `voice` resource.
+3. Preserve each non-empty `framework.md`, `examples.md`, and `bio.md`; declare them as
+   `composition`, `examples`, and `bio` resources in that order.
+4. Preserve `product.md` without declaring it as a personal resource. Record its exclusion
+   in `sources.md` and ask whether its corporate material should seed a corporate identity.
+5. Create `identity.md` with concise shared guidance and routing derived from the declared
+   resources.
+6. Create `sources.md` with each legacy file's path, scope, authority, and migration notes.
+7. Create `identity.json` under the v1 contract with the chosen name, the ordered resources,
+   and `status: draft`.
+8. Run the approval loop and rewrite only `status` to `approved` after explicit approval.
+
+The completed manifest stamps the formerly unversioned shape as `schema_version: 1`.
+Preserve all legacy files and unresolved conflicts. Stop on a manifest-bearing package with
+any schema other than v1 and ask for an updated plugin or an owner-defined migration. Never
+silently downgrade, discard, substitute, or rewrite an unsupported package.

@@ -56,8 +56,10 @@ fall back. On exit 2, report the diagnostic and stop.
 
 If the author requests an interview or the supplied evidence is insufficient, read
 `skills/blog-writer/references/setup.md` and collect that interview as another source. Do
-not force the interview when representative sources already support an identity. Then
-invoke `Skill(skill: "create-personal-identity")` with all supplied and collected sources.
+not force the interview when representative sources already support an identity. Gather all
+supplied and collected sources as creator input. For a legacy migration, add the resolver's
+legacy root and request the creator's Step 2 v0-to-v1 rewrite. Invoke
+`Skill(skill: "create-personal-identity")` with that input.
 
 After approval, configure the returned directory through `configure-identities.py` as
 described in `skills/blog-writer/references/identity-composition.md`. Preserve an existing
