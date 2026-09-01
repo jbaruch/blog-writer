@@ -211,6 +211,26 @@ def requested_target(raw: str) -> Path:
         ) from exc
 
 
+def reject_target_within_canonical(target: Path, canonical: Path) -> None:
+    try:
+        resolved_target = target.resolve(strict=False)
+        resolved_canonical = canonical.resolve(strict=False)
+    except (OSError, RuntimeError) as exc:
+        raise ToolError(
+            f"cannot compare shared identity directory {target} with canonical "
+            f"identity root {canonical}: {exc}"
+        ) from exc
+
+    try:
+        resolved_target.relative_to(resolved_canonical)
+    except ValueError:
+        return
+    raise StorageError(
+        f"shared identity directory {target} must be outside canonical identity root "
+        f"{canonical}; choose a different directory, then re-run"
+    )
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--probe", action="store_true")
@@ -245,6 +265,11 @@ def main() -> int:
             )
             return 0
 
+        target: Path | None = None
+        if args.target is not None:
+            target = requested_target(args.target)
+            reject_target_within_canonical(target, canonical)
+
         try:
             canonical.parent.mkdir(parents=True, exist_ok=True)
         except OSError as exc:
@@ -252,8 +277,7 @@ def main() -> int:
                 f"cannot create canonical identity parent {canonical.parent}: {exc}"
             ) from exc
 
-        if args.target is not None:
-            target = requested_target(args.target)
+        if target is not None:
             ensure_directory(target, "shared identity directory")
             target_state = inspect_path(target)
             resolved_target_raw = target_state["target"]

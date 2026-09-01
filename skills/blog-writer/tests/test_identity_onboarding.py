@@ -108,6 +108,34 @@ class IdentityOnboardingTests(unittest.TestCase):
             self.assertTrue(shared.joinpath("personal").is_dir())
             self.assertTrue(shared.joinpath("corporate").is_dir())
 
+    def test_custom_setup_rejects_canonical_root_as_target_before_creating(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw) / "home"
+            home.mkdir()
+            canonical = home / ".claude/blog-writer-identities"
+
+            result = self.run_setup(home, "--target", str(canonical))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must be outside canonical identity root", result.stderr)
+            self.assertFalse(home.joinpath(".claude").exists())
+            self.assertFalse(canonical.exists())
+
+    def test_custom_setup_rejects_nested_target_before_creating(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw) / "home"
+            home.mkdir()
+            canonical = home / ".claude/blog-writer-identities"
+            nested = canonical / "shared"
+
+            result = self.run_setup(home, "--target", str(nested))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must be outside canonical identity root", result.stderr)
+            self.assertFalse(home.joinpath(".claude").exists())
+            self.assertFalse(canonical.exists())
+            self.assertFalse(nested.exists())
+
     def test_existing_directory_is_prepared_then_left_unchanged(self):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
