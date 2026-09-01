@@ -14,7 +14,9 @@ skills/**/tests/
 # CI configuration and the gate scripts the workflows run
 .github/
 
-# Eval harness — development-time measurement, not runtime surface
+# Eval harness — development-time measurement, not runtime surface. Tessl's
+# publisher discovers this directory separately, so publish.yml also sets
+# `skip-evals: true` to prevent scenario upload and execution.
 evals/
 
 # Local agent and tooling state
