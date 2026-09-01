@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import stat
 import sys
 import tempfile
 from pathlib import Path
@@ -17,6 +18,57 @@ class ConfigError(ValueError):
 
 class ToolError(RuntimeError):
     """The selection record could not be read or written."""
+
+
+def inside(base: Path, candidate: Path) -> bool:
+    try:
+        candidate.relative_to(base)
+        return True
+    except ValueError:
+        return False
+
+
+def selection_target(config_path: Path, blog_home: Path) -> Path | None:
+    """Resolve an existing selection file without crossing the project boundary."""
+    try:
+        config_path.lstat()
+    except FileNotFoundError:
+        try:
+            prospective = config_path.resolve(strict=False)
+        except RuntimeError as exc:
+            raise ConfigError(
+                f"identity config path has a symlink loop: {config_path}"
+            ) from exc
+        except OSError as exc:
+            raise ToolError(
+                f"cannot resolve identity config path {config_path}: {exc}"
+            ) from exc
+        if not inside(blog_home, prospective):
+            raise ConfigError(f"identity config path escapes blog home: {prospective}")
+        return None
+    except OSError as exc:
+        raise ToolError(f"cannot inspect {config_path}: {exc}") from exc
+
+    try:
+        target = config_path.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise ConfigError(
+            f"identity config is a dangling symlink: {config_path}"
+        ) from exc
+    except RuntimeError as exc:
+        raise ConfigError(f"identity config has a symlink loop: {config_path}") from exc
+    except OSError as exc:
+        raise ToolError(f"cannot resolve identity config {config_path}: {exc}") from exc
+    if not inside(blog_home, target):
+        raise ConfigError(f"identity config path escapes blog home: {target}")
+
+    try:
+        target_mode = target.stat().st_mode
+    except OSError as exc:
+        raise ToolError(f"cannot inspect identity config {target}: {exc}") from exc
+    if not stat.S_ISREG(target_mode):
+        raise ConfigError(f"identity config is not a regular file: {target}")
+    return target
 
 
 def load_config(path: Path) -> dict:
@@ -41,23 +93,9 @@ def load_config(path: Path) -> dict:
     return value
 
 
-def write_config(config_path: Path, config: dict) -> None:
+def write_config(config_path: Path, target: Path, config: dict) -> None:
     try:
         config_path.parent.mkdir(parents=True, exist_ok=True)
-        if config_path.is_symlink():
-            try:
-                target = config_path.resolve(strict=True)
-            except FileNotFoundError as exc:
-                raise ConfigError(
-                    f"identity config is a dangling symlink: {config_path}"
-                ) from exc
-            if not target.is_file():
-                raise ConfigError(
-                    f"identity config symlink target is not a file: {target}"
-                )
-        else:
-            target = config_path
-
         descriptor, temporary_raw = tempfile.mkstemp(
             prefix=".identity.", suffix=".tmp", dir=target.parent
         )
@@ -95,8 +133,8 @@ def main() -> int:
     try:
         blog_home = Path(args.blog_home).expanduser().resolve()
         config_path = blog_home / "_blog-skill" / "identity.json"
-        config_present = config_path.exists() or config_path.is_symlink()
-        config = load_config(config_path) if config_present else {"schema_version": 1}
+        target = selection_target(config_path, blog_home)
+        config = load_config(target) if target else {"schema_version": 1}
 
         for key, raw in (("personal", args.personal), ("corporate", args.corporate)):
             if raw is None:
@@ -106,7 +144,13 @@ def main() -> int:
             else:
                 config.pop(key, None)
 
-        write_config(config_path, config)
+        if not any(key in config for key in ("personal", "corporate")):
+            raise ConfigError(
+                "identity selection must include personal or corporate; "
+                "set another layer before clearing the final selection"
+            )
+
+        write_config(config_path, target or config_path, config)
         print(
             json.dumps(
                 {

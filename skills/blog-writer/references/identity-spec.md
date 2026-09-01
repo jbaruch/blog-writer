@@ -117,7 +117,7 @@ Identity creators write to a user-selected directory. Recommended defaults are:
 - personal: `~/.claude/blog-writer-identities/personal/<name>/`
 - corporate: `~/.claude/blog-writer-identities/corporate/<name>/`
 
-A blog project selects either or both identities in `_blog-skill/identity.json`:
+A blog project selects one or both identities in `_blog-skill/identity.json`:
 
 ```json
 {
@@ -131,6 +131,10 @@ Relative paths resolve from `_blog-skill/`. In an existing selection file, an om
 `personal` or `corporate` key explicitly disables that layer. A missing selection file is
 different: it permits the legacy personal fallback described below. This distinction makes
 corporate-only projects stable on machines that also have a legacy persona.
+
+The selection record may be a symlink only when its resolved target is a regular file
+inside the blog home. The resolver and writer reject dangling, non-regular, and external
+targets so repository-controlled links cannot read or overwrite files outside the project.
 
 An assignment-specific command-line override takes precedence over project configuration.
 Passing an empty override explicitly disables that layer for the assignment.

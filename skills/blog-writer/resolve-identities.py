@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import stat
 import sys
 from pathlib import Path
 
@@ -163,15 +164,51 @@ def load_config(path: Path) -> dict:
     return config
 
 
-def path_present(path: Path) -> bool:
-    """Return whether path exists without hiding inspection failures."""
+def selection_target(config_path: Path, blog_home: Path) -> Path | None:
+    """Resolve an existing selection file without crossing the project boundary."""
     try:
-        path.lstat()
+        config_path.lstat()
     except FileNotFoundError:
-        return False
+        try:
+            prospective = config_path.resolve(strict=False)
+        except RuntimeError as exc:
+            raise IdentityError(
+                f"identity config path has a symlink loop: {config_path}"
+            ) from exc
+        except OSError as exc:
+            raise ToolError(
+                f"cannot resolve identity config path {config_path}: {exc}"
+            ) from exc
+        if not inside(blog_home, prospective):
+            raise IdentityError(
+                f"identity config path escapes blog home: {prospective}"
+            )
+        return None
     except OSError as exc:
-        raise ToolError(f"cannot inspect {path}: {exc}") from exc
-    return True
+        raise ToolError(f"cannot inspect {config_path}: {exc}") from exc
+
+    try:
+        target = config_path.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise IdentityError(
+            f"identity config is a dangling symlink: {config_path}"
+        ) from exc
+    except RuntimeError as exc:
+        raise IdentityError(
+            f"identity config has a symlink loop: {config_path}"
+        ) from exc
+    except OSError as exc:
+        raise ToolError(f"cannot resolve identity config {config_path}: {exc}") from exc
+    if not inside(blog_home, target):
+        raise IdentityError(f"identity config path escapes blog home: {target}")
+
+    try:
+        target_mode = target.stat().st_mode
+    except OSError as exc:
+        raise ToolError(f"cannot inspect identity config {target}: {exc}") from exc
+    if not stat.S_ISREG(target_mode):
+        raise IdentityError(f"identity config is not a regular file: {target}")
+    return target
 
 
 def read_paths(*identities: dict | None) -> list[str]:
@@ -203,8 +240,9 @@ def main() -> int:
         blog_home = Path(args.blog_home).expanduser().resolve()
         state_dir = blog_home / "_blog-skill"
         config_path = state_dir / "identity.json"
-        config_present = path_present(config_path)
-        config = load_config(config_path) if config_present else {}
+        target = selection_target(config_path, blog_home)
+        config_present = target is not None
+        config = load_config(target) if target else {}
 
         personal_explicit = args.personal is not None
         corporate_explicit = args.corporate is not None

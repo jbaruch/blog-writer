@@ -127,6 +127,37 @@ class IdentityToolTests(unittest.TestCase):
             self.assertIn("cannot inspect", result.stderr)
             self.assertNotIn("legacy-persona", result.stdout)
 
+    def test_resolver_rejects_config_symlink_outside_blog_home(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            home = root / "blog"
+            state = home / "_blog-skill"
+            state.mkdir(parents=True)
+            outside = root / "outside.json"
+            outside.write_text('{"schema_version": 1}\n', encoding="utf-8")
+            state.joinpath("identity.json").symlink_to(outside)
+
+            result = self.run_tool(RESOLVER, home)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("config path escapes blog home", result.stderr)
+
+    def test_resolver_rejects_state_directory_symlink_outside_blog_home(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            home = root / "blog"
+            home.mkdir()
+            outside_state = root / "outside-state"
+            outside_state.mkdir()
+            home.joinpath("_blog-skill").symlink_to(
+                outside_state, target_is_directory=True
+            )
+
+            result = self.run_tool(RESOLVER, home)
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("config path escapes blog home", result.stderr)
+
     def test_combined_flow_orders_personal_before_corporate(self):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
@@ -294,6 +325,55 @@ class IdentityToolTests(unittest.TestCase):
                 json.loads(target.read_text(encoding="utf-8"))["personal"],
                 "/personal",
             )
+
+    def test_configurer_rejects_symlink_outside_blog_home(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            home = root / "blog"
+            state = home / "_blog-skill"
+            state.mkdir(parents=True)
+            target = root / "outside.json"
+            original = '{"schema_version": 1, "personal": "/original"}\n'
+            target.write_text(original, encoding="utf-8")
+            state.joinpath("identity.json").symlink_to(target)
+
+            result = self.run_tool(CONFIGURER, home, "--personal", "/replacement")
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("config path escapes blog home", result.stderr)
+            self.assertEqual(target.read_text(encoding="utf-8"), original)
+
+    def test_configurer_rejects_state_directory_symlink_outside_blog_home(self):
+        with tempfile.TemporaryDirectory() as raw:
+            root = Path(raw)
+            home = root / "blog"
+            home.mkdir()
+            outside_state = root / "outside-state"
+            outside_state.mkdir()
+            home.joinpath("_blog-skill").symlink_to(
+                outside_state, target_is_directory=True
+            )
+
+            result = self.run_tool(CONFIGURER, home, "--personal", "/personal")
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("config path escapes blog home", result.stderr)
+            self.assertFalse(outside_state.joinpath("identity.json").exists())
+
+    def test_configurer_rejects_clearing_the_final_layer(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            state.mkdir()
+            config_path = state / "identity.json"
+            original = '{"schema_version": 1, "personal": "/personal"}\n'
+            config_path.write_text(original, encoding="utf-8")
+
+            result = self.run_tool(CONFIGURER, home, "--personal", "")
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("must include personal or corporate", result.stderr)
+            self.assertEqual(config_path.read_text(encoding="utf-8"), original)
 
     def test_configurer_requires_a_layer_argument(self):
         with tempfile.TemporaryDirectory() as raw:
