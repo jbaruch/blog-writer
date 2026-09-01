@@ -1,6 +1,6 @@
 ---
 name: create-corporate-identity
-description: Create, update, or audit a reusable corporate writing identity from brand guides, corporate skills, published content, product messaging, editorial feedback, examples, or other user-supplied sources. Use whenever someone wants to capture, refresh, migrate, or check company-wide audience, terminology, evidence, positioning, and editorial constraints without prescribing an individual author's personality.
+description: Create, update, or audit a reusable corporate writing identity from brand and style guides, tone-of-voice guidance, corporate skills, published content, product messaging, examples, or editorial feedback. Use whenever someone wants to define, capture, refresh, migrate, or check a company voice, house style, corporate tone, audience, terminology, evidence, positioning, or editorial constraints without prescribing an individual author's personality.
 ---
 
 # Create Corporate Identity
@@ -12,6 +12,16 @@ claims, positioning, and editorial constraints. It does not prescribe an individ
 author's personality. Before any action, read
 `skills/blog-writer/references/identity-spec.md` completely and follow its package,
 provenance, strength, ownership, approval, and storage contracts.
+
+Every package has an `identity.json` manifest, concise shared guidance and routing in
+`identity.md`, and source authority, dates, contradictions, and consequential inferences in
+`sources.md`; optional Markdown resources are declared by role in the manifest.
+
+Use one approval loop for every consequential create or update: set `status` to `draft`,
+show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
+unresolved items, then ask one focused question at a time. If the user rejects or corrects
+anything, revise the package, trace each changed conclusion to its cited sources, and present
+it again. Set `status` to `approved` only after explicit approval.
 
 ## Step 1 — Create a Corporate Identity
 
@@ -32,11 +42,7 @@ Write the package to the user's selected directory, defaulting to
 `~/.claude/blog-writer-identities/corporate/<name>/`. Put concise shared guidance and
 routing in `identity.md`; add roles such as `brand`, `terminology`, `editorial-review`, and
 `product-context` only when the evidence supports them. Record every source and
-consequential inference in `sources.md`. Set `status` to `draft` first.
-
-Show the user the one-paragraph identity summary, Required and Avoid guidance, high-impact
-inferences, and unresolved items. Ask one focused question at a time for consequential
-conflicts. Set `status` to `approved` only after explicit approval. Finish here.
+consequential inference in `sources.md`. Run the approval loop, then finish here.
 
 ## Step 2 — Update a Corporate Identity
 
@@ -47,9 +53,7 @@ exist.
 
 Apply accepted changes through the same package contract as Step 1. Keep the existing
 status only when changes do not alter consequential guidance. For consequential changes,
-set `status` to `draft`, show the changed summary, Required and Avoid guidance, high-impact
-inferences, and unresolved items, then restore `approved` only after explicit approval.
-Finish here.
+run the approval loop and finish here.
 
 ## Step 3 — Audit a Corporate Identity
 
