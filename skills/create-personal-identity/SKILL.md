@@ -10,6 +10,9 @@ This skill is an action router — pick the step that matches the user's intent 
 Personal identity owns how an author sounds and reasons, never employer positioning,
 product claims, or corporate editorial policy.
 
+Before any action, read `references/lifecycle.md` completely and follow its ownership and
+migration contract.
+
 Use this package contract:
 
 - Write `identity.json` with `schema_version: 1`, `type: personal`, a lowercase kebab-case
@@ -18,10 +21,11 @@ Use this package contract:
   the package.
 - Put concise shared guidance and routing in `identity.md`; add `voice`, `composition`,
   `examples`, or `bio` resources only when evidence supports them.
-- In `sources.md`, record every source's location, date, scope, and authority. Trace each
-  consequential inference to evidence, label it Required, Preferred, Observed, Avoid, or
-  Unresolved, distinguish explicit preferences from observed patterns, and keep conflicts
-  visible.
+- In `sources.md`, record every source's location, date, scope, and authority.
+- Trace each consequential inference to evidence.
+- Label guidance Required, Preferred, Observed, Avoid, or Unresolved.
+- Distinguish explicit preferences from observed patterns.
+- Keep conflicting evidence and guidance visible.
 
 Use this approval loop for every consequential create or update:
 
