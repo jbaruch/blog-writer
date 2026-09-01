@@ -13,6 +13,12 @@ author's personality. Before any action, read
 `skills/blog-writer/references/identity-spec.md` completely and follow its package,
 provenance, strength, ownership, approval, and storage contracts.
 
+For Step 1, also read the shared storage contract before writing:
+
+```text
+skills/blog-writer/references/identity-storage.md
+```
+
 Every package has an `identity.json` manifest, concise shared guidance and routing in
 `identity.md`, and source authority, dates, contradictions, and consequential inferences in
 `sources.md`; optional Markdown resources are declared by role in the manifest.
@@ -38,10 +44,9 @@ format-specific conventions, editorial checks, and stated legal or reputational
 constraints. Keep explicit policy separate from patterns observed in examples. Compile the
 identity and review guidance from source skills without copying their workflow.
 
-Write the package to the user's selected directory, defaulting to
-`~/.claude/blog-writer-identities/corporate/<name>/`. Put concise shared guidance and
-routing in `identity.md`; add roles such as `brand`, `terminology`, `editorial-review`, and
-`product-context` only when the evidence supports them. Record every source and
+Resolve the destination through the shared storage contract. Put concise shared guidance
+and routing in `identity.md`; add roles such as `brand`, `terminology`, `editorial-review`,
+and `product-context` only when the evidence supports them. Record every source and
 consequential inference in `sources.md`. Run the approval loop, then finish here.
 
 ## Step 2 — Update a Corporate Identity

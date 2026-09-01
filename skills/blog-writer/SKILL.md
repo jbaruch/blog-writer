@@ -40,17 +40,26 @@ Proceed immediately to Step 2.
 
 ## Step 2 — Route Identity Selection
 
-On resolver exit 0, follow the draft-status and reading rules in
-`skills/blog-writer/references/identity-composition.md`. If every identity the author
-explicitly requested resolved, skip to Step 5. If a requested personal identity is absent,
-proceed to Step 3. If a persistent combined selection was requested and the resolved
-personal identity is legacy, proceed to Step 3 to migrate it. If only a requested corporate
-identity is absent, proceed to Step 4.
+On resolver exit 0 with a present project configuration, follow the draft-status and reading
+rules in `skills/blog-writer/references/identity-composition.md`. Treat that selection as
+authoritative and skip to Step 5. Do not run discovery or ask again. Apply the same route
+when every assignment-specific identity path resolved.
 
-If exit 1 reports that no identity or ready legacy persona exists, proceed to Step 4 for an
-explicitly corporate-only assignment; otherwise proceed to Step 3. For any other exit 1,
-report the diagnostic and ask the author to repair or select the identity; do not silently
-fall back. On exit 2, report the diagnostic and stop.
+For an unconfigured project with no complete assignment-specific selection, read
+`skills/blog-writer/references/identity-storage.md`. Follow its shared-root discovery and
+first-use selection flow. A resolver result carrying only the legacy fallback is still an
+unconfigured project. Configure confirmed existing candidates together, rerun the resolver,
+and skip to Step 5 only when it returns the confirmed personal-only, corporate-only, or
+combined selection.
+
+Proceed to Step 3 when the confirmed choice requires personal creation or legacy migration.
+Proceed to Step 4 when it requires only corporate creation. If both require creation,
+proceed to Step 3 first and retain the confirmed corporate choice for Step 4.
+
+On resolver exit 1 reporting no selection, run the first-use flow above. For every other
+exit 1, including an unusable selected or requested package, report the diagnostic and ask
+the author to repair it or choose a replacement. Never fall back silently. On exit 2,
+report the diagnostic and stop.
 
 ## Step 3 — Create a Personal Identity
 
@@ -63,8 +72,9 @@ legacy root and request the creator's Step 2 v0-to-v1 rewrite. Invoke
 
 After approval, configure the returned directory through `configure-identities.py` as
 described in `skills/blog-writer/references/identity-composition.md`. Preserve an existing
-corporate selection. Rerun the resolver. If an explicitly requested corporate identity is
-still absent, proceed immediately to Step 4; otherwise proceed immediately to Step 5.
+corporate selection or include the corporate candidate confirmed during first-use discovery.
+Rerun the resolver. If the confirmed corporate choice still requires creation, proceed
+immediately to Step 4; otherwise proceed immediately to Step 5.
 
 ## Step 4 — Create a Corporate Identity
 
@@ -75,8 +85,9 @@ identity is legacy, keep the corporate path as an assignment-only resolver overr
 routes persistent combined configuration through personal migration first. Never silently
 replace the legacy personal layer.
 
-After approval, configure the returned directory when the selection is persistent, rerun
-the resolver, and proceed immediately to Step 5.
+After approval, configure the returned directory when the selection is persistent. Preserve
+an existing personal selection or include the personal candidate returned by Step 3. Rerun
+the resolver and proceed immediately to Step 5.
 
 ## Step 5 — Refresh the Anti-Pattern File
 

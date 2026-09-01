@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 import json
-import os
-import pwd
+import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -369,7 +369,8 @@ class IdentityToolTests(unittest.TestCase):
     def test_configurer_creates_corporate_only_selection(self):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
-            corporate = home / "corporate"
+            state = home / "_blog-skill"
+            corporate = make_identity(state, "corporate", "acme")
 
             result = self.run_tool(
                 CONFIGURER,
@@ -392,43 +393,38 @@ class IdentityToolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
             state = home / "_blog-skill"
-            state.mkdir()
+            personal = make_identity(state, "personal", "writer")
+            corporate = make_identity(state, "corporate", "acme")
             state.joinpath("identity.json").write_text(
-                json.dumps({"schema_version": 1, "personal": "/personal"}),
+                json.dumps({"schema_version": 1, "personal": str(personal)}),
                 encoding="utf-8",
             )
 
-            result = self.run_tool(CONFIGURER, home, "--corporate", "/corporate")
+            result = self.run_tool(CONFIGURER, home, "--corporate", str(corporate))
 
             self.assertEqual(result.returncode, 0, result.stderr)
             config = json.loads(
                 state.joinpath("identity.json").read_text(encoding="utf-8")
             )
-            self.assertEqual(config["personal"], "/personal")
-            self.assertEqual(config["corporate"], "/corporate")
+            self.assertEqual(config["personal"], str(personal))
+            self.assertEqual(config["corporate"], str(corporate))
             self.assertEqual(config["schema_version"], 2)
 
-    def test_configurer_migrates_v1_named_user_path_before_other_update(self):
-        with tempfile.TemporaryDirectory() as raw:
-            home = Path(raw)
-            state = home / "_blog-skill"
-            state.mkdir()
-            username = pwd.getpwuid(os.getuid()).pw_name
-            named_personal = f"~{username}/identity"
-            state.joinpath("identity.json").write_text(
-                json.dumps({"schema_version": 1, "personal": named_personal}),
-                encoding="utf-8",
-            )
+    def test_configurer_migrates_v1_named_user_path(self):
+        script_root = str(CONFIGURER.parent)
+        sys.path.insert(0, script_root)
+        try:
+            namespace = runpy.run_path(str(CONFIGURER), run_name="test_import")
+        finally:
+            sys.path.remove(script_root)
+        named_personal = "~root/identity"
 
-            result = self.run_tool(CONFIGURER, home, "--corporate", "/corporate")
+        migrated = namespace["migrate_config"](
+            {"schema_version": 1, "personal": named_personal}
+        )
 
-            self.assertEqual(result.returncode, 0, result.stderr)
-            config = json.loads(
-                state.joinpath("identity.json").read_text(encoding="utf-8")
-            )
-            self.assertEqual(config["schema_version"], 2)
-            self.assertEqual(config["personal"], str(Path(named_personal).expanduser()))
-            self.assertEqual(config["corporate"], "/corporate")
+        self.assertEqual(migrated["schema_version"], 2)
+        self.assertEqual(migrated["personal"], str(Path(named_personal).expanduser()))
 
     def test_configurer_does_not_rewrite_unmigratable_v1_named_user_path(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -469,20 +465,49 @@ class IdentityToolTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as raw:
             home = Path(raw)
             state = home / "_blog-skill"
-            state.mkdir()
+            personal = make_identity(state, "personal", "writer")
             target = home / "shared-selection.json"
             target.write_text('{"schema_version": 1}\n', encoding="utf-8")
             config_path = state / "identity.json"
             config_path.symlink_to(target)
 
-            result = self.run_tool(CONFIGURER, home, "--personal", "/personal")
+            result = self.run_tool(CONFIGURER, home, "--personal", str(personal))
 
             self.assertEqual(result.returncode, 0, result.stderr)
             self.assertTrue(config_path.is_symlink())
             self.assertEqual(
                 json.loads(target.read_text(encoding="utf-8"))["personal"],
-                "/personal",
+                str(personal),
             )
+
+    def test_configurer_rejects_unresolvable_identity_without_writing(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            missing = home / "missing-personal"
+
+            result = self.run_tool(CONFIGURER, home, "--personal", str(missing))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("required identity file is missing", result.stderr)
+            self.assertIn("restore it or select a different identity", result.stderr)
+            self.assertFalse(home.joinpath("_blog-skill/identity.json").exists())
+
+    def test_configurer_validates_preserved_selection_before_writing(self):
+        with tempfile.TemporaryDirectory() as raw:
+            home = Path(raw)
+            state = home / "_blog-skill"
+            personal = make_identity(state, "personal", "writer")
+            corporate = make_identity(state, "corporate", "acme")
+            config_path = state / "identity.json"
+            original = json.dumps({"schema_version": 2, "personal": str(personal)})
+            config_path.write_text(original, encoding="utf-8")
+            personal.joinpath("identity.md").unlink()
+
+            result = self.run_tool(CONFIGURER, home, "--corporate", str(corporate))
+
+            self.assertEqual(result.returncode, 1)
+            self.assertIn("missing entrypoint file", result.stderr)
+            self.assertEqual(config_path.read_text(encoding="utf-8"), original)
 
     def test_configurer_rejects_symlink_outside_blog_home(self):
         with tempfile.TemporaryDirectory() as raw:
@@ -547,7 +572,11 @@ class IdentityToolTests(unittest.TestCase):
                     [
                         "python3",
                         "-c",
-                        "import runpy,sys; runpy.run_path(sys.argv[1], run_name='test_import')",
+                        (
+                            "import runpy,sys; "
+                            "sys.path.insert(0, str(__import__('pathlib').Path(sys.argv[1]).parent)); "
+                            "runpy.run_path(sys.argv[1], run_name='test_import')"
+                        ),
                         str(script),
                     ],
                     text=True,

@@ -1,120 +1,34 @@
 #!/usr/bin/env python3
-"""Update a blog project's writing-identity selection atomically."""
+"""Validate and update a blog project's writing-identity selection atomically."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import os
-import stat
 import sys
 import tempfile
 from pathlib import Path
 
-CURRENT_USER_PREFIXES = tuple(
-    f"~{separator}" for separator in (os.sep, os.altsep) if separator
+from identity_lib import (
+    CURRENT_SELECTION_SCHEMA,
+    IdentityError,
+    ToolError,
+    load_selection_config,
+    resolve_relative,
+    selection_target,
+    uses_named_user_path,
+    validate_identity,
 )
-CURRENT_SCHEMA = 2
-SUPPORTED_SCHEMAS = {1, CURRENT_SCHEMA}
 
 
 class ConfigError(ValueError):
-    """The existing selection record is invalid."""
-
-
-class ToolError(RuntimeError):
-    """The selection record could not be read or written."""
-
-
-def uses_named_user_path(raw: str) -> bool:
-    return (
-        raw.startswith("~") and raw != "~" and not raw.startswith(CURRENT_USER_PREFIXES)
-    )
-
-
-def inside(base: Path, candidate: Path) -> bool:
-    try:
-        candidate.relative_to(base)
-        return True
-    except ValueError:
-        return False
-
-
-def selection_target(config_path: Path, blog_home: Path) -> Path | None:
-    """Resolve an existing selection file without crossing the project boundary."""
-    try:
-        config_path.lstat()
-    except FileNotFoundError:
-        try:
-            prospective = config_path.resolve(strict=False)
-        except RuntimeError as exc:
-            raise ConfigError(
-                f"identity config path has a symlink loop: {config_path}"
-            ) from exc
-        except OSError as exc:
-            raise ToolError(
-                f"cannot resolve identity config path {config_path}: {exc}"
-            ) from exc
-        if not inside(blog_home, prospective):
-            raise ConfigError(f"identity config path escapes blog home: {prospective}")
-        return None
-    except OSError as exc:
-        raise ToolError(f"cannot inspect {config_path}: {exc}") from exc
-
-    try:
-        target = config_path.resolve(strict=True)
-    except FileNotFoundError as exc:
-        raise ConfigError(
-            f"identity config is a dangling symlink: {config_path}"
-        ) from exc
-    except RuntimeError as exc:
-        raise ConfigError(f"identity config has a symlink loop: {config_path}") from exc
-    except OSError as exc:
-        raise ToolError(f"cannot resolve identity config {config_path}: {exc}") from exc
-    if not inside(blog_home, target):
-        raise ConfigError(f"identity config path escapes blog home: {target}")
-
-    try:
-        target_mode = target.stat().st_mode
-    except OSError as exc:
-        raise ToolError(f"cannot inspect identity config {target}: {exc}") from exc
-    if not stat.S_ISREG(target_mode):
-        raise ConfigError(f"identity config is not a regular file: {target}")
-    return target
-
-
-def load_config(path: Path) -> dict:
-    try:
-        value = json.loads(path.read_text(encoding="utf-8"))
-    except FileNotFoundError as exc:
-        raise ConfigError(f"missing identity config: {path}") from exc
-    except (UnicodeError, json.JSONDecodeError) as exc:
-        raise ConfigError(f"invalid JSON {path}: {exc}") from exc
-    except OSError as exc:
-        raise ToolError(f"cannot read {path}: {exc}") from exc
-    if not isinstance(value, dict):
-        raise ConfigError(f"expected a JSON object: {path}")
-    errors = []
-    schema_version = value.get("schema_version")
-    if schema_version not in SUPPORTED_SCHEMAS:
-        errors.append("schema_version must be 1 or 2")
-    for key in ("personal", "corporate"):
-        if key in value and (not isinstance(value[key], str) or not value[key]):
-            errors.append(f"{key} must be a non-empty path string when present")
-        elif (
-            schema_version == CURRENT_SCHEMA
-            and key in value
-            and uses_named_user_path(value[key])
-        ):
-            errors.append(f"{key} must not use named-user expansion")
-    if errors:
-        raise ConfigError(f"invalid identity config {path}: " + "; ".join(errors))
-    return value
+    """The requested selection update is invalid."""
 
 
 def migrate_config(config: dict) -> dict[str, object]:
     migrated: dict[str, object] = dict(config)
-    if migrated["schema_version"] == CURRENT_SCHEMA:
+    if migrated["schema_version"] == CURRENT_SELECTION_SCHEMA:
         return migrated
     for key in ("personal", "corporate"):
         raw = migrated.get(key)
@@ -123,11 +37,22 @@ def migrate_config(config: dict) -> dict[str, object]:
                 migrated[key] = str(Path(raw).expanduser())
             except (RuntimeError, ValueError) as exc:
                 raise ConfigError(f"cannot migrate {key} path {raw!r}: {exc}") from exc
-    migrated["schema_version"] = CURRENT_SCHEMA
+    migrated["schema_version"] = CURRENT_SELECTION_SCHEMA
     return migrated
 
 
-def write_config(config_path: Path, target: Path, config: dict) -> None:
+def validate_config_identities(config: dict[str, object], state_dir: Path) -> None:
+    """Reject a selection unless every resulting package resolves successfully."""
+    for kind in ("personal", "corporate"):
+        raw = config.get(kind)
+        if raw is None:
+            continue
+        if not isinstance(raw, str):
+            raise ConfigError(f"{kind} must be a path string")
+        validate_identity(raw, kind, state_dir)
+
+
+def write_config(config_path: Path, target: Path, config: dict[str, object]) -> None:
     try:
         config_path.parent.mkdir(parents=True, exist_ok=True)
         descriptor, temporary_raw = tempfile.mkstemp(
@@ -149,8 +74,6 @@ def write_config(config_path: Path, target: Path, config: dict) -> None:
                     f"warning: could not remove staging file {temporary}: {exc}",
                     file=sys.stderr,
                 )
-    except ConfigError:
-        raise
     except OSError as exc:
         raise ToolError(f"cannot write identity config {config_path}: {exc}") from exc
 
@@ -165,11 +88,14 @@ def main() -> int:
         parser.error("at least one of --personal or --corporate is required")
 
     try:
-        blog_home = Path(args.blog_home).expanduser().resolve()
-        config_path = blog_home / "_blog-skill" / "identity.json"
+        blog_home = resolve_relative(args.blog_home, Path.cwd())
+        state_dir = blog_home / "_blog-skill"
+        config_path = state_dir / "identity.json"
         target = selection_target(config_path, blog_home)
         config: dict[str, object] = (
-            load_config(target) if target else {"schema_version": CURRENT_SCHEMA}
+            load_selection_config(target)
+            if target
+            else {"schema_version": CURRENT_SELECTION_SCHEMA}
         )
 
         for key, raw in (("personal", args.personal), ("corporate", args.corporate)):
@@ -191,6 +117,7 @@ def main() -> int:
             )
 
         config = migrate_config(config)
+        validate_config_identities(config, state_dir)
         write_config(config_path, target or config_path, config)
         print(
             json.dumps(
@@ -203,7 +130,7 @@ def main() -> int:
             )
         )
         return 0
-    except ConfigError as exc:
+    except (ConfigError, IdentityError) as exc:
         print(str(exc), file=sys.stderr)
         return 1
     except ToolError as exc:
