@@ -336,6 +336,10 @@ https://d.test/?referrer=grok.com' \
     'https://example.test/?utm_source=copilot.com.evil' \
     0 '([.hits[] | select(.pattern == "WP:TRACKING")] | length) == 0'
 
+  assert_json "analytics config outside a URL is not a tracking leak" \
+    'utm_source=openai is the analytics source configured for this test.' \
+    0 '([.hits[] | select(.pattern == "WP:TRACKING")] | length) == 0'
+
   assert_sweep "thematic breaks between every H2 section are reported" \
     '## First
 
