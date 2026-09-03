@@ -20,8 +20,10 @@ check. Then the proportionality check — was the amount of rewriting proportion
 slop found, and would the author still recognize the draft as their own voice. In that
 order. Do not skip passes, do not merge them, do not substitute your own method.
 
-**Do not invent patterns that aren't in this file.** If something feels "AI-ish" but
-doesn't match a pattern defined here or one of its structural variants, leave it alone.
+**Do not invent patterns outside this file or `sweep.py`.** The script also owns fixed
+vendor-artifact, tracking-parameter, and repeated-section-break checks whose verdicts need
+counting rather than judgment. If something feels "AI-ish" but doesn't match a pattern
+defined here, one of its structural variants, or a script finding, leave it alone.
 False positives from improvised rules damage the author's voice more than the pattern
 they're trying to fix.
 
@@ -416,11 +418,12 @@ a model but scream machine to a reader.
 
 **The watchlist:**
 
-Verbs: "delve", "underscore", "highlight" (as verb), "foster", "leverage", "harness",
+Verbs: "delve", "deep dive", "underscore", "highlight" (as verb), "foster", "leverage", "harness",
 "showcase", "streamline", "navigate" (abstract), "cultivate", "illuminate", "orchestrate",
 "spearhead", "bolster", "enhance" (when inflating mundane improvements), "garner",
 "align with", "resonate with", "exemplify", "encompass", "embark" (on a journey/effort),
-"elevate" (figurative: "elevate your workflow")
+"elevate" (figurative: "elevate your workflow"), "causal", "empirical", and "correlate"
+when used as vague authority signals rather than precise technical terms
 
 Pretentious-for-no-reason verbs (use the plain alternative): "utilize" (use), "leverage"
 (use), "facilitate" (help, enable), "demonstrate" (show), "implement" (build, add, write —
@@ -466,6 +469,15 @@ word lacks, keep it — but only if you're sure the reader needs that nuance.
 One of these words in a 2,000-word post is fine. Three in a paragraph is a contamination
 event. Scan for them.
 
+**Weight by model era, not as one timeless blacklist.** The familiar GPT-4-era terms
+(`delve`, `intricate`, `tapestry`, `testament`, `pivotal`, `landscape`, `meticulous`,
+`Additionally`) are historical signals and weak on their own; `delve` dropped sharply
+after 2024. GPT-4o-era terms (`align with`, `enhance`, `fostering`, `showcasing`,
+`underscore`, `vibrant`) remain stronger. Current GPT-5-era concentration is narrower:
+`emphasizing`, `enhance`, `highlighting`, and `showcasing`. Always apply the usage and
+concentration tests above. Do not rewrite a precise sentence merely because it contains
+one historical watchlist word.
+
 ---
 
 ## 13. Copula Avoidance and Nominal Style
@@ -483,6 +495,9 @@ that require filler verbs to function.
 - "the implementation of X" instead of "we implemented X"
 - "perform an evaluation" instead of "evaluate"
 - "provides support for" instead of "supports"
+- "refers to" / "operates as" / "maintains" when "is" or "has" says the same thing
+- "began his career as" or "ventured into politics as a candidate" when the fact is
+  simply that someone was in that role
 
 **Examples:**
 - ❌ "This feature serves as a bridge between the developer and the runtime."
@@ -641,6 +656,10 @@ In technical writing, this creates confusion — the reader wonders whether "the
 "the interface" are the same thing or different things. Repetition of the precise term
 is clarity. Variation with imprecise synonyms is noise.
 
+**Current weight:** This is a historical AI indicator, not a strong current-model
+fingerprint. Newer models cycle synonyms less often. Keep fixing it as a comprehension
+cost in technical prose; never use it alone to infer authorship.
+
 **Instead:** Use the same word. "The CLI" is "the CLI" every time. If it appears too
 often in a passage, restructure the sentences or use a pronoun — don't swap in a vaguer
 synonym.
@@ -695,6 +714,8 @@ clause didn't already say.
 - "..., demonstrating the ongoing relevance of this approach."
 - "..., ensuring consistent behavior across environments."
 - "..., contributing to the overall reliability of the system."
+- "..., symbolizing the team's progress."
+- "..., cultivating trust" / "..., fostering collaboration."
 - The "-ing" clause could be deleted without losing any information
 
 **Examples:**
@@ -1130,6 +1151,12 @@ point, stop. Trust the reader to connect the dots.
 **The tell:** Announcing that something important is about to be said, instead of just
 saying it. Mid-post preamble announcements that create artificial suspense.
 
+Transition words in isolation are ineffective AI indicators. Ordinary human essays use
+them, and most transitions carry real logic. This pattern fires only on the narrow
+telegraphing forms below, where the transition announces importance and can be deleted
+without changing the argument. Do not flag `but`, `however`, or another connective merely
+for existing.
+
 **Symptoms:**
 - "But here's the thing:"
 - "Here's what I mean:"
@@ -1319,6 +1346,8 @@ something meaningful — but the reader learns nothing they can verify.
 - The adjective could apply to any product/feature/tool — it's not specific to this one
 - Stripping the adjective from the sentence leaves it empty or trivially obvious
 - Multiple assessment adjectives stacked: "innovative, robust, and scalable"
+- "natural beauty" or another generic assessment presented without observable detail
+- "exemplifies" followed by an asserted quality rather than evidence
 
 **Examples:**
 - ❌ "A robust and scalable solution for modern teams."
@@ -1444,7 +1473,8 @@ Product phrases: "end-to-end solution", "one-stop shop", "best-in-class", "indus
 (without the battle), "turnkey solution", "out-of-the-box"
 
 Relationship phrases: "trusted by industry leaders", "trusted partner", "your success is our
-success", "we're committed to [vague noun]", "empowering developers to", "enabling teams to"
+success", "we're committed to [vague noun]", "commitment to [vague noun]",
+"empowering developers to", "enabling teams to"
 
 Value phrases: "solve your business problems", "drive business value", "accelerate your
 digital transformation", "unlock the full potential of", "take your [X] to the next level",
@@ -1649,3 +1679,41 @@ terminal output you actually saw. That's narrative density and it stays (see
 `skills/blog-writer/references/tone-guide.md`). The pattern is a body part standing in for a feeling the
 sentence declines to name. Concrete lived specifics are the human marker; body-performance
 is the machine one.
+
+---
+
+## 40. Vague Connection or Association
+
+**The tell:** A sentence names an association but hides the relationship that matters:
+`in connection with`, `associated with`, `connected with`, or `in association with`.
+This is especially easy to miss in technical prose: "a bug associated with the connection
+pool" sounds precise while declining to say whether the pool caused, exposed, or merely
+contained the bug.
+
+**The relationship test:** Try `of`, `for`, `by`, `caused by`, or `used for`. If one says
+the same thing, use it. If none works, name the actual relationship from the draft's
+evidence. When that requires knowledge the draft does not contain, mark the claim for
+verification instead of inventing a connection.
+
+**Instead:** State the relationship directly.
+- ❌ "Latency associated with the retry path increased."
+- ✅ "Retries increased latency by 400 ms."
+- ❌ "The service was developed in association with Acme."
+- ✅ "Acme funded the service and reviewed its API."
+
+---
+
+## 41. Knowledge-Cutoff and Source-Unavailability Hedging
+
+**The tell:** Epistemic cover stands in for a missing fact: `as of my last knowledge
+update`, `while specific details are limited`, `not widely documented`, `based on
+available information`, `in the provided sources`, or the speculative claim that someone
+`maintains a low profile`.
+
+These phrases differ from polite hedging in #10. They imply that a search boundary or
+model limitation is evidence. "Not widely documented" is itself an unsupported claim;
+"maintains a low profile" invents intent from an absence of sources.
+
+**Instead:** Cut the unsupported sentence. If the missing fact is essential, mark it for
+research and do not publish the claim until a source supports it. Do not soften the hedge
+or turn the unavailable source into the subject of another sentence.

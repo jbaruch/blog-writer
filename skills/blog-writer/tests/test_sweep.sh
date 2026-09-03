@@ -27,7 +27,8 @@
 #      `verify_context` set on the sentence-counting sweeps only, since that is
 #      the flag SKILL.md routes on.
 #  11. Judgment patterns are never reported — the watchlist families stay with
-#      the agent, so no hit may carry #1, #10, #12, #17, #32, #35 or #36.
+#      the agent, so no hit may carry #1, #10, #12, #17, #32, #35, #36, #40,
+#      or #41.
 #  12. Coverage total — read from references/ai-anti-patterns.md on every run,
 #      never a literal. A file that cannot be counted exits 2 rather than
 #      reporting a guessed figure, and so does a catalog no larger than the
@@ -184,7 +185,8 @@ We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
   assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
-  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 7'
+  assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 3'
+  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 9'
   # The total is read out of the pattern file, never restated here — a literal
   # in the suite would be the same stale second copy the script stopped keeping.
   # grep's status is captured explicitly rather than discarded by the command
@@ -289,7 +291,98 @@ nobody outside the team ever saw or asked about. It held.' \
     'The build finished… eventually, after three unexplained retries on the runner.' \
     1 yes "ellipsis character"
 
-  # 7. Markdown exclusions
+  # 7. Fixed model-interface artifacts
+  assert_sweep "citation artifacts cover each vendor family" \
+    'ChatGPT left turn0search0. Gemini left [cite: 1]. Grok left grok_card.
+DeepSeek left 【85†L261-269】. Perplexity left [web:1].' \
+    1 yes "citation artifact"
+
+  assert_json "every documented citation artifact form is covered" \
+    'contentReference[oaicite:0]{index=0}
+oai_citation
+turn0search0
+attributableIndex
+[cite: 1]
+[span_1](start_span)
+grok_card
+grok_render_citation_card_json
+【85†L261-269】
+[attached_file:1]
+[web:1]
+:::writing{variant="document" id=12345}
+turn1search2 +1' \
+    1 '([.hits[] | select(.pattern == "WP:OAICITE")] | length) == 14 and any(.hits[]; .detail == "ChatGPT trailing +1")'
+
+  assert_json "ordinary arithmetic ending in +1 is not a citation artifact" \
+    'Increment the retry count by +1' \
+    0 '([.hits[] | select(.pattern == "WP:OAICITE")] | length) == 0'
+
+  assert_sweep "unclassified writing wrappers are citation artifacts" \
+    ':::writing{variant="document" id=12345}' \
+    1 yes "unclassified writing wrapper"
+
+  assert_sweep "AI-source tracking parameters are reported" \
+    'Read https://example.test/post?utm_source=chatgpt.com and judge the source yourself.' \
+    1 yes "AI-source tracking parameter"
+
+  assert_json "every documented AI-source parameter is covered" \
+    'https://a.test/?utm_source=openai
+https://b.test/?utm_source=chatgpt.com
+https://c.test/?utm_source=copilot.com
+https://d.test/?referrer=grok.com' \
+    1 '[.hits[] | select(.pattern == "WP:TRACKING")] | length == 4'
+
+  assert_json "longer tracking values do not match known attribution values" \
+    'https://example.test/?utm_source=copilot.com.evil' \
+    0 '([.hits[] | select(.pattern == "WP:TRACKING")] | length) == 0'
+
+  assert_json "analytics config outside a URL is not a tracking leak" \
+    'utm_source=openai is the analytics source configured for this test.' \
+    0 '([.hits[] | select(.pattern == "WP:TRACKING")] | length) == 0'
+
+  assert_sweep "tracking parameter in a double-quoted URL is reported" \
+    'Read "https://example.test/?utm_source=openai" before publishing.' \
+    1 yes "AI-source tracking parameter"
+
+  assert_sweep "tracking parameter in a single-quoted URL is reported" \
+    "Read 'https://example.test/?referrer=grok.com' before publishing." \
+    1 yes "AI-source tracking parameter"
+
+  assert_sweep "thematic breaks between every H2 section are reported" \
+    '## First
+
+Ordinary prose belongs here.
+
+---
+
+## Second
+
+More ordinary prose belongs here.
+
+---
+
+## Third
+
+The final prose belongs here.' \
+    1 yes "thematic break between every section"
+
+  assert_sweep "an occasional thematic break is not reported" \
+    '## First
+
+Ordinary prose belongs here.
+
+---
+
+## Second
+
+More ordinary prose belongs here.
+
+## Third
+
+The final prose belongs here.' \
+    0 no "thematic break between every section"
+
+  # 8. Markdown exclusions
   assert_sweep "fenced code does not contribute hits" \
     '# Title
 
@@ -346,6 +439,16 @@ Bullet • and “curly quotes” and an en–dash live in this sample output.
 
 The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
     0 no "unicode giveaway"
+
+  assert_json "artifact checks ignore fenced code" \
+    '# Title
+
+```text
+turn0search0 utm_source=openai
+```
+
+The visible prose carries no leaked tokens or parameters in it.' \
+    0 '(.hits | length) == 0'
 
   assert_sweep "#18 ignores unicode inside an HTML comment" \
     '# Title
@@ -567,7 +670,7 @@ Three facilities — Austin, Berlin, Osaka — ran the nightly job without compl
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
 In todays landscape, it is important to note that this is, of course, pivotal.'
   local leaked
-  leaked=$(jq -r '[.hits[].pattern] - ["#3/#4","#7","#8","#14","#18"] | join(" ")' <<<"$CASE_OUT")
+  leaked=$(jq -r '[.hits[].pattern] - ["#3/#4","#7","#8","#14","#18","WP:OAICITE","WP:TRACKING","WP:SECTIONBREAK"] | join(" ")' <<<"$CASE_OUT")
   if [ -n "$leaked" ]; then
     fail "judgment patterns reported as hits: ${leaked} — those stay with the agent"
   else
@@ -733,8 +836,8 @@ The third — an aside — is not.' \
     echo "  a pattern file with no numbered headings exits 2"
   fi
 
-  # A catalog no larger than the sweep is the dangerous case. At exactly six the
-  # note claims zero unexamined while not_run_judgment still names seven sweeps;
+  # A catalog no larger than the sweep is the dangerous case. At exactly six
+  # the note claims zero unexamined while not_run_judgment still names sweeps;
   # below six the arithmetic goes negative. Both must fail rather than report.
   printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"

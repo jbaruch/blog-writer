@@ -17,10 +17,10 @@ kinds of work. This script owns one of them.
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script therefore covers 6 patterns across 5 sweeps (#3 and #4 share the
-fragment-chain sweep) out of every pattern `references/ai-anti-patterns.md`
-defines, and says so on every run. The total is counted from that file rather
-than restated here.
+This script covers 6 numbered patterns across 5 sweeps (#3 and #4 share the
+fragment-chain sweep), plus 3 supplemental fixed-output checks. It says so on
+every run. The numbered total is counted from `references/ai-anti-patterns.md`
+rather than restated here.
 Every result carries its coverage, including a result with no findings: silence
 about coverage is what lets a passing script displace the contextual read it
 never performed.
@@ -39,10 +39,10 @@ Output (stdout):
     Each hit carries {"pattern", "label", "line", "detail", "context"}, where
     `line` is the 1-indexed line of the sentence the finding sits in.
 
-    `coverage` carries {"ran", "not_run_judgment", "patterns_examined",
-    "patterns_total", "note"}. It is present on every run, including a run with
-    no hits, because an empty `hits` reads as "the check passed" when it means
-    "the counting half passed".
+    `coverage` carries {"ran", "supplemental_checks", "not_run_judgment",
+    "patterns_examined", "patterns_total", "note"}. It is present on every run,
+    including a run with no hits, because an empty `hits` reads as "the check
+    passed" when it means "the counting half passed".
 
 Exit codes:
     0  swept, no hits in the counting sweeps. NOT "the draft is clean" — most
@@ -113,6 +113,38 @@ UNICODE_GIVEAWAYS = [
     ("non-breaking space", "\u00a0"),
 ]
 
+# WP:OAICITE — fixed output artifacts emitted by specific model interfaces.
+CITATION_ARTIFACTS = [
+    (
+        "ChatGPT contentReference",
+        re.compile(r"contentReference\[oaicite:\d+\]\{index=\d+\}"),
+    ),
+    ("ChatGPT oai_citation", re.compile(r"\boai_citation\b")),
+    ("ChatGPT search reference", re.compile(r"\bturn\d+search\d+\b")),
+    ("ChatGPT attributableIndex", re.compile(r"\battributableIndex\b")),
+    ("Gemini citation", re.compile(r"\[cite:\s*\d+\]")),
+    ("Gemini span", re.compile(r"\[span_\d+\]\(start_span\)")),
+    ("Grok card", re.compile(r"\bgrok_card\b")),
+    ("Grok citation card", re.compile(r"\bgrok_render_citation_card_json\b")),
+    ("DeepSeek line citation", re.compile(r"【\d+†L\d+(?:-\d+)?】")),
+    ("Perplexity attached file", re.compile(r"\[attached_file:\d+\]")),
+    ("Perplexity web citation", re.compile(r"\[web:\d+\]")),
+    (
+        "unclassified writing wrapper",
+        re.compile(r':::writing\{variant="document" id=\d+\}'),
+    ),
+]
+
+TRACKING_PARAMETERS = re.compile(
+    r"[?&]"
+    r"(?P<parameter>utm_source=(?:openai|chatgpt\.com|copilot\.com)|referrer=grok\.com)"
+    r"(?=$|[&#\s)\]}>]|['\"]|[.,;](?:\s|$))",
+    re.IGNORECASE,
+)
+
+THEMATIC_BREAK = re.compile(r"^\s{0,3}(?:-{3,}|\*{3,}|_{3,})\s*$")
+H2_HEADING = re.compile(r"^\s{0,3}##\s+")
+
 # --- Coverage statement ------------------------------------------------------
 # Printed on every run, hits or not. The inverse failure this script is built to
 # avoid is a clean report displacing the read it never performed.
@@ -142,6 +174,12 @@ COUNTING_SWEEPS = [
     ("#18", "unicode giveaways"),
 ]
 
+SUPPLEMENTAL_SWEEPS = [
+    ("WP:OAICITE", "citation-artifact leakage"),
+    ("WP:TRACKING", "AI-source tracking parameters"),
+    ("WP:SECTIONBREAK", "thematic breaks between every section"),
+]
+
 JUDGMENT_SWEEPS = [
     ("#1", "contrastive negation — is it the same slot?"),
     ("#10", "introductory filler — apply the delete test"),
@@ -150,6 +188,8 @@ JUDGMENT_SWEEPS = [
     ("#32", "stacked data points — do two numbers make one point?"),
     ("#35", "temporal filler — apply the delete test"),
     ("#36", "corporate cliche — apply the interchangeability test"),
+    ("#40", "vague connection — name the relationship"),
+    ("#41", "source-unavailability hedging — cut unsupported claims"),
 ]
 
 # --- Sentence segmentation ---------------------------------------------------
@@ -739,6 +779,97 @@ def sweep_unicode(blocks):
     return hits
 
 
+def eligible_lines(blocks):
+    """Reader-visible draft lines used by literal artifact sweeps."""
+    return [
+        (number, text)
+        for block in blocks
+        if block.kind != "placeholder"
+        for number, text in block.numbered
+    ]
+
+
+def sweep_citation_artifacts(blocks):
+    """WP:OAICITE — model-interface citation tokens leaked into the draft."""
+    hits = []
+    for number, text in eligible_lines(blocks):
+        chatgpt_artifact = False
+        for description, pattern in CITATION_ARTIFACTS:
+            found = pattern.search(text)
+            if found:
+                chatgpt_artifact = chatgpt_artifact or description.startswith("ChatGPT")
+                hits.append(
+                    hit(
+                        "WP:OAICITE",
+                        "citation artifact",
+                        number,
+                        description,
+                        found.group(),
+                    )
+                )
+        if chatgpt_artifact and re.search(r"\+1\s*$", text):
+            hits.append(
+                hit(
+                    "WP:OAICITE",
+                    "citation artifact",
+                    number,
+                    "ChatGPT trailing +1",
+                    "+1",
+                )
+            )
+    return hits
+
+
+def sweep_tracking_parameters(blocks):
+    """WP:TRACKING — AI-product attribution leaked into a pasted URL."""
+    hits = []
+    for number, text in eligible_lines(blocks):
+        for found in TRACKING_PARAMETERS.finditer(text):
+            parameter = found.group("parameter")
+            hits.append(
+                hit(
+                    "WP:TRACKING",
+                    "AI-source tracking parameter",
+                    number,
+                    parameter,
+                    text,
+                )
+            )
+    return hits
+
+
+def sweep_section_breaks(raw):
+    """WP:SECTIONBREAK — a thematic break in every gap between H2 sections."""
+    visible = [
+        (number, text)
+        for number, text, role in read_lines(raw.split("\n"))
+        if role == "content"
+    ]
+    headings = [number for number, text in visible if H2_HEADING.match(text)]
+    breaks = [number for number, text in visible if THEMATIC_BREAK.match(text)]
+    if len(headings) < 3:
+        return []
+
+    gaps = list(zip(headings, headings[1:]))
+    separated = [
+        (left, right)
+        for left, right in gaps
+        if any(left < line < right for line in breaks)
+    ]
+    if len(separated) != len(gaps):
+        return []
+
+    return [
+        hit(
+            "WP:SECTIONBREAK",
+            "thematic break between every section",
+            separated[0][0],
+            f"{len(separated)} of {len(gaps)} section gaps contain a thematic break",
+            "remove the repeated separators",
+        )
+    ]
+
+
 def run_sweeps(raw):
     blocks, sections = parse(raw)
     hits = []
@@ -747,6 +878,9 @@ def run_sweeps(raw):
     hits += sweep_emdash_density(sections)
     hits += sweep_burstiness(blocks)
     hits += sweep_unicode(blocks)
+    hits += sweep_citation_artifacts(blocks)
+    hits += sweep_tracking_parameters(blocks)
+    hits += sweep_section_breaks(raw)
     hits.sort(key=lambda h: (h["line"], h["pattern"]))
     return hits
 
@@ -818,6 +952,9 @@ def result(path, hits, patterns_total):
         "hits": hits,
         "coverage": {
             "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
+            "supplemental_checks": [
+                f"{number} {name}" for number, name in SUPPLEMENTAL_SWEEPS
+            ],
             "not_run_judgment": [
                 f"{number} {name}" for number, name in JUDGMENT_SWEEPS
             ],

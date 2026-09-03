@@ -1,5 +1,9 @@
 # Changelog
 
+### Added
+
+- **The anti-pattern refresh adds five current Wikipedia findings** ([#42](https://github.com/jbaruch/blog-writer/issues/42)) — `sweep.py` now detects leaked model-interface citations, AI-product tracking parameters, and thematic breaks repeated between every H2 section. The judgment catalog adds vague-connection and source-unavailability hedging checks, expands the existing vocabulary and corporate-language watchlists, weights vocabulary and synonym cycling by model era, and clarifies that ordinary transition words are weak evidence on their own.
+
 ## 1.1.38 — 2026-09-03
 
 ### Fixed
