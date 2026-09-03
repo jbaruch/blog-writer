@@ -71,7 +71,7 @@ After the user confirms a personal-only, corporate-only, or combined choice, wri
 `configure-identities.py`. The writer validates every resulting package before changing
 the selection file. Run `resolve-identities.py` and continue only when it returns the
 confirmed identities. Apply the draft-status rule in
-`skills/blog-writer/references/identity-composition.md` before using a newly selected draft.
+`references/identity-composition.md` before using a newly selected draft.
 
 On later sessions, a present project selection is authoritative. Do not run discovery or
 ask again. If resolution reports a selected package as unusable, report the diagnostic and

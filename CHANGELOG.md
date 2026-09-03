@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+- **Reference paths now resolve from the mounted skill root** ([#46](https://github.com/jbaruch/blog-writer/issues/46)) — `SKILL.md` mixed repository-relative `skills/blog-writer/references/...` paths with skill-relative `references/...` paths. A real consumer install places the files beneath the mounted skill directory, and the loader resolves referenced resources from that directory. Every reference in `SKILL.md` now uses the skill-relative form; the three reference documents that retained repository-relative cross-references use the same convention.
+
 ## 1.1.37 — 2026-09-03
 
 ### Changed

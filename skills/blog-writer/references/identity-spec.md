@@ -114,7 +114,7 @@ packages remain errors when their paths were explicitly selected.
 
 The canonical shared root is `~/.claude/blog-writer-identities/`. It is a real directory or
 a symlink to a user-selected shared directory. The shared storage lifecycle is defined in
-`skills/blog-writer/references/identity-storage.md`.
+`references/identity-storage.md`.
 
 Identity creators write default packages beneath the resolved root:
 
