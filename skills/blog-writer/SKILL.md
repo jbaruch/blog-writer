@@ -261,18 +261,19 @@ and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`,
   patterns went unexamined. `.coverage.not_run_judgment` is not that list:
   it names only the sweeps that look mechanical and are not, so they cannot be assumed
   covered by a script that just reported nothing.
-- Read for the sweeps in `.coverage.not_run_judgment`.
-- Read for every remaining pattern in `references/ai-anti-patterns.md`.
+- After Exit 0, read for the sweeps in `.coverage.not_run_judgment`.
+- After Exit 0, read for every remaining pattern in `references/ai-anti-patterns.md`.
 - **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
   of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
   the script placed sentence boundaries: read its `context` before rewriting, and if a
   "sentence" shown there is a split artifact rather than real prose, that hit is the
   artifact and the prose stays.
-- Re-run until it exits 0.
-- Report findings to the author in your own words. The object is for you, not for them.
+- After Exit 1, re-run until it exits 0.
+- After Exit 1, report findings to the author in your own words. The object is for you, not
+  for them.
 - **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
   stdout. Report the diagnostic to the author.
-- Do not claim the sweep ran after Exit 2.
+- After Exit 2, do not claim the sweep ran.
 
 Re-run it after every rewrite, including the rewrites made to fix its own findings and
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
