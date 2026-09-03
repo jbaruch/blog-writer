@@ -17,10 +17,10 @@ kinds of work. This script owns one of them.
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script therefore covers 9 patterns across 8 sweeps (#3 and #4 share the
-fragment-chain sweep) out of every pattern `references/ai-anti-patterns.md`
-defines, and says so on every run. The total is counted from that file rather
-than restated here.
+This script covers 6 numbered patterns across 5 sweeps (#3 and #4 share the
+fragment-chain sweep), plus 3 supplemental fixed-output checks. It says so on
+every run. The numbered total is counted from `references/ai-anti-patterns.md`
+rather than restated here.
 Every result carries its coverage, including a result with no findings: silence
 about coverage is what lets a passing script displace the contextual read it
 never performed.
@@ -39,10 +39,10 @@ Output (stdout):
     Each hit carries {"pattern", "label", "line", "detail", "context"}, where
     `line` is the 1-indexed line of the sentence the finding sits in.
 
-    `coverage` carries {"ran", "not_run_judgment", "patterns_examined",
-    "patterns_total", "note"}. It is present on every run, including a run with
-    no hits, because an empty `hits` reads as "the check passed" when it means
-    "the counting half passed".
+    `coverage` carries {"ran", "supplemental_checks", "not_run_judgment",
+    "patterns_examined", "patterns_total", "note"}. It is present on every run,
+    including a run with no hits, because an empty `hits` reads as "the check
+    passed" when it means "the counting half passed".
 
 Exit codes:
     0  swept, no hits in the counting sweeps. NOT "the draft is clean" — most
@@ -122,7 +122,6 @@ CITATION_ARTIFACTS = [
     ("ChatGPT oai_citation", re.compile(r"\boai_citation\b")),
     ("ChatGPT search reference", re.compile(r"\bturn\d+search\d+\b")),
     ("ChatGPT attributableIndex", re.compile(r"\battributableIndex\b")),
-    ("ChatGPT trailing +1", re.compile(r"\+1\s*$")),
     ("Gemini citation", re.compile(r"\[cite:\s*\d+\]")),
     ("Gemini span", re.compile(r"\[span_\d+\]\(start_span\)")),
     ("Grok card", re.compile(r"\bgrok_card\b")),
@@ -162,8 +161,8 @@ ANTI_PATTERNS_FILE = (
 # not a pattern.
 PATTERN_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 
-# Nine, not eight: #3 and #4 are two patterns sharing one fragment-chain sweep.
-PATTERNS_EXAMINED = 9
+# Six, not five: #3 and #4 are two patterns sharing one fragment-chain sweep.
+PATTERNS_EXAMINED = 6
 
 COUNTING_SWEEPS = [
     ("#3/#4", "fragment chains"),
@@ -171,6 +170,9 @@ COUNTING_SWEEPS = [
     ("#8", "em-dash density"),
     ("#14", "low burstiness"),
     ("#18", "unicode giveaways"),
+]
+
+SUPPLEMENTAL_SWEEPS = [
     ("WP:OAICITE", "citation-artifact leakage"),
     ("WP:TRACKING", "AI-source tracking parameters"),
     ("WP:SECTIONBREAK", "thematic breaks between every section"),
@@ -789,9 +791,11 @@ def sweep_citation_artifacts(blocks):
     """WP:OAICITE — model-interface citation tokens leaked into the draft."""
     hits = []
     for number, text in eligible_lines(blocks):
+        chatgpt_artifact = False
         for description, pattern in CITATION_ARTIFACTS:
             found = pattern.search(text)
             if found:
+                chatgpt_artifact = chatgpt_artifact or description.startswith("ChatGPT")
                 hits.append(
                     hit(
                         "WP:OAICITE",
@@ -801,6 +805,16 @@ def sweep_citation_artifacts(blocks):
                         found.group(),
                     )
                 )
+        if chatgpt_artifact and re.search(r"\+1\s*$", text):
+            hits.append(
+                hit(
+                    "WP:OAICITE",
+                    "citation artifact",
+                    number,
+                    "ChatGPT trailing +1",
+                    "+1",
+                )
+            )
     return hits
 
 
@@ -935,6 +949,9 @@ def result(path, hits, patterns_total):
         "hits": hits,
         "coverage": {
             "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
+            "supplemental_checks": [
+                f"{number} {name}" for number, name in SUPPLEMENTAL_SWEEPS
+            ],
             "not_run_judgment": [
                 f"{number} {name}" for number, name in JUDGMENT_SWEEPS
             ],

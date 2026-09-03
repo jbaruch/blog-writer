@@ -184,7 +184,8 @@ which everyone had quietly accepted as simply the cost of shipping anything at a
 We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
-  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 8'
+  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
+  assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 3'
   assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 9'
   # The total is read out of the pattern file, never restated here — a literal
   # in the suite would be the same stale second copy the script stopped keeping.
@@ -198,7 +199,7 @@ We cut it.'
   elif [ "$defined" -lt 2 ]; then
     fail "references/ai-anti-patterns.md reported only ${defined} pattern(s)"
   else
-    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 9 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
+    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
   fi
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
@@ -309,8 +310,12 @@ grok_render_citation_card_json
 [attached_file:1]
 [web:1]
 :::writing{variant="document" id=12345}
-or another citation +1' \
-    1 '[.hits[] | select(.pattern == "WP:OAICITE")] | length == 13'
+turn1search2 +1' \
+    1 '([.hits[] | select(.pattern == "WP:OAICITE")] | length) == 14 and any(.hits[]; .detail == "ChatGPT trailing +1")'
+
+  assert_json "ordinary arithmetic ending in +1 is not a citation artifact" \
+    'Increment the retry count by +1' \
+    0 '([.hits[] | select(.pattern == "WP:OAICITE")] | length) == 0'
 
   assert_sweep "unclassified writing wrappers are citation artifacts" \
     ':::writing{variant="document" id=12345}' \
@@ -790,14 +795,14 @@ The third — an aside — is not.' \
   local probe="${SUITE_TMP}/probe.md"
   printf 'A sentence of ordinary length that trips none of the counting sweeps.\n' >"$probe"
 
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n\n## 9. I\n\n## 10. J\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n' >"${iso}/references/ai-anti-patterns.md"
   local iso_out iso_rc
   iso_out=$("$PYTHON" "${iso}/sweep.py" "$probe" 2>"${SUITE_TMP}/iso_err")
   iso_rc=$?
   if [ "$iso_rc" -ne 0 ]; then
     fail "isolated sweep expected exit 0, got ${iso_rc} ($(cat "${SUITE_TMP}/iso_err"))"
-  elif ! jq -e '.coverage.patterns_total == 10' <<<"$iso_out" >/dev/null; then
-    fail "the total ignores the pattern file: expected 10, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
+  elif ! jq -e '.coverage.patterns_total == 8' <<<"$iso_out" >/dev/null; then
+    fail "the total ignores the pattern file: expected 8, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
   else
     ok
     echo "  the total is counted from the pattern file"
@@ -815,16 +820,16 @@ The third — an aside — is not.' \
     echo "  a pattern file with no numbered headings exits 2"
   fi
 
-  # A catalog no larger than the sweep is the dangerous case. At exactly nine
+  # A catalog no larger than the sweep is the dangerous case. At exactly six
   # the note claims zero unexamined while not_run_judgment still names sweeps;
-  # below nine the arithmetic goes negative. Both must fail rather than report.
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n\n## 9. I\n' >"${iso}/references/ai-anti-patterns.md"
+  # below six the arithmetic goes negative. Both must fail rather than report.
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog of exactly the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 9 this script sweeps for' "${SUITE_TMP}/iso_err"; then
-    fail "the exactly-nine diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+    fail "the exactly-six diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
     echo "  a catalog of exactly the examined count exits 2"
@@ -835,7 +840,7 @@ The third — an aside — is not.' \
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 9 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
