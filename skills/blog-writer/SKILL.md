@@ -20,8 +20,7 @@ explicitly selected corporate identity. Personal identity supplies expression; c
 identity supplies audience, terminology, evidence, positioning, and editorial constraints.
 
 **Script invocation.** Run every script this skill calls through its interpreter: `bash`
-for a `.sh`, `python3` for a `.py`. The installed plugin's files carry no executable bit.
-Never invoke one by bare path.
+for a `.sh`, `python3` for a `.py`. Never invoke one by bare path.
 
 ## Step 1 — Resolve Writing Identities
 
@@ -258,19 +257,23 @@ Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`,
 and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
 `patterns_total` and `note`. Route on the exit code:
 
-- **Exit 0** — `.hits` is empty. This is not a clean draft, and `.coverage.note` says how
-  many patterns went unexamined. `.coverage.not_run_judgment` is not that list:
+- **Exit 0** — `.hits` is empty. This is not a clean draft. `.coverage.note` says how many
+  patterns went unexamined. `.coverage.not_run_judgment` is not that list:
   it names only the sweeps that look mechanical and are not, so they cannot be assumed
-  covered by a script that just reported nothing. Read for those, and for every remaining
-  pattern in `references/ai-anti-patterns.md`.
+  covered by a script that just reported nothing.
+- After Exit 0, read for the sweeps in `.coverage.not_run_judgment`.
+- After Exit 0, read for every remaining pattern in `references/ai-anti-patterns.md`.
 - **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
   of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
   the script placed sentence boundaries: read its `context` before rewriting, and if a
   "sentence" shown there is a split artifact rather than real prose, that hit is the
-  artifact and the prose stays. Re-run until it exits 0. Report findings to the author in
-  your own words; the object is for you, not for them.
+  artifact and the prose stays.
+- After Exit 1, re-run until it exits 0.
+- After Exit 1, report findings to the author in your own words. The object is for you, not
+  for them.
 - **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
-  stdout. Report the diagnostic to the author and do not claim the sweep ran.
+  stdout. Report the diagnostic to the author.
+- After Exit 2, do not claim the sweep ran.
 
 Re-run it after every rewrite, including the rewrites made to fix its own findings and
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
