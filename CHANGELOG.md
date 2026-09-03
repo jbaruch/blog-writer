@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.37 — 2026-09-03
+
 ### Changed
 
 - **Step 10's mechanical-sweep routes now use atomic directives** ([#38](https://github.com/jbaruch/blog-writer/issues/38)) — the Exit 0, Exit 1, and Exit 2 bullets previously bundled interpretation, reading, rewriting, rerunning, and reporting actions. Splitting those actions makes each route scannable while preserving the context-verification exception that protects prose from rewrites based on split sentence artifacts. The script-invocation preamble also drops implementation rationale already archived in the changelog and keeps only its two directives.
