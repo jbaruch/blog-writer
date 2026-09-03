@@ -27,7 +27,8 @@
 #      `verify_context` set on the sentence-counting sweeps only, since that is
 #      the flag SKILL.md routes on.
 #  11. Judgment patterns are never reported — the watchlist families stay with
-#      the agent, so no hit may carry #1, #10, #12, #17, #32, #35 or #36.
+#      the agent, so no hit may carry #1, #10, #12, #17, #32, #35, #36, #40,
+#      or #41.
 #  12. Coverage total — read from references/ai-anti-patterns.md on every run,
 #      never a literal. A file that cannot be counted exits 2 rather than
 #      reporting a guessed figure, and so does a catalog no larger than the
@@ -183,8 +184,8 @@ which everyone had quietly accepted as simply the cost of shipping anything at a
 We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
-  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
-  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 7'
+  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 8'
+  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 9'
   # The total is read out of the pattern file, never restated here — a literal
   # in the suite would be the same stale second copy the script stopped keeping.
   # grep's status is captured explicitly rather than discarded by the command
@@ -197,7 +198,7 @@ We cut it.'
   elif [ "$defined" -lt 2 ]; then
     fail "references/ai-anti-patterns.md reported only ${defined} pattern(s)"
   else
-    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
+    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 9 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
   fi
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
@@ -289,7 +290,78 @@ nobody outside the team ever saw or asked about. It held.' \
     'The build finished… eventually, after three unexplained retries on the runner.' \
     1 yes "ellipsis character"
 
-  # 7. Markdown exclusions
+  # 7. Fixed model-interface artifacts
+  assert_sweep "citation artifacts cover each vendor family" \
+    'ChatGPT left turn0search0. Gemini left [cite: 1]. Grok left grok_card.
+DeepSeek left 【85†L261-269】. Perplexity left [web:1].' \
+    1 yes "citation artifact"
+
+  assert_json "every documented citation artifact form is covered" \
+    'contentReference[oaicite:0]{index=0}
+oai_citation
+turn0search0
+attributableIndex
+[cite: 1]
+[span_1](start_span)
+grok_card
+grok_render_citation_card_json
+【85†L261-269】
+[attached_file:1]
+[web:1]
+:::writing{variant="document" id=12345}
+or another citation +1' \
+    1 '[.hits[] | select(.pattern == "WP:OAICITE")] | length == 13'
+
+  assert_sweep "unclassified writing wrappers are citation artifacts" \
+    ':::writing{variant="document" id=12345}' \
+    1 yes "unclassified writing wrapper"
+
+  assert_sweep "AI-source tracking parameters are reported" \
+    'Read https://example.test/post?utm_source=chatgpt.com and judge the source yourself.' \
+    1 yes "AI-source tracking parameter"
+
+  assert_json "every documented AI-source parameter is covered" \
+    'https://a.test/?utm_source=openai
+https://b.test/?utm_source=chatgpt.com
+https://c.test/?utm_source=copilot.com
+https://d.test/?referrer=grok.com' \
+    1 '[.hits[] | select(.pattern == "WP:TRACKING")] | length == 4'
+
+  assert_sweep "thematic breaks between every H2 section are reported" \
+    '## First
+
+Ordinary prose belongs here.
+
+---
+
+## Second
+
+More ordinary prose belongs here.
+
+---
+
+## Third
+
+The final prose belongs here.' \
+    1 yes "thematic break between every section"
+
+  assert_sweep "an occasional thematic break is not reported" \
+    '## First
+
+Ordinary prose belongs here.
+
+---
+
+## Second
+
+More ordinary prose belongs here.
+
+## Third
+
+The final prose belongs here.' \
+    0 no "thematic break between every section"
+
+  # 8. Markdown exclusions
   assert_sweep "fenced code does not contribute hits" \
     '# Title
 
@@ -346,6 +418,16 @@ Bullet • and “curly quotes” and an en–dash live in this sample output.
 
 The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
     0 no "unicode giveaway"
+
+  assert_json "artifact checks ignore fenced code" \
+    '# Title
+
+```text
+turn0search0 utm_source=openai
+```
+
+The visible prose carries no leaked tokens or parameters in it.' \
+    0 '(.hits | length) == 0'
 
   assert_sweep "#18 ignores unicode inside an HTML comment" \
     '# Title
@@ -567,7 +649,7 @@ Three facilities — Austin, Berlin, Osaka — ran the nightly job without compl
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
 In todays landscape, it is important to note that this is, of course, pivotal.'
   local leaked
-  leaked=$(jq -r '[.hits[].pattern] - ["#3/#4","#7","#8","#14","#18"] | join(" ")' <<<"$CASE_OUT")
+  leaked=$(jq -r '[.hits[].pattern] - ["#3/#4","#7","#8","#14","#18","WP:OAICITE","WP:TRACKING","WP:SECTIONBREAK"] | join(" ")' <<<"$CASE_OUT")
   if [ -n "$leaked" ]; then
     fail "judgment patterns reported as hits: ${leaked} — those stay with the agent"
   else
@@ -708,14 +790,14 @@ The third — an aside — is not.' \
   local probe="${SUITE_TMP}/probe.md"
   printf 'A sentence of ordinary length that trips none of the counting sweeps.\n' >"$probe"
 
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n\n## 9. I\n\n## 10. J\n' >"${iso}/references/ai-anti-patterns.md"
   local iso_out iso_rc
   iso_out=$("$PYTHON" "${iso}/sweep.py" "$probe" 2>"${SUITE_TMP}/iso_err")
   iso_rc=$?
   if [ "$iso_rc" -ne 0 ]; then
     fail "isolated sweep expected exit 0, got ${iso_rc} ($(cat "${SUITE_TMP}/iso_err"))"
-  elif ! jq -e '.coverage.patterns_total == 8' <<<"$iso_out" >/dev/null; then
-    fail "the total ignores the pattern file: expected 8, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
+  elif ! jq -e '.coverage.patterns_total == 10' <<<"$iso_out" >/dev/null; then
+    fail "the total ignores the pattern file: expected 10, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
   else
     ok
     echo "  the total is counted from the pattern file"
@@ -733,16 +815,16 @@ The third — an aside — is not.' \
     echo "  a pattern file with no numbered headings exits 2"
   fi
 
-  # A catalog no larger than the sweep is the dangerous case. At exactly six the
-  # note claims zero unexamined while not_run_judgment still names seven sweeps;
-  # below six the arithmetic goes negative. Both must fail rather than report.
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
+  # A catalog no larger than the sweep is the dangerous case. At exactly nine
+  # the note claims zero unexamined while not_run_judgment still names sweeps;
+  # below nine the arithmetic goes negative. Both must fail rather than report.
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n\n## 9. I\n' >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog of exactly the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
-    fail "the exactly-six diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  elif ! grep -qF 'not more than the 9 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+    fail "the exactly-nine diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
     echo "  a catalog of exactly the examined count exits 2"
@@ -753,7 +835,7 @@ The third — an aside — is not.' \
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 9 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
