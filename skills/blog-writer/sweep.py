@@ -138,7 +138,7 @@ CITATION_ARTIFACTS = [
 TRACKING_PARAMETERS = re.compile(
     r"[?&]"
     r"(?P<parameter>utm_source=(?:openai|chatgpt\.com|copilot\.com)|referrer=grok\.com)"
-    r"(?=$|[&#\s)\]}>]|[.,;](?:\s|$))",
+    r"(?=$|[&#\s)\]}>]|['\"]|[.,;](?:\s|$))",
     re.IGNORECASE,
 )
 

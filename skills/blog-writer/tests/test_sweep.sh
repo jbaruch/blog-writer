@@ -340,6 +340,14 @@ https://d.test/?referrer=grok.com' \
     'utm_source=openai is the analytics source configured for this test.' \
     0 '([.hits[] | select(.pattern == "WP:TRACKING")] | length) == 0'
 
+  assert_sweep "tracking parameter in a double-quoted URL is reported" \
+    'Read "https://example.test/?utm_source=openai" before publishing.' \
+    1 yes "AI-source tracking parameter"
+
+  assert_sweep "tracking parameter in a single-quoted URL is reported" \
+    "Read 'https://example.test/?referrer=grok.com' before publishing." \
+    1 yes "AI-source tracking parameter"
+
   assert_sweep "thematic breaks between every H2 section are reported" \
     '## First
 
