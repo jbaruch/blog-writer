@@ -1,6 +1,6 @@
 # post-shapes.json — Schema and Contract
 
-State file backing audit 6 (shape convergence) in `references/structural-audits.md`. It
+State file backing audit 6 (shape convergence) in `skills/blog-writer/references/structural-audits.md`. It
 records the structural skeleton of each finished post so the next post can be shaped
 differently on purpose.
 

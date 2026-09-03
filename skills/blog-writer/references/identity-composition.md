@@ -1,7 +1,7 @@
 # Identity Resolution and Composition
 
 The blog writer consumes personal and optional corporate identity packages defined by
-`references/identity-spec.md`.
+`skills/blog-writer/references/identity-spec.md`.
 
 ## Resolve
 

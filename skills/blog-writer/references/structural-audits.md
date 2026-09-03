@@ -1,6 +1,6 @@
 # Structural Audits
 
-The anti-patterns in `references/ai-anti-patterns.md` work at the sentence and section
+The anti-patterns in `skills/blog-writer/references/ai-anti-patterns.md` work at the sentence and section
 level. This file works at the level above: the shape of the whole post. A draft can pass
 every one of them and still be identifiable as machine-written from its skeleton alone.
 
@@ -51,7 +51,7 @@ named cultural references, audit 4 is already satisfied. Check the profile first
 decide whether the audit has anything to say.
 
 Where the personal identity declares a `composition` resource, it governs post architecture
-and overrides `references/blog-anatomy.md`. A legacy `persona/framework.md` has that role.
+and overrides `skills/blog-writer/references/blog-anatomy.md`. A legacy `persona/framework.md` has that role.
 Audits 2 and 6 read its declared
 opening and closing modes as the menu to vary across, rather than the generic one below.
 
@@ -131,7 +131,7 @@ with no digression? If yes to both, that is the tell.
 **The gap:** the single largest in the corpus. AI performs emotion through the body 81% of
 the time against 38% for humans; humans name the feeling outright 29% against 8%.
 
-**This is pattern #39** in `references/ai-anti-patterns.md`, which carries the full
+**This is pattern #39** in `skills/blog-writer/references/ai-anti-patterns.md`, which carries the full
 treatment: symptoms, variants, the fix, and the carve-out protecting factual physical
 detail. Do not restate it here — run the pattern.
 
@@ -154,7 +154,7 @@ This audit is broader — it covers every unnamed thing, not just unnamed author
 is the cheapest human marker available and it costs nothing but accuracy.
 
 **Interaction with placeholders:** where the specific isn't known, that is a `Fact`
-placeholder for the author to fill (see `references/process.md` Phase 3), not a licence to
+placeholder for the author to fill (see `skills/blog-writer/references/process.md` Phase 3), not a licence to
 stay vague. A vague allusion is a placeholder nobody flagged.
 
 ## Audit 5 — Reader engagement
@@ -184,12 +184,12 @@ yours.
 
 **Where the history lives:** `_blog-skill/post-shapes.json` in the Blog Home Directory
 records the shape of each published post. Do not read or compare it yourself. SKILL.md
-Step 9 has the invocation, the routing, and the correction loop; `references/post-shapes-schema.md`
+Step 9 has the invocation, the routing, and the correction loop; `skills/blog-writer/references/post-shapes-schema.md`
 has the field meanings.
 
 **The fix:** open somewhere else, arc somewhere else, or close somewhere else — whichever
 the verdict names. The intervention menu below and the mode menus in
-`references/blog-anatomy.md` are what to reach for.
+`skills/blog-writer/references/blog-anatomy.md` are what to reach for.
 
 Change what the verdict asks for and no more. Rewriting every axis on every post rebuilds
 the same problem with different defaults, which is the convergence trap in a new costume.
@@ -230,6 +230,6 @@ distinctive of the five models:
 ## What this file does not do
 
 It does not fix vocabulary, punctuation, or sentence craft — that is
-`references/ai-anti-patterns.md` and `references/tone-guide.md`. It does not impose a
+`skills/blog-writer/references/ai-anti-patterns.md` and `skills/blog-writer/references/tone-guide.md`. It does not impose a
 voice — that is the personal identity when selected. And it does not make a post undetectable. Nothing
 does. It makes the post better shaped, which is the part that was worth doing anyway.

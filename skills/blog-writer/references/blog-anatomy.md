@@ -18,8 +18,8 @@ that earns every sentence is better than a padded 1,800.
 **This shape is a starting point, not a template to fill.** Two of its parts are fixed
 schema — the TLDR and the author bio. Everything between them is one arrangement among
 several, and running the same arrangement every time is exactly the convergence audit 6 in
-`references/structural-audits.md` exists to catch. Vary the opening and closing moves across
-posts, and record which ones a post used (see `references/post-shapes-schema.md`).
+`skills/blog-writer/references/structural-audits.md` exists to catch. Vary the opening and closing moves across
+posts, and record which ones a post used (see `skills/blog-writer/references/post-shapes-schema.md`).
 
 The default arrangement:
 
@@ -41,7 +41,7 @@ section earns the reader's trust.
 **The broader point** — Zoom out. What does this mean for how we build software? Cultural
 references, analogies, and dry observations live here. **Optional, and the first thing to
 cut.** A zoom-out section placed after the story already landed is the epilogue habit — the
-most distinctive fingerprint of the model doing the drafting (see `references/structural-audits.md`,
+most distinctive fingerprint of the model doing the drafting (see `skills/blog-writer/references/structural-audits.md`,
 "Know what drafted the text"). Some posts should skip it. Some should open with it instead.
 A post that ends on its strongest concrete moment does not need one.
 
@@ -69,7 +69,7 @@ detail's meaning.
 
 Change what the verdict asks for and no more. Rewriting every axis on every post rebuilds
 the same problem with different defaults — see the convergence trap in
-`references/structural-audits.md`.
+`skills/blog-writer/references/structural-audits.md`.
 
 ## Series Support
 

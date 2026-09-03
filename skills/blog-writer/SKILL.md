@@ -25,7 +25,7 @@ for a `.sh`, `python3` for a `.py`. Never invoke one by bare path.
 ## Step 1 — Resolve Writing Identities
 
 Ask for or infer the blog home from the current project, then read
-`references/identity-composition.md`. Run its resolver with any
+`skills/blog-writer/references/identity-composition.md`. Run its resolver with any
 assignment-specific identity paths the author supplied. Personal and corporate identities
 are independently optional, but at least one must resolve. Corporate identity is active
 only when explicitly selected for the assignment or configured by the project. Never infer
@@ -40,12 +40,12 @@ Proceed immediately to Step 2.
 ## Step 2 — Route Identity Selection
 
 On resolver exit 0 with a present project configuration, follow the draft-status and reading
-rules in `references/identity-composition.md`. Treat that selection as
+rules in `skills/blog-writer/references/identity-composition.md`. Treat that selection as
 authoritative and skip to Step 5. Do not run discovery or ask again. Apply the same route
 when every assignment-specific identity path resolved.
 
 For an unconfigured project with no complete assignment-specific selection, read
-`references/identity-storage.md`. Follow its shared-root discovery and
+`skills/blog-writer/references/identity-storage.md`. Follow its shared-root discovery and
 first-use selection flow. A resolver result carrying only the legacy fallback is still an
 unconfigured project. Configure confirmed existing candidates together, rerun the resolver,
 and skip to Step 5 only when it returns the confirmed personal-only, corporate-only, or
@@ -63,14 +63,14 @@ report the diagnostic and stop.
 ## Step 3 — Create a Personal Identity
 
 If the author requests an interview or the supplied evidence is insufficient, read
-`references/setup.md` and collect that interview as another source. Do
+`skills/blog-writer/references/setup.md` and collect that interview as another source. Do
 not force the interview when representative sources already support an identity. Gather all
 supplied and collected sources as creator input. For a legacy migration, add the resolver's
 legacy root and request the creator's Step 2 v0-to-v1 rewrite. Invoke
 `Skill(skill: "create-personal-identity")` with that input.
 
 After approval, configure the returned directory through `configure-identities.py` as
-described in `references/identity-composition.md`. Preserve an existing
+described in `skills/blog-writer/references/identity-composition.md`. Preserve an existing
 corporate selection or include the corporate candidate confirmed during first-use discovery.
 Rerun the resolver. If the confirmed corporate choice still requires creation, proceed
 immediately to Step 4; otherwise proceed immediately to Step 5.
@@ -91,7 +91,7 @@ the resolver and proceed immediately to Step 5.
 ## Step 5 — Refresh the Anti-Pattern File
 
 Fetch Wikipedia's "Signs of AI writing" article and compare it against
-`references/ai-anti-patterns.md`.
+`skills/blog-writer/references/ai-anti-patterns.md`.
 
 ```bash
 bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/fetch-signs-of-ai-writing.sh
@@ -102,18 +102,18 @@ Read the file at `.path`.
 
 - **Exit 0** — read the article and continue below.
 - **Exit 1** — the fetch failed (network, HTTP error, or a body too short to be the
-  article). Proceed with `references/ai-anti-patterns.md` as-is.
+  article). Proceed with `skills/blog-writer/references/ai-anti-patterns.md` as-is.
 - **Exit 2** — a tool or usage error (curl missing, destination not writable). Report the
   script's stderr diagnostic, then proceed with the current anti-pattern file as-is.
 
 Report what the article carries and the anti-pattern file does not. Never edit
-`references/ai-anti-patterns.md` from this step. Give the author each finding in three
+`skills/blog-writer/references/ai-anti-patterns.md` from this step. Give the author each finding in three
 parts:
 
 - what the article names, with its own wording for the tell
 - the closest pattern already in the file, or that there is none
 - whether its verdict is a count or a judgment, per the split in
-  `references/process.md` Phase 3 Pass 1
+  `skills/blog-writer/references/process.md` Phase 3 Pass 1
 
 Say so plainly when the article carries nothing new. Then continue the session with the
 current file either way — a finding changes the skill, never this run's draft.
@@ -131,19 +131,19 @@ Read these reference files in order:
 2. Every corporate identity file in `read_order`, if selected. Read its entry point first
    and follow its routing. Record any explicit conflict the assignment does not resolve.
 3. `persona/framework.md` for a legacy identity, if it exists and has content. It defines
-   post-level architecture and overrides `references/blog-anatomy.md`
-   and the narrative-density doctrine in `references/tone-guide.md`.
-4. `references/tone-guide.md` — The generic writing framework. Narrative density rules,
+   post-level architecture and overrides `skills/blog-writer/references/blog-anatomy.md`
+   and the narrative-density doctrine in `skills/blog-writer/references/tone-guide.md`.
+4. `skills/blog-writer/references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-5. `references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
+5. `skills/blog-writer/references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
-6. `references/structural-audits.md` — Six discourse-level audits that work above the
+6. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
    sentence: theme explicitness, structural tidiness, emotion mode, reference specificity,
    reader engagement, and shape convergence. Audits 1, 2, and 6 run on the outline in Phase 2;
    audits 3, 4, and 5 run on the prose in Phase 3 and 4.
-7. `references/process.md` — The workflow from transcript to published draft.
-8. `references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
+7. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
+8. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
    series handling. Fallback only — a selected personal `composition` resource, including
    legacy `persona/framework.md`, overrides it.
 9. Product-context resources from selected identities. Scan an index to know what is
@@ -157,7 +157,7 @@ Proceed immediately to Step 7.
 Read the source material and build the narrative model: who is involved, what was built,
 what went wrong, what went right, what was shown on screen, and the jokes and references
 that surfaced naturally. Gather product context and previous posts in the series if either
-is configured. `references/process.md` Phase 0 has the full procedure.
+is configured. `skills/blog-writer/references/process.md` Phase 0 has the full procedure.
 
 Gate: the gaps in your understanding are identified. Do not summarize, and do not start
 writing.
@@ -168,7 +168,7 @@ Proceed immediately to Step 8.
 
 Ask the author one question at a time, each with 1-4 concrete options plus an open answer,
 your best guess marked. Group questions by narrative, technical, visual, and context gaps.
-`references/process.md` Phase 1 has the question format and grouping rules.
+`skills/blog-writer/references/process.md` Phase 1 has the question format and grouping rules.
 
 Gate: the author confirms the narrative reconstruction is accurate and no ambiguity
 remains.
@@ -177,12 +177,12 @@ Proceed immediately to Step 9.
 
 ## Step 9 — Run Phase 2: Editorial Planning
 
-Lock the main idea, the CTA, and the section outline. `references/process.md` Phase 2 has
+Lock the main idea, the CTA, and the section outline. `skills/blog-writer/references/process.md` Phase 2 has
 the main-idea template and the outline requirements.
 
-Before locking, audit the outline against `references/structural-audits.md`
+Before locking, audit the outline against `skills/blog-writer/references/structural-audits.md`
 audits 1, 2, and 6 — theme explicitness, structural tidiness, shape convergence — one audit
-at a time. `references/process.md` section 2f has the procedure.
+at a time. `skills/blog-writer/references/process.md` section 2f has the procedure.
 
 For audit 6, ask the script for the verdict rather than reading the shape history yourself:
 
@@ -230,7 +230,7 @@ Proceed immediately to Step 10.
 
 Write the draft to `blog-draft-[slug].md`, insert and confirm placeholders, then run the
 anti-pattern, structural, accuracy, and tightening checks.
-`references/process.md` Phase 3 has the writing rules, the placeholder
+`skills/blog-writer/references/process.md` Phase 3 has the writing rules, the placeholder
 conventions, and the check procedure.
 
 Five rules bind this step and Step 11:
@@ -243,7 +243,7 @@ rhetorical devices when a personal identity exists, plus the consequential corpo
 requirements when a corporate identity exists; if you cannot, read the relevant resources again.
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
-top of `references/ai-anti-patterns.md` — re-read the file first, run the three-pass
+top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
 procedure in order, and never invent a pattern the file does not define.
 
 **Mechanical sweep adherence.** The counting half of the Pass 1 anti-pattern check runs as
@@ -262,7 +262,7 @@ and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`,
   it names only the sweeps that look mechanical and are not, so they cannot be assumed
   covered by a script that just reported nothing.
 - After Exit 0, read for the sweeps in `.coverage.not_run_judgment`.
-- After Exit 0, read for every remaining pattern in `references/ai-anti-patterns.md`.
+- After Exit 0, read for every remaining pattern in `skills/blog-writer/references/ai-anti-patterns.md`.
 - **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
   of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
   the script placed sentence boundaries: read its `context` before rewriting, and if a
@@ -279,11 +279,11 @@ Re-run it after every rewrite, including the rewrites made to fix its own findin
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
 the sweep as clean without having run it. Never report the draft as clean from this sweep;
 it examines a minority of the catalog and `.coverage.note` says how many it left.
-`references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
+`skills/blog-writer/references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
 you read for.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from
-`references/structural-audits.md` one at a time, after the anti-pattern
+`skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern
 passes. Read the personal voice resource first when selected. Where the profile already prescribes the human-side
 behavior, the audit is a drift check rather than a new rule. Never apply more than two
 interventions from the menu to one post.
@@ -302,7 +302,7 @@ Proceed immediately to Step 11.
 ## Step 11 — Run Phase 4: Revision
 
 Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
-change. `references/process.md` Phase 4 has the revision procedure.
+change. `skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
 
 Gate: the author declares the post done.
 
@@ -321,7 +321,7 @@ bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh 
 
 Record the post as it ended up, not as it was first drafted. Reuse an existing mode string
 verbatim when the shape is the same; the comparison is by equality.
-`references/post-shapes-schema.md` has the field meanings.
+`skills/blog-writer/references/post-shapes-schema.md` has the field meanings.
 
 Route on the exit code:
 
