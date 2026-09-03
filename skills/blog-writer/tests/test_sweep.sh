@@ -332,6 +332,10 @@ https://c.test/?utm_source=copilot.com
 https://d.test/?referrer=grok.com' \
     1 '[.hits[] | select(.pattern == "WP:TRACKING")] | length == 4'
 
+  assert_json "longer tracking values do not match known attribution values" \
+    'https://example.test/?utm_source=copilot.com.evil' \
+    0 '([.hits[] | select(.pattern == "WP:TRACKING")] | length) == 0'
+
   assert_sweep "thematic breaks between every H2 section are reported" \
     '## First
 

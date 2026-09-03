@@ -244,7 +244,7 @@ requirements when a corporate identity exists; if you cannot, read the relevant 
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
-procedure in order, and never invent a pattern the file does not define.
+procedure in order, and never invent a pattern the file or mechanical sweep does not define.
 
 **Mechanical sweep adherence.** The counting half of the Pass 1 anti-pattern check runs as
 a script, never by reading. Run it over the draft:
@@ -254,8 +254,10 @@ python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draf
 ```
 
 Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`, `context`
-and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`, `patterns_examined`,
-`patterns_total` and `note`. Route on the exit code:
+and `verify_context` per finding. `.coverage.ran` names numbered patterns the script checks.
+`.coverage.supplemental_checks` names fixed-output checks outside the numbered catalog.
+`.coverage` also carries `not_run_judgment`, `patterns_examined`, `patterns_total` and
+`note`. Route on the exit code:
 
 - **Exit 0** — `.hits` is empty. This is not a clean draft. `.coverage.note` says how many
   patterns went unexamined. `.coverage.not_run_judgment` is not that list:

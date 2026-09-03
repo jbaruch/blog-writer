@@ -136,7 +136,9 @@ CITATION_ARTIFACTS = [
 ]
 
 TRACKING_PARAMETERS = re.compile(
-    r"(?:utm_source=(?:openai|chatgpt\.com|copilot\.com)|referrer=grok\.com)",
+    r"(?:^|[?&])"
+    r"(?P<parameter>utm_source=(?:openai|chatgpt\.com|copilot\.com)|referrer=grok\.com)"
+    r"(?=$|[&#\s)\]}>]|[.,;](?:\s|$))",
     re.IGNORECASE,
 )
 
@@ -823,12 +825,13 @@ def sweep_tracking_parameters(blocks):
     hits = []
     for number, text in eligible_lines(blocks):
         for found in TRACKING_PARAMETERS.finditer(text):
+            parameter = found.group("parameter")
             hits.append(
                 hit(
                     "WP:TRACKING",
                     "AI-source tracking parameter",
                     number,
-                    found.group(),
+                    parameter,
                     text,
                 )
             )
