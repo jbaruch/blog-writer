@@ -107,13 +107,13 @@ Read the file at `.path`.
   script's stderr diagnostic, then proceed with the current anti-pattern file as-is.
 
 Report what the article carries and the anti-pattern file does not. Never edit
-`references/ai-anti-patterns.md` from this step. Give the author each finding in three
+`skills/blog-writer/references/ai-anti-patterns.md` from this step. Give the author each finding in three
 parts:
 
 - what the article names, with its own wording for the tell
 - the closest pattern already in the file, or that there is none
 - whether its verdict is a count or a judgment, per the split in
-  `references/process.md` Phase 3 Pass 1
+  `skills/blog-writer/references/process.md` Phase 3 Pass 1
 
 Say so plainly when the article carries nothing new. Then continue the session with the
 current file either way — a finding changes the skill, never this run's draft.
@@ -262,7 +262,7 @@ and `verify_context` per finding; `.coverage` carries `ran`, `not_run_judgment`,
   it names only the sweeps that look mechanical and are not, so they cannot be assumed
   covered by a script that just reported nothing.
 - After Exit 0, read for the sweeps in `.coverage.not_run_judgment`.
-- After Exit 0, read for every remaining pattern in `references/ai-anti-patterns.md`.
+- After Exit 0, read for every remaining pattern in `skills/blog-writer/references/ai-anti-patterns.md`.
 - **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
   of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
   the script placed sentence boundaries: read its `context` before rewriting, and if a
@@ -279,7 +279,7 @@ Re-run it after every rewrite, including the rewrites made to fix its own findin
 those from any other check. A clean draft plus one edit is an unchecked draft. Never report
 the sweep as clean without having run it. Never report the draft as clean from this sweep;
 it examines a minority of the catalog and `.coverage.note` says how many it left.
-`references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
+`skills/blog-writer/references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
 you read for.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from

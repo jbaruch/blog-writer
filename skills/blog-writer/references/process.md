@@ -219,7 +219,7 @@ technical meat or the broader point as a natural aside.
 
 ### 2f: Structural Audit of the Outline
 
-Before the checkpoint, audit the outline against `references/structural-audits.md`. Run the
+Before the checkpoint, audit the outline against `skills/blog-writer/references/structural-audits.md`. Run the
 three outline-level audits **one at a time** — the study behind them found aspect-based
 checking catches 95.4% of what it looks for against 68.4% for a single combined read.
 
@@ -240,7 +240,7 @@ is the tidy epilogue after the fix landed, never the fix itself.
 **Audit 6 — Shape convergence.** Name the planned opening mode, arc, and closing mode, then
 ask `check-shape-convergence.sh` for the verdict. Do not read or compare the history
 yourself. The invocation, the exit-code routing, and the correction loop are in SKILL.md
-Step 9; the field meanings and both contracts are in `references/post-shapes-schema.md`.
+Step 9; the field meanings and both contracts are in `skills/blog-writer/references/post-shapes-schema.md`.
 
 When an audit finds no issue, proceed silently. Report a `can_fire` of false, though — that
 says the audit could not run, which is different from running clean. An audit that fires on
@@ -273,7 +273,7 @@ expression and do not invent an individual persona.
 4. **Code blocks are part of the story.** Don't dump code without context. Set up why the
    reader is about to see this code, show it, then explain what it means.
 
-5. **Sentence and paragraph craft.** Apply the rules from `references/tone-guide.md` section
+5. **Sentence and paragraph craft.** Apply the rules from `skills/blog-writer/references/tone-guide.md` section
    "Sentence & Paragraph Craft" while writing — not just during review. Key checks:
    - One new idea per sentence. If you're cramming, split.
    - Generalize before listing unfamiliar items ("three tools: X, Y, Z").
@@ -292,7 +292,7 @@ expression and do not invent an individual persona.
    - Abstract nouns replacing lived experience ("The architectural convergence" vs "Three
      companies shipped the same idea within a month")
    - Paragraphs that could be rewritten as bullet points without losing anything
-   Re-read `references/tone-guide.md` section "Narrative Density: Show, Don't Summarize"
+   Re-read `skills/blog-writer/references/tone-guide.md` section "Narrative Density: Show, Don't Summarize"
    for the full diagnostic.
 
 7. **Placeholders use INDEPENDENT numbering per type.** There is NO shared counter
@@ -391,7 +391,7 @@ comments on reconstructed code and diagrams as open questions rather than resolv
 
 ### After writing:
 
-Run the anti-pattern check (three passes). Open `references/ai-anti-patterns.md` and scan
+Run the anti-pattern check (three passes). Open `skills/blog-writer/references/ai-anti-patterns.md` and scan
 the draft:
 
 **Pass 1 — Surface scan:** Read the draft against each pattern in the catalog, looking for
@@ -412,7 +412,7 @@ routing, and that is the only place they live. Which patterns it covers, and wit
 figures, is the script's own contract — the run reports them in `.coverage.ran`, and the
 named constants under "Decision contract" at the top of `skills/blog-writer/sweep.py` hold
 the numbers. Do not reproduce either here or by reading. The fix for each pattern it
-reports is in `references/ai-anti-patterns.md` under that pattern's number.
+reports is in `skills/blog-writer/references/ai-anti-patterns.md` under that pattern's number.
 
 Re-run it after every rewrite: a clean draft plus one edit is an unchecked draft, and the
 most common way a tell ships is being introduced by the fix for something else.
@@ -468,11 +468,11 @@ not a finding.
   product name for a competitor's. If the sentence still works, it is a cliché — replace it
   with a specific fact.
 
-The remaining patterns in `references/ai-anti-patterns.md` get the contextual read this
+The remaining patterns in `skills/blog-writer/references/ai-anti-patterns.md` get the contextual read this
 pass is named for. The script's silence is not a verdict on them, and neither is a clean
 result on the seven above.
 
-**Craft sweep (between Pass 1 and Pass 2):** Check the draft against `references/tone-guide.md`
+**Craft sweep (between Pass 1 and Pass 2):** Check the draft against `skills/blog-writer/references/tone-guide.md`
 section "Sentence & Paragraph Craft":
 - **Overloaded sentences:** Find any sentence that answers 3+ distinct questions (what? how?
   for whom? why?). Split it.
@@ -557,7 +557,7 @@ the pre-scan version and ask two questions at the draft level:
   cases) stays. If the answer to this question is no, restore the human sentences the
   scan didn't actually flag.
 
-Run the prose-level structural audits. Open `references/structural-audits.md` and run audits
+Run the prose-level structural audits. Open `skills/blog-writer/references/structural-audits.md` and run audits
 3, 4, and 5 **one at a time**, after the anti-pattern check is complete. Read the personal
 voice resource first when selected: where it already prescribes the human-side behavior,
 the audit is a drift check — "did this draft wander off the profile" — not a new rule.
@@ -634,7 +634,7 @@ conversation — edit the file surgically.
 
 **How to handle feedback:**
 - Apply changes to the draft file using Edit
-- Re-run the anti-pattern check (`references/ai-anti-patterns.md`) after changes — all
+- Re-run the anti-pattern check (`skills/blog-writer/references/ai-anti-patterns.md`) after changes — all
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
   audit rule: every rewrite must pass a full-catalog scan on its own before it's

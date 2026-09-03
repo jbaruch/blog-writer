@@ -12,7 +12,7 @@ The anti-pattern check is a defined procedure, not a vibe check. Three rules gov
 specific patterns, symptoms, examples, structural variants, and alternatives — not your
 general knowledge of AI writing patterns.
 
-**Follow the three-pass procedure exactly as written in `references/process.md`.** Pass 1
+**Follow the three-pass procedure exactly as written in `skills/blog-writer/references/process.md`.** Pass 1
 is the surface scan against every pattern in this file. Pass 2 is the skeleton scan on adjacent
 sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
 that passes pattern checks but still reads as AI. Then the rewrite audit. Then the voice
@@ -1646,6 +1646,6 @@ moment that actually earns it.
 **Carve-out — this is not a ban on physical detail.** Detail that is factually what
 happened is reportage: the one sock, the cat on the keyboard, the 2:14 AM kitchen, the
 terminal output you actually saw. That's narrative density and it stays (see
-`references/tone-guide.md`). The pattern is a body part standing in for a feeling the
+`skills/blog-writer/references/tone-guide.md`). The pattern is a body part standing in for a feeling the
 sentence declines to name. Concrete lived specifics are the human marker; body-performance
 is the machine one.

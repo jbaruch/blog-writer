@@ -1,5 +1,9 @@
 # Changelog
 
+### Fixed
+
+- **Reference paths now use one repository-relative convention** ([#46](https://github.com/jbaruch/blog-writer/issues/46)) — `SKILL.md` mixed repository-relative `skills/blog-writer/references/...` paths with skill-relative `references/...` paths. A real consumer install preserves the plugin root above `skills/blog-writer/`, and successful use confirms that resource resolution is not based on the consumer's shell directory. Every cross-reference in `SKILL.md` and its reference documents now uses the repository-relative form required by the authoring contract.
+
 ## 1.1.37 — 2026-09-03
 
 ### Changed

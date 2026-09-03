@@ -43,7 +43,7 @@ The other half — emotion staged through the body or the room — inverted whil
 looking. "My stomach dropped," "the cursor blinked mockingly," "I felt something shift"
 are now the strongest single machine signature in the measured corpus, because models were
 trained on the same writing advice and follow it harder than people do. See pattern #39 in
-`references/ai-anti-patterns.md` for the full treatment.
+`skills/blog-writer/references/ai-anti-patterns.md` for the full treatment.
 
 So the density rule splits cleanly:
 
@@ -88,7 +88,7 @@ conference afterparty, not a whitepaper.
 
 ## Anti-Patterns: What to Never Do
 
-**`references/ai-anti-patterns.md` is the list.** It names every pattern, with symptoms,
+**`skills/blog-writer/references/ai-anti-patterns.md` is the list.** It names every pattern, with symptoms,
 examples, structural variants, and alternatives. Read it there — this file carries no
 copy of it. Scan the draft against every pattern during Phase 3 and Phase 4. Zero
 tolerance.
