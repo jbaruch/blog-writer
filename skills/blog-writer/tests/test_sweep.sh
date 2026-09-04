@@ -978,6 +978,11 @@ The third — an aside — is not.' \
     final 1 \
     'any(.hits[]; .pattern == "WP:FINALIZATION" and .line == 3 and .token == "<!-- VERIFY: reconstructed\nconfirm the source -->")'
 
+  assert_json_mode "final mode reports draft machinery inside fenced blocks" \
+    $'```html\n[Screenshot 01: unresolved dashboard]\n<!-- VERIFY: replace this example -->\n```' \
+    final 1 \
+    '[.hits[] | select(.pattern == "WP:FINALIZATION") | {line, token}] == [{"line":2,"token":"[Screenshot 01: unresolved dashboard]"},{"line":3,"token":"<!-- VERIFY: replace this example -->"}]'
+
   assert_json_mode "final mode accepts normal blog Markdown" \
     '---
 title: A useful guide

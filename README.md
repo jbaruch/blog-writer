@@ -37,8 +37,7 @@ the same thing with less abstraction.
 The mechanical sweep has separate draft and final contracts. Draft mode permits the five
 placeholder types and their VERIFY comments. Final mode blocks every unresolved marker and
 deterministic interface residue before the finished post can be recorded. Phrases such as
-"let me know" are surfaced separately for contextual review because they can be leaked
-assistant chatter or intentional prose addressed to the reader.
+"let me know" are surfaced separately for contextual review.
 
 ## Anti-pattern detection
 

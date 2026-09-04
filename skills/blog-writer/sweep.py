@@ -532,8 +532,8 @@ def parse(raw):
       fenced code, frontmatter, HTML comments
           not prose. `<!-- VERIFY: ... -->` markers and ```d2 diagram sources
           are draft machinery per `process.md` placeholder conventions. Draft
-          mode makes them transparent rather than deleting them. Final mode
-          scans VERIFY markers before this parser — see
+          mode makes them transparent rather than deleting them. Final mode also
+          scans unresolved machinery directly from the raw artifact through
           sweep_finalization_artifacts().
       headings
           not sentences. Counting them inflates the short-sentence runs #3/#4
@@ -905,12 +905,9 @@ def find_assistant_chatter_candidates(blocks):
 def sweep_finalization_artifacts(raw):
     """WP:FINALIZATION — unresolved draft machinery in a final artifact."""
     source = raw.split("\n")
-    excluded = excluded_spans(source)
     hits = []
 
     for index, text in enumerate(source, start=1):
-        if index - 1 in excluded:
-            continue
         for found in _PLACEHOLDER.finditer(text):
             token = found.group()
             hits.append(
@@ -926,8 +923,6 @@ def sweep_finalization_artifacts(raw):
 
     for found in re.finditer(r"<!--\s*VERIFY\b", raw, re.IGNORECASE):
         line = raw.count("\n", 0, found.start()) + 1
-        if line - 1 in excluded:
-            continue
         close = raw.find("-->", found.end())
         if close >= 0:
             token = raw[found.start() : close + 3]
