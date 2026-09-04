@@ -1,5 +1,16 @@
 # Changelog
 
+### Fixed
+
+- **Personal voice calibration now requires representative prose from the assignment's
+  writing mode** ([#53](https://github.com/jbaruch/blog-writer/issues/53)) — an approved
+  identity or a list of rhetorical devices can no longer stand in for evidence. The writer
+  selects two or three passages with known authorship, compares five voice dimensions before
+  and after editing, checks paragraph continuity for card-deck flow, protects dependent
+  punchlines and earned connective tissue, and reports mechanical, manual, and voice states
+  independently. Two eval fixtures cover the unresolved-evidence path and an evidence-backed
+  continuity repair.
+
 ## 1.1.39 — 2026-09-03
 
 ### Added

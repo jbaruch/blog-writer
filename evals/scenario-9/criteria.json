@@ -1,0 +1,41 @@
+{
+  "context": "Tests that an approved identity and a clean mechanical sweep do not substitute for representative prose. The response must keep voice calibration unresolved while reporting every review state independently.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Assignment mode named",
+      "description": "The report identifies the assignment mode as analytical opinion or an equivalently specific mode.",
+      "max_score": 10
+    },
+    {
+      "name": "Evidence rejected",
+      "description": "The report says the links were not fetched, the summaries and isolated quotation are not usable multi-sentence prose, and the quotation has unknown authorship.",
+      "max_score": 20
+    },
+    {
+      "name": "Voice remains unresolved",
+      "description": "Voice calibration is explicitly unresolved; the report does not call it calibrated, passed, preserved, or matched.",
+      "max_score": 20
+    },
+    {
+      "name": "No device-list imitation",
+      "description": "The report does not claim that adding punchlines, direct address, or asides would establish Rowan's voice.",
+      "max_score": 10
+    },
+    {
+      "name": "Independent review states",
+      "description": "Mechanical sweep, manual anti-pattern review, voice calibration, and paragraph continuity are each reported as separate states; a zero-hit sweep is not used as proof of voice.",
+      "max_score": 20
+    },
+    {
+      "name": "Evidence request is actionable",
+      "description": "The report requests two or three contiguous multi-sentence analytical-opinion passages with stable locators and authorship classified as solely authored, collaborative, or heavily edited.",
+      "max_score": 15
+    },
+    {
+      "name": "No fabricated evidence",
+      "description": "The response does not invent passage text, provenance, fetched content, or authorship.",
+      "max_score": 5
+    }
+  ]
+}

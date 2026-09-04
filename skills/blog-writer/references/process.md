@@ -54,6 +54,10 @@ Skip this section if no product context is configured.]
 ## Editorial Plan
 [Phase 2: main idea sentence, CTA, series context, approved structure outline]
 
+## Voice Calibration
+[Phase 2+: assignment mode, two or three representative passages and their authorship,
+readiness, comparison notes, paragraph continuity result]
+
 ## Draft Notes
 [Phase 3+: any decisions made during writing, author feedback, revision notes]
 ```
@@ -217,7 +221,18 @@ than any amount of praise — it shows the author has real experience, not just 
 talking points. The limitation doesn't need its own section; it can live inside the
 technical meat or the broader point as a natural aside.
 
-### 2f: Structural Audit of the Outline
+### 2f: Voice Calibration Plan
+
+Name the assignment mode and apply `skills/blog-writer/references/voice-calibration.md`.
+Select two or three contiguous passages from that mode, record their authorship, and note
+what each demonstrates across the five calibration dimensions. Store the result in the
+research memory bank.
+
+If the identity has no usable matching prose, mark voice calibration unresolved. Ask the
+author for evidence, then continue only with that state visible. Do not substitute an
+approved manifest, a device list, isolated lines, or unread URLs for the missing passages.
+
+### 2g: Structural Audit of the Outline
 
 Before the checkpoint, audit the outline against `skills/blog-writer/references/structural-audits.md`. Run the
 three outline-level audits **one at a time** — the study behind them found aspect-based
@@ -255,10 +270,10 @@ audits exist to prevent.
 
 **Purpose:** Write the post. Use the approved structure. Follow the tone guide religiously.
 
-**If personal identity is selected, re-read its voice resource now.** Do not rely on memory
-from earlier in the conversation. Confirm you can name at least 3 rhetorical devices from
-the profile before writing. With corporate-only writing, use the generic tone guide for
-expression and do not invent an individual persona.
+**If personal identity is selected, re-read its voice resource and selected calibration
+passages now.** Do not rely on memory from earlier in the conversation. Name the assignment
+mode and confirm whether the evidence gate is ready or unresolved. With corporate-only
+writing, use the generic tone guide for expression and do not invent an individual persona.
 
 ### Writing rules:
 
@@ -267,20 +282,24 @@ expression and do not invent an individual persona.
 2. **Write sections in narrative order.** The reader should feel like they're on a journey,
    not reading a report.
 
-3. **Every section must earn its place.** If a section doesn't serve the main idea or the
-   narrative arc, cut it or fold it into another section.
+3. **Every section must earn its place.** If a section doesn't serve the main idea, the
+   narrative arc, or an earned digression, cut it or fold it into another section. Keep a
+   digression whose detour changes how the reader receives the next beat.
 
 4. **Code blocks are part of the story.** Don't dump code without context. Set up why the
    reader is about to see this code, show it, then explain what it means.
 
 5. **Sentence and paragraph craft.** Apply the rules from `skills/blog-writer/references/tone-guide.md` section
    "Sentence & Paragraph Craft" while writing — not just during review. Key checks:
-   - One new idea per sentence. If you're cramming, split.
+   - One new competing idea per sentence. Related ideas may share a sentence when their
+     relationship is the point. If you're cramming unrelated claims, split.
    - Generalize before listing unfamiliar items ("three tools: X, Y, Z").
    - Strong subjects (real actors) and strong verbs (real actions). Don't hide actions
      behind state verbs or nominalizations.
-   - One topic per paragraph. First sentence = main idea or hook.
-   - Every paragraph must advance the reader toward the main idea (point B from Phase 2).
+   - One developing topic per paragraph. Its first sentence opens, develops, or qualifies
+     the current movement; it need not restate a miniature thesis.
+   - Every paragraph must move the reader toward the main idea, carry necessary connective
+     tissue, or earn a digression that changes the next beat.
 
 6. **Maintain narrative density in EVERY section, not just the opening.** This is the most
    common quality failure. The opening hook always has personality because writers focus
@@ -487,7 +506,8 @@ section "Sentence & Paragraph Craft":
   tell a coherent story? Flag any that are vague ("Let's consider another aspect...") or
   that don't connect to the preceding paragraph's conclusion.
 - **Goal alignment:** For each paragraph, ask "does this advance the reader toward point B?"
-  Flag any paragraph that's interesting but tangential.
+  Preserve connective tissue and an earned digression that changes how the next beat lands.
+  Flag a tangent that changes neither the argument nor the reader's relationship to it.
 
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
 look at the grammatical skeleton only. Ask: "Do these two sentences have the same shape?"
@@ -540,10 +560,13 @@ pattern in a different surface form. This is especially true for:
 Do not consider an anti-pattern fixed until the replacement passes a full-catalog scan
 on its own.
 
-**Voice check:** After confirming the rewrite is anti-pattern clean, re-read it against the
-personal voice resource when selected. If it is correct but flat, redo it using the
-author's documented devices. For corporate-only writing, check human readability against
-the generic tone guide and corporate identity instead.
+**Voice calibration:** After confirming the rewrite is anti-pattern clean, apply
+`skills/blog-writer/references/voice-calibration.md`. For personal identity, re-read the
+selected evidence and compare the pre-edit and post-edit prose on narrator presence, spoken
+cadence, connective flow, reader relationship, and argument movement. Documented devices
+are evidence-backed options, not quotas. For corporate-only writing, mark personal voice
+calibration not applicable and check human readability against the generic tone guide and
+corporate identity instead.
 
 **Proportionality check:** After all rewrites are done, compare the edited draft against
 the pre-scan version and ask two questions at the draft level:
@@ -580,6 +603,12 @@ Apply at most two interventions from the file's menu to any one post, and vary t
 posts. Uniform application of the whole menu is the convergence trap the file opens with —
 it trades one detectable shape for another.
 
+Run the paragraph continuity check from `skills/blog-writer/references/voice-calibration.md`
+after the structural audits and every later prose edit. Test adjacent paragraph pairs and
+at least one run of three or more paragraphs. Repair reorderable cards by restoring real
+argument movement. Preserve a dependent punchline paragraph, an earned digression,
+connective tissue, and related ideas that belong together.
+
 Run the product accuracy check when a selected identity declares `product-context`. Verify
 every claim about the product — feature names, CLI commands, behavior, and terminology —
 against authoritative pages fetched in Phase 0. Fetch any newly needed page through the
@@ -605,8 +634,10 @@ Run the tightening pass. Re-read the draft sentence by sentence with fresh eyes:
   better than 2,000 words with padding.
 
 **Checkpoint:** Write the first draft to `blog-draft-[slug].md` in the working directory.
-Tell the author the file is ready for review. Also display a summary in conversation: word
-count, placeholder counts by type, and any open questions or flags.
+Tell the author the file is ready for review. Also display a summary in conversation with
+word count, placeholder counts by type, open questions, mechanical sweep state, manual
+anti-pattern review state, voice calibration state and evidence, assignment mode, and
+paragraph continuity state. Report each state independently.
 
 ---
 
@@ -615,9 +646,10 @@ count, placeholder counts by type, and any open questions or flags.
 **Purpose:** Iterate based on author feedback. This phase loops until the author declares
 the post done.
 
-**If personal identity is selected, re-read its voice resource now.** Every time you enter
-Phase 4 or return after author feedback, re-read it. Long revision cycles are where voice
-drift happens.
+**If personal identity is selected, re-read its voice resource and selected calibration
+passages now.** Every time you enter Phase 4 or return after author feedback, re-read them
+and restate the assignment mode and calibration readiness. Long revision cycles are where
+voice drift happens.
 
 **Draft is a file.** All revisions happen in `blog-draft-[slug].md` using the Edit tool.
 This gives the author a persistent artifact they can review in their editor, diff against
@@ -650,6 +682,8 @@ conversation — edit the file surgically.
   introduce redundancy with existing content
 - Re-run structural audits 3, 4, and 5 on new or rewritten sections. A section added in
   Phase 4 has been through no structural check at all
+- Re-run voice calibration and paragraph continuity on new or rewritten prose. Compare the
+  pre-edit and post-edit text, then report all four review states independently
 
 **The post is done when the author says it's done. Not before.**
 
@@ -665,7 +699,7 @@ Do not record it here — invoking the writer from both places would file the po
 |-------|------|-------------|
 | 0: Intake | Material read, gaps identified | Automatic |
 | 1: Clarification | All gaps resolved | Author confirms |
-| 2: Editorial Planning | Main idea + CTA + outline approved, outline audited | Author approves |
-| 3: First Draft | Draft written, anti-patterns and structure checked | Delivered to author |
+| 2: Editorial Planning | Main idea + CTA + outline approved, voice evidence gated, outline audited | Author approves |
+| 3: First Draft | Draft written; mechanical, manual, voice, continuity, and structure states reported | Delivered to author |
 | 4: Revision | Post meets author's standards | Author declares done |
 | Step 12: Record shape | Finished post's skeleton appended to the shape history | Automatic |

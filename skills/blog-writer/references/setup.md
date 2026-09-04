@@ -26,6 +26,10 @@ personas, and editorial feedback. Ask which sources are truly the author's voice
 were ghostwritten, heavily corporate-edited, experimental, or known to be weak. Read every
 accessible source selected for compilation.
 
+Ask which writing modes each source represents. Identify contiguous passages that show
+cadence, transitions, reader relationship, and argument movement; a URL or device summary
+does not substitute for reading the prose.
+
 ## 4. Analyze
 
 Look for register, confidence, relationship to the reader, argument construction,
