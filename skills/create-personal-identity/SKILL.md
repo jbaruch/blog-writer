@@ -1,6 +1,6 @@
 ---
 name: create-personal-identity
-description: Create, update, or audit a reusable personal writing identity from writing samples, transcripts, interviews, existing persona files, or editorial feedback. Use whenever someone wants to define, capture, refresh, migrate, or check an individual author's voice, tone, writing style, reasoning patterns, and writing preferences without absorbing employer brand rules.
+description: Creates, updates, migrates, and audits evidence-backed personal writing identity packages by tracing voice and composition guidance to source passages while excluding employer branding. Use when someone asks to capture their writing style, make a persona from their posts, build an author voice profile or tone guide, refresh an existing writing identity, migrate legacy persona files, or audit whether a profile matches its author.
 ---
 
 # Create Personal Identity
@@ -10,11 +10,11 @@ This skill is an action router — pick the step that matches the user's intent 
 Personal identity owns how an author sounds and reasons, never employer positioning,
 product claims, or corporate editorial policy.
 
-Before any action, read the lifecycle reference completely and follow its ownership and
-migration contract:
+Before any action, read both contracts completely:
 
 ```text
 skills/create-personal-identity/references/lifecycle.md
+skills/create-personal-identity/references/package-contract.md
 ```
 
 For Step 1 or Step 2, also read the shared storage contract before writing:
@@ -23,21 +23,8 @@ For Step 1 or Step 2, also read the shared storage contract before writing:
 skills/blog-writer/references/identity-storage.md
 ```
 
-Use this package contract:
-
-- Write `identity.json` with `schema_version: 1`, `type: personal`, a lowercase kebab-case
-  `name`, `status` set to `draft` or `approved`, `entrypoint: identity.md`, and
-  `sources: sources.md`.
-- When supporting files exist, add `resources` as an ordered array of `{role, path}`
-  objects. Each `role` is lowercase kebab-case. Each `path` is non-empty, does not start
-  with `~`, is relative, and stays inside the package.
-- Put concise shared guidance and routing in `identity.md`; add `voice`, `composition`,
-  `examples`, or `bio` resources only when evidence supports them.
-- In `sources.md`, record every source's location, date, scope, and authority.
-- Trace each consequential inference to evidence.
-- Label guidance Required, Preferred, Observed, Avoid, or Unresolved.
-- Distinguish explicit preferences from observed patterns.
-- Keep conflicting evidence and guidance visible.
+That contract lives with `blog-writer` because every identity type shares its destination,
+discovery, and selection layout.
 
 Use this approval loop for every consequential create or update:
 
@@ -45,37 +32,35 @@ Use this approval loop for every consequential create or update:
 - Show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
   unresolved items.
 - Ask one focused question at a time for consequential conflicts.
-- When the user rejects or corrects a conclusion, revise it.
-- Re-read each revised conclusion beside its cited sources.
-- Present each corrected conclusion with its cited sources.
+- Apply corrections, re-read each changed conclusion beside its cited sources, and present
+  the corrected conclusion with those sources.
 - Set `status` to `approved` only after explicit approval.
 
 ## Step 1 — Create a Personal Identity
 
-Inventory every source the user supplies before drawing conclusions. Accept local files or
-directories, URLs, pasted text, existing skills, transcripts, published posts, interviews,
-editorial feedback, and legacy persona files. Distinguish the author's own work from
-ghostwritten, heavily corporate-edited, experimental, or rejected material. Read each
-accessible source deeply enough to establish its scope and authority.
+1. Inventory every supplied file, directory, URL, pasted passage, existing skill,
+   transcript, published post, interview, feedback item, and legacy persona file.
+2. Classify each source as authored, ghostwritten, heavily corporate-edited, experimental,
+   rejected, or unresolved; record its scope and authority before drawing conclusions.
+3. Compile evidence about register, confidence, reader relationship, argument construction,
+   rhetorical devices, humor, references, technical depth, recurring elements, deliberate
+   variation, off-voice moves, and durable bio facts. Keep explicit preferences separate
+   from observed patterns; sample frequency is evidence, not a quota.
+4. Classify representative prose by writing mode and authorship. Route supported contiguous
+   passages through an `examples` resource.
+5. Mark a writing mode Unresolved when it lacks representative prose. Do not use these as
+   prose evidence:
 
-Compile evidence about register, confidence, reader relationship, argument construction,
-rhetorical devices, humor, references, technical depth, recurring elements, deliberate
-variation, off-voice moves, and durable bio facts. Keep explicit preferences separate from
-observed patterns. Sample frequency is evidence, not a quota.
+   - URLs whose prose has not been read
+   - summaries
+   - isolated lines
 
-Classify representative prose by writing mode and authorship. When the sources support it,
-route contiguous passages through an `examples` resource. Do not use these as prose
-evidence:
+6. Resolve the destination through the shared storage contract, write the package through
+   `skills/create-personal-identity/references/package-contract.md`, run the approval loop,
+   then finish here.
 
-- URLs whose prose has not been read
-- summaries
-- isolated lines
-
-They do not demonstrate cadence or paragraph flow. Record modes with insufficient prose as
-Unresolved.
-
-Resolve the destination through the shared storage contract. Write the package through the
-contract above, run the approval loop, then finish here.
+Before approval, confirm every declared resource and consequential guidance item traces to
+an inventoried source; leave any missing trace Unresolved.
 
 ## Step 2 — Migrate a Legacy Personal Identity
 
@@ -90,9 +75,10 @@ guidance and source history. Identify which conclusions the new sources confirm,
 replace, or leave unresolved; never regenerate the package as if prior decisions did not
 exist. Stop on a non-v1 package; Step 2 owns the only supported older shape.
 
-Apply accepted changes through the same package contract as Step 1. Keep the existing
-status only when changes do not alter consequential guidance. For consequential changes,
-run the approval loop. Finish here.
+Apply accepted changes through
+`skills/create-personal-identity/references/package-contract.md`. Keep the existing status
+only when changes do not alter consequential guidance. For consequential changes, run the
+approval loop. Finish here.
 
 ## Step 4 — Audit a Personal Identity
 

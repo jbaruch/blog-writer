@@ -4,13 +4,10 @@
 
 - `create-personal-identity` is the sole owner and writer. It reads every manifest and
   provenance field when it creates, updates, migrates, or audits a package.
-- `resolve-identities.py` is the validating reader for `blog-writer`. It requires
-  `schema_version: 1`, `type: personal`, a lowercase kebab-case `name`, `status` set to
-  `draft` or `approved`, `entrypoint: identity.md`, and `sources: sources.md`.
-- A missing `resources` field defaults to an empty ordered list. Each present resource must
-  be an object with a lowercase kebab-case `role` and a non-empty `path`. The path must not
-  start with `~`; it must be relative and stay inside the package. No other required field
-  has a default; a missing or malformed value makes resolution fail.
+- `resolve-identities.py` is the validating reader for `blog-writer`. It enforces the
+  manifest and resource schema in
+  `skills/create-personal-identity/references/package-contract.md`; a missing or malformed
+  required value makes resolution fail.
 - `blog-writer` reads only the files returned by a successful resolver result. It may inspect
   a draft but asks before using one for publishable content. It never writes the package or
   invents missing fields.
@@ -36,8 +33,9 @@ source and compile a new package at the destination resolved through
 5. Create `identity.md` with concise shared guidance and routing derived from the declared
    resources.
 6. Create `sources.md` with each legacy file's path, scope, authority, and migration notes.
-7. Create `identity.json` under the v1 contract with the chosen name, the ordered resources,
-   and `status: draft`.
+7. Create `identity.json` under
+   `skills/create-personal-identity/references/package-contract.md` with the chosen name,
+   the ordered resources, and `status: draft`.
 8. Run the approval loop and rewrite only `status` to `approved` after explicit approval.
 
 The completed manifest stamps the new package as `schema_version: 1`. Leave the legacy
