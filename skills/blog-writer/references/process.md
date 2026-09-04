@@ -426,7 +426,7 @@ halves fail. Keep them apart.
 Some patterns have a verdict that falls out of an arithmetic result: word counts
 per sentence, occurrences per section, character presence, runs and windows. Reading for
 them does not work. Uniform sentence length is invisible when reading for content and
-obvious when counting; a paired em-dash hides in a sentence you wrote yourself an hour ago.
+obvious when counting.
 
 Run `sweep.py` over the draft. `SKILL.md` Step 10 carries the invocation and the exit-code
 routing, and that is the only place they live. Which patterns it covers, and with what
@@ -434,6 +434,9 @@ figures, is the script's own contract — the run reports them in `.coverage.ran
 named constants under "Decision contract" at the top of `skills/blog-writer/sweep.py` hold
 the numbers. Do not reproduce either here or by reading. The fix for each pattern it
 reports is in `skills/blog-writer/references/ai-anti-patterns.md` under that pattern's number.
+The same object carries `.observations.em_dashes`: paired-aside locations and per-section
+counts. Those figures are inputs to the #7/#8 identity and genre judgment, never findings
+on their own.
 
 Re-run it after every rewrite: a clean draft plus one edit is an unchecked draft, and the
 most common way a tell ships is being introduced by the fix for something else.
@@ -454,6 +457,11 @@ not a finding.
   pattern #1 only when the two sides are candidates for the same slot, with the negation
   doing the work of "not". The "Not X. Y." form announces itself on a contextual read; this
   one does not, which is why it needs the literal search first and the judgment second.
+- **Em-dash calibration (#7/#8):** Read `.observations.em_dashes`, then compare its paired
+  asides and section counts with the selected same-mode calibration passages. Judge the
+  punctuation's rhetorical function and the assignment genre. A pair or a high count is a
+  candidate, not a finding. Preserve an earned interruption or identity-backed density;
+  report the judgment unresolved when usable calibration evidence is unavailable.
 - **Introductory filler words (#10):** Search for the watchlist words from the
   "introductory filler words" variant in pattern #10: "of course", "naturally", "obviously",
   "clearly", "certainly", "indeed", "in fact", "honestly", "frankly", "additionally",
@@ -462,12 +470,10 @@ not a finding.
   the meaning is unchanged, delete. If it is not, the word is doing real grammatical work
   and stays. No script can run that test. These accumulate invisibly — one per paragraph is
   death by a thousand cuts.
-- **AI vocabulary (#12):** Scan for the watchlist words (delve, leverage, tapestry,
-  landscape, pivotal, crucial, seamless, and the rest). One in a post is fine. Two or more
-  is a contamination event. Read the qualifiers in the watchlist rather than matching the
-  bare word: "highlight" is listed as a verb, "navigate" in its abstract sense, "rich" and
-  "key" only when figurative. In a technical post the literal senses are ordinary English
-  and are not hits, which is exactly the distinction a string match cannot make.
+- **AI vocabulary (#12):** Scan the canonical watchlist, including inflections of emphasize,
+  enhance, highlight, and showcase. Apply the current-versus-historical weights and the
+  usage qualifiers. One precise occurrence is not a finding. In a technical post the
+  literal senses are ordinary English and stay; concentration and usage make the verdict.
 - **Synonym cycling (#17):** Build a term inventory: list every noun phrase used for each
   core concept in the post. If any concept has more than one name, flag it. Cross-section
   cycling — one term in the intro, a different one in the conclusion — is the most common
@@ -488,10 +494,17 @@ not a finding.
   "passionate team", "drives business value"). Apply the interchangeability test: swap the
   product name for a competitor's. If the sentence still works, it is a cliché — replace it
   with a specific fact.
+- **Vague relationship (#40):** Search the candidate inventory, including `connected to`.
+  Apply the relationship test and name the role, cause, ownership, or function the evidence
+  supports. Keep literal technical connections whose domain meaning is already precise.
+- **Ceremonial coverage (#42):** Search for the named publication and source-quality
+  candidates. Ask what claim the source evidence establishes. A named publication stays
+  when the draft uses its reporting or measurement; flag it when appearing in coverage is
+  doing the work of proof.
 
 The remaining patterns in `skills/blog-writer/references/ai-anti-patterns.md` get the contextual read this
 pass is named for. The script's silence is not a verdict on them, and neither is a clean
-result on the seven above.
+result on the checks above.
 
 **Craft sweep (between Pass 1 and Pass 2):** Check the draft against `skills/blog-writer/references/tone-guide.md`
 section "Sentence & Paragraph Craft":

@@ -6,10 +6,8 @@
 #   2. Coverage is always stated — the report names what ran and what did not on
 #      a zero-hit run too, and never prints a bare "clean". This is the contract
 #      that stops a passing sweep from displacing the contextual read.
-#   3. #7 paired em-dash — fires on a real pair of any interior length, and does
-#      NOT pair across a sentence boundary or across two list items.
-#   4. #8 em-dash density — fires above the per-section limit, not at it, and
-#      counts per section rather than per document.
+#   3. #7/#8 em-dash observations — report exact pairs and per-section counts
+#      without producing hard findings or changing the exit code.
 #   5. #3/#4 fragment chains — fires on a run of short sentences, not on a
 #      shorter run, and not on a list of short items. Blockquotes count as
 #      prose; sentence boundaries survive a trailing capital.
@@ -27,8 +25,8 @@
 #      `verify_context` set on the sentence-counting sweeps only, since that is
 #      the flag SKILL.md routes on.
 #  11. Judgment patterns are never reported — the watchlist families stay with
-#      the agent, so no hit may carry #1, #10, #12, #17, #32, #35, #36, #40,
-#      or #41.
+#      the agent, so no hit may carry #1, #7, #8, #10, #12, #17, #32, #35,
+#      #36, #40, #41, or #42.
 #  12. Coverage total — read from references/ai-anti-patterns.md on every run,
 #      never a literal. A file that cannot be counted exits 2 rather than
 #      reporting a guessed figure, and so does a catalog no larger than the
@@ -189,6 +187,24 @@ assert_hit_line() {
   return 0
 }
 
+# Asserts the first paired em-dash observation sits on line $3.
+assert_emdash_observation_line() {
+  local label=$1 body=$2 expect_line=$3
+  local actual
+
+  sweep_fixture "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body"
+  actual=$(jq -r 'first(.observations.em_dashes.paired_asides[].line) // "none"' <<<"$CASE_OUT")
+
+  if [ "$actual" != "$expect_line" ]; then
+    fail "${label}: expected paired em-dash observation on line ${expect_line}, got ${actual}"
+    return 1
+  fi
+
+  ok
+  echo "  ${label}"
+  return 0
+}
+
 main() {
   set -uo pipefail
 
@@ -219,9 +235,11 @@ which everyone had quietly accepted as simply the cost of shipping anything at a
 We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
-  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
+  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 3'
   assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 4'
-  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 9'
+  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 12'
+  assert_json "em-dash verdicts are routed to judgment" "$clean_draft" 0 \
+    '([.coverage.ran[] | select(startswith("#7 ") or startswith("#8 "))] | length) == 0 and ([.coverage.not_run_judgment[] | select(startswith("#7 ") or startswith("#8 "))] | length) == 2'
   # The total is read out of the pattern file, never restated here — a literal
   # in the suite would be the same stale second copy the script stopped keeping.
   # grep's status is captured explicitly rather than discarded by the command
@@ -234,7 +252,7 @@ We cut it.'
   elif [ "$defined" -lt 2 ]; then
     fail "references/ai-anti-patterns.md reported only ${defined} pattern(s)"
   else
-    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
+    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 4 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
   fi
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
@@ -247,39 +265,37 @@ We cut it.'
     echo "  a zero-hit run still carries coverage"
   fi
 
-  # 2. #7 paired em-dash
-  assert_sweep "#7 fires on a real pair" \
+  # 2. #7/#8 em-dash observations
+  assert_json "a real pair is an observation, not a hard finding" \
     'Three facilities — Austin, Berlin, Osaka — ran the nightly job without complaint.' \
-    1 yes "PAIRED EM-DASH"
+    0 '(.hits | length) == 0 and .observations.em_dashes.total == 2 and .observations.em_dashes.paired_asides == [{"line":1,"token":"— Austin, Berlin, Osaka —","context":"Three facilities — Austin, Berlin, Osaka — ran the nightly job without complaint."}]'
 
   # Two asides in adjacent sentences are not one pair. Matching over the whole
   # paragraph would join the dash of one sentence to the dash of the next.
-  assert_sweep "#7 does not pair across a sentence boundary" \
+  assert_json "observations do not pair across a sentence boundary" \
     'The build broke — again, predictably. Nobody noticed for a while — the alerts were off.' \
-    0 no "PAIRED EM-DASH"
+    0 '.observations.em_dashes.total == 2 and (.observations.em_dashes.paired_asides | length) == 0'
 
   # Regression: two list items each ending in an em-dash aside were reported as
   # a single pair spanning both items.
-  assert_sweep "#7 does not pair across two list items" \
+  assert_json "observations do not pair across two list items" \
     '- **Surface scan** — matches known pattern forms
 - **Skeleton scan** — compares grammatical shape' \
-    0 no "PAIRED EM-DASH"
+    0 '.observations.em_dashes.total == 2 and (.observations.em_dashes.paired_asides | length) == 0'
 
-  # 3. #8 em-dash density, per section
-  assert_sweep "#8 fires above the section limit" \
+  assert_json "high em-dash density remains an observation" \
     '## Section
 
 One — two — three — four dashes live in this single section of the draft.' \
-    1 yes "em-dash density"
+    0 '(.hits | length) == 0 and .observations.em_dashes.sections == [{"heading":"## Section","line":1,"count":3}]'
 
-  assert_sweep "#8 does not fire at the section limit" \
+  assert_json "observations carry density below the former threshold too" \
     '## Section
 
 The build broke — twice that week. Nobody filed a ticket — we all just moved on.' \
-    0 no "em-dash density"
+    0 '.observations.em_dashes.sections == [{"heading":"## Section","line":1,"count":2}]'
 
-  # Counting per document rather than per section would flag this.
-  assert_sweep "#8 counts per section, not per document" \
+  assert_json "em-dash observations count per section" \
     '## First
 
 The build broke — twice that week. Nobody filed a ticket — we all moved on.
@@ -287,7 +303,7 @@ The build broke — twice that week. Nobody filed a ticket — we all moved on.
 ## Second
 
 The deploy stalled — briefly, that time. The alert stayed quiet — as it always does.' \
-    0 no "em-dash density"
+    0 '[.observations.em_dashes.sections[].count] == [2,2] and .observations.em_dashes.total == 4'
 
   # 4. #3/#4 fragment chains
   assert_sweep "#3/#4 fires on three short sentences" \
@@ -452,29 +468,29 @@ The final prose belongs here.' \
     0 no "thematic break between every section"
 
   # 8. Markdown exclusions
-  assert_sweep "fenced code does not contribute hits" \
+  assert_json "fenced code does not contribute em-dash observations" \
     '# Title
 
 ```bash
 echo "this — has — paired dashes and must be ignored"
 ```' \
-    0 no "PAIRED EM-DASH"
+    0 '.observations.em_dashes.total == 0 and (.observations.em_dashes.paired_asides | length) == 0'
 
-  assert_sweep "HTML comments do not contribute hits" \
+  assert_json "HTML comments do not contribute em-dash observations" \
     '# Title
 
 <!-- VERIFY: reconstructed — from — the transcript -->
 
 The paragraph itself is ordinary prose that carries no findings of any kind here.' \
-    0 no "PAIRED EM-DASH"
+    0 '.observations.em_dashes.total == 0 and (.observations.em_dashes.paired_asides | length) == 0'
 
-  assert_sweep "frontmatter does not contribute hits" \
+  assert_json "frontmatter does not contribute em-dash observations" \
     '---
 title: A — post — title
 ---
 
 The body itself is ordinary prose that carries no findings of any kind at all.' \
-    0 no "PAIRED EM-DASH"
+    0 '.observations.em_dashes.total == 0 and (.observations.em_dashes.paired_asides | length) == 0'
 
   assert_sweep "asset placeholders do not form a fragment chain" \
     '[Screenshot 01: the dashboard]
@@ -587,11 +603,17 @@ The prose itself carries nothing else wrong at all in any way whatsoever.' \
 > anywhere near the first of them, so it must not read as two.' \
     0 no "fragment chain"
 
-  # Regression: the span cap silently exempted the long asides that are the most
-  # characteristic form of #7.
-  assert_sweep "#7 finds a pair spanning more than 80 characters" \
-    'The system — a Rails monolith running on three boxes in a colo nobody remembers renting — finally fell over.' \
-    1 yes "PAIRED EM-DASH"
+  # Regression: the span cap silently exempted long aside candidates.
+  assert_json "em-dash observations include pairs spanning more than 80 characters" \
+    'The system — a Rails monolith running on three aging boxes in a colo nobody on the current team remembers renting or visiting — finally fell over.' \
+    0 '(.observations.em_dashes.paired_asides | length) == 1 and (.observations.em_dashes.paired_asides[0].token | length) > 80'
+
+  # Wrapped prose is one sentence, but observation tokens remain one line for
+  # stable display and downstream routing.
+  assert_json "wrapped em-dash observation tokens are normalized" \
+    'The system — a Rails monolith running on three aging boxes
+in a colo nobody remembers — finally fell over.' \
+    0 '.observations.em_dashes.paired_asides[0].token == "— a Rails monolith running on three aging boxes in a colo nobody remembers —"'
 
   # Regression: an opener with no closer made every later line transparent, so a
   # draft with no blocks swept clean. A false clean is the worst outcome this
@@ -683,7 +705,7 @@ title: It failed. We knew. Nobody cared.
 The body carries nothing wrong at all so the sweep must stay entirely quiet.' \
     0 '(.hits | length) == 0'
 
-  assert_sweep "a matched fence is still excluded" \
+  assert_json "a matched fence is still excluded from em-dash observations" \
     '# Title
 
 ````bash
@@ -691,7 +713,7 @@ echo "this — has — paired dashes and must be ignored"
 ````
 
 The prose itself carries nothing wrong at all, so the sweep must stay quiet.' \
-    0 no "PAIRED EM-DASH"
+    0 '.observations.em_dashes.total == 0 and (.observations.em_dashes.paired_asides | length) == 0'
 
   # Regression: a group was labelled a list if ANY line in it looked like a list
   # item, so prose running straight into a list (valid markdown, no blank line)
@@ -728,7 +750,7 @@ It failed. We knew. Nobody cared.
 Three facilities — Austin, Berlin, Osaka — ran the nightly job without complaint.'
   if ! jq -e '[.hits[] | select(.pattern == "#3/#4" or .pattern == "#14") | .verify_context] | length > 0 and all' <<<"$CASE_OUT" >/dev/null; then
     fail "sentence-counting hits do not carry verify_context true"
-  elif ! jq -e '[.hits[] | select(.pattern == "#7" or .pattern == "#8" or .pattern == "#18") | .verify_context] | all(. == false)' <<<"$CASE_OUT" >/dev/null; then
+  elif ! jq -e '[.hits[] | select(.pattern == "#18") | .verify_context] | all(. == false)' <<<"$CASE_OUT" >/dev/null; then
     fail "character-counting hits carry verify_context true"
   else
     ok
@@ -737,9 +759,10 @@ Three facilities — Austin, Berlin, Osaka — ran the nightly job without compl
 
   # 9. Judgment families are never reported
   sweep_fixture judgment 'Rather than delve into the tapestry, we leveraged a seamless, robust paradigm.
-In todays landscape, it is important to note that this is, of course, pivotal.'
+In todays landscape, it is important to note that this is, of course, pivotal.
+The release — covered in trade publications — was connected to the platform team.'
   local leaked
-  leaked=$(jq -r '[.hits[].pattern] - ["#3/#4","#7","#8","#14","#18","WP:OAICITE","WP:TRACKING","WP:SECTIONBREAK"] | join(" ")' <<<"$CASE_OUT")
+  leaked=$(jq -r '[.hits[].pattern | select(. == "#1" or . == "#7" or . == "#8" or . == "#10" or . == "#12" or . == "#17" or . == "#32" or . == "#35" or . == "#36" or . == "#40" or . == "#41" or . == "#42")] | join(" ")' <<<"$CASE_OUT")
   if [ -n "$leaked" ]; then
     fail "judgment patterns reported as hits: ${leaked} — those stay with the agent"
   else
@@ -749,13 +772,13 @@ In todays landscape, it is important to note that this is, of course, pivotal.'
 
   # 10. The object shape every consumer routes on
   local json_fixture="${SUITE_TMP}/shape.md"
-  printf '%s\n' 'Three facilities — Austin, Berlin, Osaka — ran the job.' >"$json_fixture"
+  printf '%s\n' 'He said “no” and left before the deployment finished.' >"$json_fixture"
   local json_out json_rc
   json_out=$("$PYTHON" "$SCRIPT" "$json_fixture")
   json_rc=$?
   if [ "$json_rc" -ne 1 ]; then
     fail "object shape: expected exit 1 on a hit, got ${json_rc}"
-  elif ! jq -e '.ok == true and .mode == "draft" and (.hits | length) >= 1 and (.path | length) > 0' <<<"$json_out" >/dev/null; then
+  elif ! jq -e '.ok == true and .mode == "draft" and (.hits | length) >= 1 and (.path | length) > 0 and (.candidates | has("assistant_chatter")) and (.observations | has("em_dashes"))' <<<"$json_out" >/dev/null; then
     fail "object shape: output is not the promised object"
   elif ! jq -e '.hits[0] | has("pattern") and has("label") and has("line") and has("detail") and has("context") and has("verify_context") and has("token")' <<<"$json_out" >/dev/null; then
     fail "object shape: a hit is missing a documented field"
@@ -767,7 +790,7 @@ In todays landscape, it is important to note that this is, of course, pivotal.'
   # 11. Exact hit lines. Excluded regions are blanked rather than deleted, so a
   # finding after frontmatter or a multi-line comment still points at the line
   # the author sees in their editor.
-  assert_hit_line "line is exact after frontmatter" \
+  assert_emdash_observation_line "em-dash observation line is exact after frontmatter" \
     '---
 title: A post
 date: 2026-01-01
@@ -776,9 +799,9 @@ date: 2026-01-01
 # Heading
 
 Three facilities — Austin, Berlin, Osaka — ran the nightly job.' \
-    "#7" 8
+    8
 
-  assert_hit_line "line is exact after a multi-line HTML comment" \
+  assert_emdash_observation_line "em-dash observation line is exact after a multi-line HTML comment" \
     '# Heading
 
 <!-- VERIFY: reconstructed
@@ -786,7 +809,7 @@ Three facilities — Austin, Berlin, Osaka — ran the nightly job.' \
      confirm this -->
 
 Three facilities — Austin, Berlin, Osaka — ran the nightly job.' \
-    "#7" 7
+    7
 
   # A multi-line comment must not join the prose on either side of it into one
   # line, and must not split a paragraph the author wrote as one. Deleting the
@@ -815,22 +838,22 @@ time nobody noticed until the pager went off at three in the morning.' \
     0 no "fragment chain"
 
   # Inside a list, the finding points at the item, not at the block.
-  assert_hit_line "line is the list item, not the block" \
+  assert_emdash_observation_line "em-dash observation line is the list item, not the block" \
     '# Heading
 
 - a plain first item
 - a plain second item
 - a third item — with an aside — inside it' \
-    "#7" 5
+    5
 
   # Inside a wrapped paragraph, the finding points at the sentence's own line.
-  assert_hit_line "line is the sentence, not the paragraph" \
+  assert_emdash_observation_line "em-dash observation line is the sentence, not the paragraph" \
     '# Heading
 
 This first sentence is perfectly ordinary and carries nothing worth reporting.
 This second one is also ordinary and equally quiet on every count.
 The third — an aside — is not.' \
-    "#7" 5
+    5
 
   # 11. Error paths all exit 2 with an actionable diagnostic
   local case_err
@@ -905,16 +928,16 @@ The third — an aside — is not.' \
     echo "  a pattern file with no numbered headings exits 2"
   fi
 
-  # A catalog no larger than the sweep is the dangerous case. At exactly six
+  # A catalog no larger than the sweep is the dangerous case. At exactly four
   # the note claims zero unexamined while not_run_judgment still names sweeps;
-  # below six the arithmetic goes negative. Both must fail rather than report.
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
+  # below four the arithmetic goes negative. Both must fail rather than report.
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n' >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog of exactly the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
-    fail "the exactly-six diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
+  elif ! grep -qF 'not more than the 4 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+    fail "the exactly-four diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
     echo "  a catalog of exactly the examined count exits 2"
@@ -925,7 +948,7 @@ The third — an aside — is not.' \
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 4 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok

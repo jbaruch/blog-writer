@@ -17,7 +17,7 @@ kinds of work. This script owns one of them.
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script covers 6 numbered patterns across 5 sweeps (#3 and #4 share the
+This script covers 4 numbered patterns across 3 sweeps (#3 and #4 share the
 fragment-chain sweep), plus supplemental fixed-output checks. It says so on
 every run. The numbered total is counted from `references/ai-anti-patterns.md`
 rather than restated here.
@@ -37,7 +37,8 @@ Input:
 Output (stdout):
     A single JSON object (`script-delegation` Script Requirements):
       {"ok": true, "path": "<file>", "hits": [ ... ],
-       "candidates": {"assistant_chatter": [ ... ]}, "coverage": { ... }}
+       "candidates": {"assistant_chatter": [ ... ]},
+       "observations": { ... }, "coverage": { ... }}
 
     Each hit carries {"pattern", "label", "line", "detail", "context",
     "verify_context", "token"}. `line` is the 1-indexed source line. `token`
@@ -47,6 +48,10 @@ Output (stdout):
     Each assistant-chatter candidate carries {"pattern", "label", "line",
     "detail", "context", "token", "test"}. These ambiguous phrases require
     contextual review and do not affect the exit code.
+
+    `observations.em_dashes` carries paired-aside locations and per-section
+    counts. They require the identity/genre judgment in patterns #7 and #8 and
+    never affect the exit code on their own.
 
     `coverage` carries {"ran", "supplemental_checks", "not_run_judgment",
     "patterns_examined", "patterns_total", "note"}. It is present on every run,
@@ -88,17 +93,6 @@ FRAGMENT_RUN = 3
 # #14 — "any run of 3+ consecutive sentences within 5 words of each other"
 BURSTINESS_RUN = 3
 BURSTINESS_SPREAD = 5
-
-# #8 — "Count em-dashes per section. More than two in a section is a flag."
-EMDASH_PER_SECTION = 2
-
-# #7 — a paired em-dash is an aside inside one sentence, so the pair is matched
-# per sentence. There is deliberately no cap on how much text may sit between
-# the two dashes: the pattern's rule is that every pair is a finding, and a cap
-# silently exempted the long asides ("The system — a Rails monolith running in a
-# colo nobody remembers renting — fell over") that are the most characteristic
-# form of it. Per-sentence matching, not a length limit, is what keeps two
-# unrelated asides from reading as one pair.
 
 EM_DASH = "—"
 
@@ -180,13 +174,11 @@ ANTI_PATTERNS_FILE = (
 # not a pattern.
 PATTERN_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 
-# Six, not five: #3 and #4 are two patterns sharing one fragment-chain sweep.
-PATTERNS_EXAMINED = 6
+# Four, not three: #3 and #4 are two patterns sharing one fragment-chain sweep.
+PATTERNS_EXAMINED = 4
 
 COUNTING_SWEEPS = [
     ("#3/#4", "fragment chains"),
-    ("#7", "paired em-dashes"),
-    ("#8", "em-dash density"),
     ("#14", "low burstiness"),
     ("#18", "unicode giveaways"),
 ]
@@ -205,6 +197,8 @@ FINAL_SUPPLEMENTAL_SWEEP = (
 
 JUDGMENT_SWEEPS = [
     ("#1", "contrastive negation — is it the same slot?"),
+    ("#7", "paired em-dashes — compare identity, genre, and rhetorical function"),
+    ("#8", "em-dash density — compare observations with same-mode evidence"),
     ("#10", "introductory filler — apply the delete test"),
     ("#12", "AI vocabulary — the watchlist qualifiers are the check"),
     ("#17", "synonym cycling — do two phrases denote one concept?"),
@@ -213,6 +207,7 @@ JUDGMENT_SWEEPS = [
     ("#36", "corporate cliche — apply the interchangeability test"),
     ("#40", "vague connection — name the relationship"),
     ("#41", "source-unavailability hedging — cut unsupported claims"),
+    ("#42", "ceremonial coverage — use what the source establishes"),
 ]
 
 # --- Sentence segmentation ---------------------------------------------------
@@ -541,9 +536,9 @@ def parse(raw):
       list items and table rows (for #3/#4 and #14 only)
           a list of five three-word items is a list, not a fragment chain, and
           parallel list items are supposed to be uniform in length. Flagging
-          them would fire on every post that contains a list. Em-dash sweeps
-          (#7, #8) and the unicode sweep (#18) still cover list text, since an
-          em-dash in a list item is still an em-dash.
+          them would fire on every post that contains a list. Em-dash
+          observations (#7, #8) and the unicode sweep (#18) still cover list
+          text, including em dashes inside list items.
       placeholder lines
           `[Screenshot 01: ...]` is an asset marker, not a sentence.
 
@@ -707,51 +702,51 @@ def sweep_fragments(blocks):
     return hits
 
 
-def sweep_paired_emdash(blocks):
-    """#7 — every paired em-dash. Each occurrence is a flag regardless of count.
+def observe_emdashes(blocks, sections):
+    """Count #7/#8 candidates without turning them into findings.
 
-    Matched per sentence: a parenthetical aside lives inside one sentence, so
-    matching across the whole text would pair the dash of one sentence with the
-    dash of the next.
+    Pair locations and section counts are arithmetic. Their verdict depends on
+    author identity, assignment genre, and rhetorical function, so patterns #7
+    and #8 own the judgment.
     """
     pattern = re.compile(EM_DASH + r"[^" + EM_DASH + r"]+" + EM_DASH)
 
-    hits = []
+    pairs = []
     for block in blocks:
         if block.kind in ("heading", "placeholder"):
             continue
         for number, sentence in sentence_units(block):
             for match in pattern.finditer(sentence):
-                hits.append(
-                    hit(
-                        "#7",
-                        "PAIRED EM-DASH",
-                        number,
-                        match.group().replace("\n", " "),
-                        sentence,
-                    )
+                pairs.append(
+                    {
+                        "line": number,
+                        "token": " ".join(match.group().split()),
+                        "context": " ".join(sentence.split())[:90],
+                    }
                 )
-    return hits
 
-
-def sweep_emdash_density(sections):
-    """#8 — more than two em-dashes in a section."""
-    hits = []
+    section_counts = []
     for heading, line, blocks in sections:
         count = sum(
             block.text.count(EM_DASH) for block in blocks if block.kind != "placeholder"
         )
-        if count > EMDASH_PER_SECTION:
-            hits.append(
-                hit(
-                    "#8",
-                    "em-dash density",
-                    line,
-                    f"{count} em-dashes (limit {EMDASH_PER_SECTION})",
-                    heading,
-                )
-            )
-    return hits
+        section_counts.append(
+            {
+                "heading": heading,
+                "line": line,
+                "count": count,
+            }
+        )
+
+    return {
+        "paired_asides": pairs,
+        "sections": section_counts,
+        "total": sum(section["count"] for section in section_counts),
+        "note": (
+            "Observations only: apply patterns #7 and #8 with same-mode identity "
+            "evidence and assignment genre."
+        ),
+    }
 
 
 def sweep_burstiness(blocks):
@@ -975,10 +970,9 @@ def sweep_section_breaks(raw):
 
 def run_sweeps(raw, mode="draft"):
     blocks, sections = parse(raw)
+    observations = {"em_dashes": observe_emdashes(blocks, sections)}
     hits = []
     hits += sweep_fragments(blocks)
-    hits += sweep_paired_emdash(blocks)
-    hits += sweep_emdash_density(sections)
     hits += sweep_burstiness(blocks)
     hits += sweep_unicode(blocks)
     hits += sweep_citation_artifacts(blocks)
@@ -990,7 +984,7 @@ def run_sweeps(raw, mode="draft"):
     candidates = {
         "assistant_chatter": find_assistant_chatter_candidates(blocks),
     }
-    return hits, candidates
+    return hits, candidates, observations
 
 
 # --- Result -----------------------------------------------------------------
@@ -1028,9 +1022,9 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
 
     total = len(PATTERN_HEADING.findall(text))
     # The floor is strictly above the examined count, not zero. This script's
-    # whole contract is that it covers a minority: at six the note reports zero
-    # unexamined while `not_run_judgment` still names seven sweeps it did not
-    # run, and below six the arithmetic goes negative ("-3 of the 3 patterns
+    # whole contract is that it covers a minority: at four the note reports zero
+    # unexamined while `not_run_judgment` still names twelve checks it did not
+    # run, and below four the arithmetic goes negative ("-1 of the 3 patterns
     # were not examined"). Both are structured nonsense, which is worse than no
     # report at all.
     if total <= PATTERNS_EXAMINED:
@@ -1045,7 +1039,7 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
     return total
 
 
-def result(path, hits, candidates, patterns_total, mode="draft"):
+def result(path, hits, candidates, observations, patterns_total, mode="draft"):
     """The full result object.
 
     `coverage` is not decoration. This script examines a minority of the
@@ -1060,6 +1054,7 @@ def result(path, hits, candidates, patterns_total, mode="draft"):
         "mode": mode,
         "hits": hits,
         "candidates": candidates,
+        "observations": observations,
         "coverage": {
             "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
             "supplemental_checks": [
@@ -1136,9 +1131,19 @@ def main(argv=None):
         print(exc, file=sys.stderr)
         return 2
 
-    hits, candidates = run_sweeps(raw, args.mode)
+    hits, candidates, observations = run_sweeps(raw, args.mode)
     print(
-        json.dumps(result(path, hits, candidates, patterns_total, args.mode), indent=2)
+        json.dumps(
+            result(
+                path,
+                hits,
+                candidates,
+                observations,
+                patterns_total,
+                args.mode,
+            ),
+            indent=2,
+        )
     )
     return 1 if hits else 0
 

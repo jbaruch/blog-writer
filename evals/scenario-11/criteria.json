@@ -1,0 +1,56 @@
+{
+  "context": "Tests the remaining #57 prose-catalog work: ceremonial coverage versus actual source evidence, connected-to relationship judgment, current versus historical vocabulary weighting, identity/genre-calibrated em-dash observations, and valid Markdown boundaries.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Ceremonial coverage flagged",
+      "description": "The independent-coverage/featured-in/trade-publications sentence is identified as ceremonial proof and removed or rewritten around evidence rather than publication status.",
+      "max_score": 14
+    },
+    {
+      "name": "Used publication evidence retained",
+      "description": "The Wired and InfoQ measurement sentence is retained in substance and is not flagged merely for naming publications; the report explains that it uses what the sources established.",
+      "max_score": 12
+    },
+    {
+      "name": "Vague relationships resolved",
+      "description": "The connected-to rollout and associated-with retry-queue claims are flagged as hiding concrete roles and are rewritten from available evidence or marked for verification rather than guessed.",
+      "max_score": 12
+    },
+    {
+      "name": "Literal technical connection retained",
+      "description": "The client connected to Postgres over TLS remains unchanged in substance and is explicitly treated as precise domain language, not pattern #40.",
+      "max_score": 10
+    },
+    {
+      "name": "Em dashes calibrated",
+      "description": "The report uses the same-mode passages and rhetorical function to judge the em-dash observations, does not invoke a two-per-section hard threshold, and preserves the draft's earned aside or gives a specific evidence-backed reason to change it.",
+      "max_score": 14
+    },
+    {
+      "name": "Current vocabulary cluster fixed",
+      "description": "The showcasing/emphasizing/seamless promotional cluster is flagged and rewritten around facts.",
+      "max_score": 10
+    },
+    {
+      "name": "Precise highlight usage retained",
+      "description": "The trace-highlights sentence is retained or changed only for a concrete prose reason; one precise use is not treated as contamination.",
+      "max_score": 7
+    },
+    {
+      "name": "Historical term weighted weakly",
+      "description": "The single use of delve is recognized as a historical, weak standalone signal; any rewrite is for plainness and not presented as proof of AI authorship.",
+      "max_score": 7
+    },
+    {
+      "name": "Markdown constructs preserved",
+      "description": "The H1, H2 headings, list, repeated title metadata, and useful comparison table remain valid constructs and are not flagged as AI prose.",
+      "max_score": 9
+    },
+    {
+      "name": "Accuracy stays separate",
+      "description": "The report keeps source correctness and link health in an accuracy or source-verification category instead of treating them as style tells.",
+      "max_score": 5
+    }
+  ]
+}
