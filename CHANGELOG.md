@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.41 — 2026-09-04
+
 ### Fixed
 
 - **Finalization now catches leaked residue and unresolved draft machinery**
