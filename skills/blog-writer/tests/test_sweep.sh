@@ -34,7 +34,13 @@
 #      reporting a guessed figure, and so does a catalog no larger than the
 #      sweep's own examined count, which would report zero unexamined or drive
 #      the note negative.
-#  13. Entry-point guard — importing the module runs nothing.
+#  13. Draft/final modes — draft mode permits the five supported placeholders
+#      and VERIFY comments; final mode reports every unresolved marker while
+#      accepting ordinary headings, lists, tables, and repeated title metadata.
+#  14. Interface residue — standalone contentReference and oaicite tokens,
+#      Perplexity uploads, generalized writing wrappers, and assistant chatter
+#      report their exact token and source line.
+#  15. Entry-point guard — importing the module runs nothing.
 #
 # Approach: every fixture is written programmatically into a suite-owned temp
 # directory, so the suite touches no network, clock, randomness, or real draft.
@@ -71,10 +77,18 @@ ok() {
 sweep_fixture() {
   local name=$1
   local body=$2
+  sweep_fixture_mode "$name" "$body" draft
+}
+
+# Writes $2 to a fixture named $1 and sweeps it in $3. Sets CASE_OUT and CASE_RC.
+sweep_fixture_mode() {
+  local name=$1
+  local body=$2
+  local mode=$3
   local fixture="${SUITE_TMP}/${name}.md"
 
   printf '%s\n' "$body" >"$fixture"
-  CASE_OUT=$("$PYTHON" "$SCRIPT" "$fixture" 2>"${SUITE_TMP}/err")
+  CASE_OUT=$("$PYTHON" "$SCRIPT" --mode "$mode" "$fixture" 2>"${SUITE_TMP}/err")
   CASE_RC=$?
   CASE_ERR=$(cat "${SUITE_TMP}/err")
 }
@@ -121,6 +135,26 @@ assert_json() {
   local label=$1 body=$2 expect_rc=$3 filter=$4
 
   sweep_fixture "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body"
+
+  if [ "$CASE_RC" -ne "$expect_rc" ]; then
+    fail "${label}: expected exit ${expect_rc}, got ${CASE_RC} (stderr: ${CASE_ERR})"
+    return 1
+  fi
+  if ! jq -e "$filter" <<<"$CASE_OUT" >/dev/null; then
+    fail "${label}: filter '${filter}' did not hold on the result"
+    return 1
+  fi
+
+  ok
+  echo "  ${label}"
+  return 0
+}
+
+# Asserts a mode-specific run exits $4 and satisfies jq filter $5.
+assert_json_mode() {
+  local label=$1 body=$2 mode=$3 expect_rc=$4 filter=$5
+
+  sweep_fixture_mode "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body" "$mode"
 
   if [ "$CASE_RC" -ne "$expect_rc" ]; then
     fail "${label}: expected exit ${expect_rc}, got ${CASE_RC} (stderr: ${CASE_ERR})"
@@ -185,7 +219,7 @@ We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
   assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
-  assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 3'
+  assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 4'
   assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 9'
   # The total is read out of the pattern file, never restated here — a literal
   # in the suite would be the same stale second copy the script stopped keeping.
@@ -320,6 +354,36 @@ turn1search2 +1' \
   assert_sweep "unclassified writing wrappers are citation artifacts" \
     ':::writing{variant="document" id=12345}' \
     1 yes "unclassified writing wrapper"
+
+  assert_json "standalone ChatGPT residue reports exact tokens and lines" \
+    'Ordinary prose starts here.
+
+contentReference
+
+oaicite' \
+    1 '[.hits[] | select(.pattern == "WP:OAICITE") | {line, token}] == [{"line":3,"token":"contentReference"},{"line":5,"token":"oaicite"}]'
+
+  assert_json "composite contentReference remains one exact token" \
+    'contentReference[oaicite:7]{index=12}' \
+    1 '[.hits[] | select(.pattern == "WP:OAICITE")] == [{"pattern":"WP:OAICITE","label":"citation artifact","line":1,"detail":"ChatGPT contentReference","context":"contentReference[oaicite:7]{index=12}","verify_context":false,"token":"contentReference[oaicite:7]{index=12}"}]'
+
+  assert_json "Perplexity upload residue reports its exact token" \
+    'The pasted marker was ppl-ai-file-upload and it must not ship.' \
+    1 'any(.hits[]; .pattern == "WP:OAICITE" and .token == "ppl-ai-file-upload" and .line == 1)'
+
+  assert_json "generalized writing wrappers report every exact token" \
+    ':::writing{id="alpha"}
+:::writing{audience="developers" tone="direct"}
+:::writing{}' \
+    1 '[.hits[] | select(.pattern == "WP:OAICITE") | .token] == [":::writing{id=\"alpha\"}",":::writing{audience=\"developers\" tone=\"direct\"}",":::writing{}"]'
+
+  assert_json "assistant chatter reports exact tokens and source lines" \
+    'I hope this helps.
+
+Would you like a second version?
+
+Please let me know if you want changes.' \
+    1 '[.hits[] | select(.pattern == "WP:ASSISTANT") | {line, token}] == [{"line":1,"token":"I hope this helps"},{"line":3,"token":"Would you like"},{"line":5,"token":"let me know"}]'
 
   assert_sweep "AI-source tracking parameters are reported" \
     'Read https://example.test/post?utm_source=chatgpt.com and judge the source yourself.' \
@@ -686,9 +750,9 @@ In todays landscape, it is important to note that this is, of course, pivotal.'
   json_rc=$?
   if [ "$json_rc" -ne 1 ]; then
     fail "object shape: expected exit 1 on a hit, got ${json_rc}"
-  elif ! jq -e '.ok == true and (.hits | length) >= 1 and (.path | length) > 0' <<<"$json_out" >/dev/null; then
+  elif ! jq -e '.ok == true and .mode == "draft" and (.hits | length) >= 1 and (.path | length) > 0' <<<"$json_out" >/dev/null; then
     fail "object shape: output is not the promised object"
-  elif ! jq -e '.hits[0] | has("pattern") and has("label") and has("line") and has("detail") and has("context") and has("verify_context")' <<<"$json_out" >/dev/null; then
+  elif ! jq -e '.hits[0] | has("pattern") and has("label") and has("line") and has("detail") and has("context") and has("verify_context") and has("token")' <<<"$json_out" >/dev/null; then
     fail "object shape: a hit is missing a documented field"
   else
     ok
@@ -888,7 +952,61 @@ The third — an aside — is not.' \
     echo "  a missing pattern file exits 2"
   fi
 
-  # 13. Entry-point guard — importing runs nothing and prints nothing
+  # 13. Draft and final modes
+  local unresolved_draft='[Screenshot 01: dashboard]
+[Code 01: command output]
+[Link 01: product documentation]
+[Fact 01: adoption count]
+[Diagram 01: request flow]
+<!-- VERIFY: replace every unresolved marker -->'
+
+  assert_json_mode "draft mode permits supported placeholders and VERIFY" \
+    "$unresolved_draft" draft 0 \
+    '.mode == "draft" and (.hits | length) == 0 and (.coverage.supplemental_checks | length) == 4'
+
+  assert_json_mode "final mode reports every supported placeholder and VERIFY" \
+    "$unresolved_draft" final 1 \
+    '.mode == "final" and ([.hits[] | select(.pattern == "WP:FINALIZATION")] | length) == 6 and ([.hits[] | select(.pattern == "WP:FINALIZATION") | .line] == [1,2,3,4,5,6]) and all(.hits[] | select(.pattern == "WP:FINALIZATION"); (.token | length) > 0) and (.coverage.supplemental_checks | length) == 5'
+
+  assert_json_mode "final mode reports a multiline VERIFY marker exactly" \
+    $'Ordinary prose before the marker.\n\n<!-- VERIFY: reconstructed\nconfirm the source -->\n\nOrdinary prose after the marker.' \
+    final 1 \
+    'any(.hits[]; .pattern == "WP:FINALIZATION" and .line == 3 and .token == "<!-- VERIFY: reconstructed\nconfirm the source -->")'
+
+  assert_json_mode "final mode accepts normal blog Markdown" \
+    '---
+title: A useful guide
+---
+
+# A useful guide
+
+## What changed
+
+The deploy now finishes quickly enough for the team to watch it complete.
+
+- one measured result
+- one operational caveat
+
+## Useful comparison
+
+| Item | Use |
+| --- | --- |
+| Cache | Repeated reads |
+| Queue | Deferred work |' \
+    final 0 \
+    '.mode == "final" and (.hits | length) == 0'
+
+  assert_json_mode "final mode does not confuse verification prose with a marker" \
+    'The verification pass checked every cited source and every destination link.' \
+    final 0 \
+    '(.hits | length) == 0'
+
+  assert_json_mode "final mode also blocks deterministic assistant residue" \
+    'The implementation details are complete. Let me know if you want another version.' \
+    final 1 \
+    'any(.hits[]; .pattern == "WP:ASSISTANT" and .token == "Let me know" and .line == 1)'
+
+  # 15. Entry-point guard — importing runs nothing and prints nothing
   local import_out
   import_out=$(cd "$SCRIPT_DIR" && "$PYTHON" -c 'import sweep' 2>&1)
   if [ -n "$import_out" ]; then

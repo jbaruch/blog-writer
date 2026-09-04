@@ -1,5 +1,15 @@
 # Changelog
 
+### Fixed
+
+- **Finalization now fails on assistant residue and unresolved draft machinery**
+  ([#58](https://github.com/jbaruch/blog-writer/issues/58)) — `sweep.py` gains explicit
+  draft and final modes. Both catch standalone ChatGPT citation tokens, Perplexity upload
+  markers, generalized writing wrappers, and assistant-to-user chatter with the exact token
+  and source line. Draft mode still permits the five supported asset placeholders and their
+  VERIFY comments; final mode blocks them. Ordinary headings, lists, tables, and repeated
+  title metadata remain valid blog Markdown.
+
 ## 1.1.40 — 2026-09-04
 
 ### Fixed

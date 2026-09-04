@@ -268,11 +268,14 @@ procedure in order, and never invent a pattern the file or mechanical sweep does
 a script, never by reading. Run it over the draft:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
+python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py \
+  --mode draft blog-draft-[slug].md
 ```
 
-Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`, `context`
-and `verify_context` per finding. `.coverage.ran` names numbered patterns the script checks.
+Stdout is a JSON object. `.mode` names the requested contract. `.hits[]` carries `pattern`,
+`label`, `line`, `detail`, `context`, `verify_context`, and `token` per finding. `token` is
+the exact matched text for deterministic residue and finalization hits. `.coverage.ran`
+names numbered patterns the script checks.
 `.coverage.supplemental_checks` names fixed-output checks outside the numbered catalog.
 `.coverage` also carries `not_run_judgment`, `patterns_examined`, `patterns_total` and
 `note`. Route on the exit code:
@@ -327,7 +330,20 @@ Proceed immediately to Step 11.
 Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
 change. `skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
 
-Gate: the author declares the post done.
+After the author declares the post done, run the final artifact gate:
+
+```bash
+python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py \
+  --mode final blog-draft-[slug].md
+```
+
+Use Step 10's exit-code routing. Exit 1 blocks finalization until every deterministic
+assistant-residue hit, supported asset placeholder, and `VERIFY` marker is resolved and the
+final-mode sweep exits 0. Exit 2 stops the workflow with its diagnostic. This gate checks
+residue and unresolved draft machinery; citation and link accuracy remain in the
+product-accuracy and source-verification passes.
+
+Gate: the author declares the post done and the final-mode sweep exits 0.
 
 Proceed immediately to Step 12.
 
