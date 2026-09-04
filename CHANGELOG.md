@@ -9,7 +9,9 @@
   and after editing, checks paragraph continuity for card-deck flow, protects dependent
   punchlines and earned connective tissue, and reports mechanical, manual, and voice states
   independently. Two eval fixtures cover the unresolved-evidence path and an evidence-backed
-  continuity repair.
+  continuity repair. The personal-identity authoring contract now has a concrete v1 manifest
+  template and a dedicated package reference shared by create, migrate, update, and audit
+  paths.
 
 ## 1.1.39 — 2026-09-03
 
