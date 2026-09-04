@@ -720,7 +720,7 @@ def observe_emdashes(blocks, sections):
                 pairs.append(
                     {
                         "line": number,
-                        "token": match.group(),
+                        "token": " ".join(match.group().split()),
                         "context": " ".join(sentence.split())[:90],
                     }
                 )

@@ -8,7 +8,9 @@
   contemporary models in its cited comparison, only Claude exceeded professional writers.
   That evidence moves paired asides and section counts from hard sweep hits to arithmetic
   observations judged against author identity, assignment mode, genre, and rhetorical
-  function. The catalog adds ceremonial proof by coverage, extends vague relationships with
+  function. Sentence-length uniformity stays in the arithmetic sweep because reading for
+  content can hide a pattern that becomes clear in the counts. The catalog adds ceremonial
+  proof by coverage, extends vague relationships with
   `connected to`, aligns the current emphasize/enhance/highlight/showcase families while
   retaining weaker historical terms, and separates source indicators, Wikipedia/interface
   residue, developer-blog craft checks, and accuracy defects. A new eval fixture exercises

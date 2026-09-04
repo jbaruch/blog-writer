@@ -608,6 +608,13 @@ The prose itself carries nothing else wrong at all in any way whatsoever.' \
     'The system — a Rails monolith running on three aging boxes in a colo nobody on the current team remembers renting or visiting — finally fell over.' \
     0 '(.observations.em_dashes.paired_asides | length) == 1 and (.observations.em_dashes.paired_asides[0].token | length) > 80'
 
+  # Wrapped prose is one sentence, but observation tokens remain one line for
+  # stable display and downstream routing.
+  assert_json "wrapped em-dash observation tokens are normalized" \
+    'The system — a Rails monolith running on three aging boxes
+in a colo nobody remembers — finally fell over.' \
+    0 '.observations.em_dashes.paired_asides[0].token == "— a Rails monolith running on three aging boxes in a colo nobody remembers —"'
+
   # Regression: an opener with no closer made every later line transparent, so a
   # draft with no blocks swept clean. A false clean is the worst outcome this
   # script can produce, and it exited 0 while examining nothing.

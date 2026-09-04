@@ -51,10 +51,9 @@ in three passes:
 - Soul check, a holistic read for sterile, voiceless writing that passes pattern checks
   but still reads as obviously AI
 
-Four of the patterns are counted rather than read. Fragment chains, sentence-length
-uniformity, and unicode giveaways have verdicts that fall out of arithmetic, and reading
-for them does not work: uniform sentence length is invisible when you read for content and
-obvious when you count. Those run as a script (`sweep.py`) over the draft. The same run
+Four patterns are covered by three counting sweeps. They check fragment chains (#3/#4),
+sentence-length uniformity (#14), and unicode giveaways (#18). Those run as a script
+(`sweep.py`) over the draft. The same run
 reports paired em-dash locations and per-section counts as observations for an identity-
 and genre-calibrated judgment; punctuation counts alone do not fail the draft. Every run
 reports what it did not examine, so a passing sweep cannot be mistaken for a passing check.
