@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.40 — 2026-09-04
+
 ### Fixed
 
 - **Personal voice calibration now requires representative prose from the assignment's
