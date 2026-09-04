@@ -56,7 +56,7 @@ sentence-length uniformity (#14), and unicode giveaways (#18). Those run as a sc
 (`sweep.py`) over the draft. The same run
 reports paired em-dash locations and per-section counts as observations for an identity-
 and genre-calibrated judgment; punctuation counts alone do not fail the draft. Every run
-reports what it did not examine, so a passing sweep cannot be mistaken for a passing check.
+reports what it did not examine.
 
 The rest stay with the model. Their check is a reading, not a match: whether deleting a
 filler word changes the meaning, whether a product claim still works with a competitor's
