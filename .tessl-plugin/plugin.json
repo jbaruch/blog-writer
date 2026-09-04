@@ -1,6 +1,6 @@
 {
   "name": "jbaruch/blog-writer",
-  "version": "1.1.39",
+  "version": "1.1.40",
   "private": false,
   "description": "Write developer blog posts from video transcripts, meeting notes, or rough ideas while composing reusable personal and explicitly selected corporate writing identities, then checking each draft against the full AI anti-pattern catalog and structural audits.",
   "skills": [
