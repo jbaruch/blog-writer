@@ -36,12 +36,17 @@ Input:
 
 Output (stdout):
     A single JSON object (`script-delegation` Script Requirements):
-      {"ok": true, "path": "<file>", "hits": [ ... ], "coverage": { ... }}
+      {"ok": true, "path": "<file>", "hits": [ ... ],
+       "candidates": {"assistant_chatter": [ ... ]}, "coverage": { ... }}
 
     Each hit carries {"pattern", "label", "line", "detail", "context",
     "verify_context", "token"}. `line` is the 1-indexed source line. `token`
     is the exact matched text for deterministic residue and finalization hits;
     aggregate counting hits use null.
+
+    Each assistant-chatter candidate carries {"pattern", "label", "line",
+    "detail", "context", "token", "test"}. These ambiguous phrases require
+    contextual review and do not affect the exit code.
 
     `coverage` carries {"ran", "supplemental_checks", "not_run_judgment",
     "patterns_examined", "patterns_total", "note"}. It is present on every run,
@@ -141,7 +146,7 @@ CITATION_ARTIFACTS = [
     ),
 ]
 
-ASSISTANT_CHATTER = [
+ASSISTANT_CHATTER_CANDIDATES = [
     ("assistant sign-off", re.compile(r"\bI hope this helps\b", re.IGNORECASE)),
     ("assistant offer", re.compile(r"\bWould you like\b", re.IGNORECASE)),
     ("assistant follow-up", re.compile(r"\blet me know\b", re.IGNORECASE)),
@@ -189,7 +194,7 @@ COUNTING_SWEEPS = [
 SUPPLEMENTAL_SWEEPS = [
     ("WP:OAICITE", "citation-artifact leakage"),
     ("WP:TRACKING", "AI-source tracking parameters"),
-    ("WP:ASSISTANT", "assistant-to-user chatter"),
+    ("WP:ASSISTANT", "assistant-chatter candidate discovery"),
     ("WP:SECTIONBREAK", "thematic breaks between every section"),
 ]
 
@@ -869,23 +874,32 @@ def sweep_tracking_parameters(blocks):
     return hits
 
 
-def sweep_assistant_chatter(blocks):
-    """WP:ASSISTANT — assistant-to-user residue left in reader-visible text."""
-    hits = []
+def find_assistant_chatter_candidates(blocks):
+    """Locate phrases that need a reader-facing-prose judgment.
+
+    The same phrase can be leaked assistant chatter or an intentional address to
+    the post's reader. The script reports exact locations; it does not decide
+    which use the author intended.
+    """
+    candidates = []
     for number, text in eligible_lines(blocks):
-        for description, pattern in ASSISTANT_CHATTER:
+        for description, pattern in ASSISTANT_CHATTER_CANDIDATES:
             for found in pattern.finditer(text):
-                hits.append(
-                    hit(
-                        "WP:ASSISTANT",
-                        "assistant chatter",
-                        number,
-                        description,
-                        text,
-                        token=found.group(),
-                    )
+                candidates.append(
+                    {
+                        "pattern": "WP:ASSISTANT",
+                        "label": "possible assistant chatter",
+                        "line": number,
+                        "detail": description,
+                        "context": " ".join(text.split())[:90],
+                        "token": found.group(),
+                        "test": (
+                            "remove only if an assistant is addressing the author; "
+                            "keep intentional prose addressed to the post's reader"
+                        ),
+                    }
                 )
-    return hits
+    return candidates
 
 
 def sweep_finalization_artifacts(raw):
@@ -974,12 +988,14 @@ def run_sweeps(raw, mode="draft"):
     hits += sweep_unicode(blocks)
     hits += sweep_citation_artifacts(blocks)
     hits += sweep_tracking_parameters(blocks)
-    hits += sweep_assistant_chatter(blocks)
     hits += sweep_section_breaks(raw)
     if mode == "final":
         hits += sweep_finalization_artifacts(raw)
     hits.sort(key=lambda h: (h["line"], h["pattern"]))
-    return hits
+    candidates = {
+        "assistant_chatter": find_assistant_chatter_candidates(blocks),
+    }
+    return hits, candidates
 
 
 # --- Result -----------------------------------------------------------------
@@ -1034,7 +1050,7 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
     return total
 
 
-def result(path, hits, patterns_total, mode="draft"):
+def result(path, hits, candidates, patterns_total, mode="draft"):
     """The full result object.
 
     `coverage` is not decoration. This script examines a minority of the
@@ -1048,6 +1064,7 @@ def result(path, hits, patterns_total, mode="draft"):
         "path": str(path),
         "mode": mode,
         "hits": hits,
+        "candidates": candidates,
         "coverage": {
             "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
             "supplemental_checks": [
@@ -1124,8 +1141,10 @@ def main(argv=None):
         print(exc, file=sys.stderr)
         return 2
 
-    hits = run_sweeps(raw, args.mode)
-    print(json.dumps(result(path, hits, patterns_total, args.mode), indent=2))
+    hits, candidates = run_sweeps(raw, args.mode)
+    print(
+        json.dumps(result(path, hits, candidates, patterns_total, args.mode), indent=2)
+    )
     return 1 if hits else 0
 
 

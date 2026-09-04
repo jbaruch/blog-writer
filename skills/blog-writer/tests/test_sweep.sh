@@ -38,8 +38,9 @@
 #      and VERIFY comments; final mode reports every unresolved marker while
 #      accepting ordinary headings, lists, tables, and repeated title metadata.
 #  14. Interface residue — standalone contentReference and oaicite tokens,
-#      Perplexity uploads, generalized writing wrappers, and assistant chatter
-#      report their exact token and source line.
+#      Perplexity uploads, and generalized writing wrappers report their exact
+#      token and source line. Ambiguous assistant-chatter phrases are reported
+#      as candidates, not findings, with legitimate reader invitations covered.
 #  15. Entry-point guard — importing the module runs nothing.
 #
 # Approach: every fixture is written programmatically into a suite-owned temp
@@ -377,13 +378,17 @@ oaicite' \
 :::writing{}' \
     1 '[.hits[] | select(.pattern == "WP:OAICITE") | .token] == [":::writing{id=\"alpha\"}",":::writing{audience=\"developers\" tone=\"direct\"}",":::writing{}"]'
 
-  assert_json "assistant chatter reports exact tokens and source lines" \
+  assert_json "assistant chatter candidates report exact tokens and source lines" \
     'I hope this helps.
 
 Would you like a second version?
 
 Please let me know if you want changes.' \
-    1 '[.hits[] | select(.pattern == "WP:ASSISTANT") | {line, token}] == [{"line":1,"token":"I hope this helps"},{"line":3,"token":"Would you like"},{"line":5,"token":"let me know"}]'
+    0 '[.candidates.assistant_chatter[] | {line, token}] == [{"line":1,"token":"I hope this helps"},{"line":3,"token":"Would you like"},{"line":5,"token":"let me know"}] and ([.hits[] | select(.pattern == "WP:ASSISTANT")] | length) == 0'
+
+  assert_json "reader invitation remains a candidate rather than a blocker" \
+    'If you have measured this failure mode, let me know in the comments.' \
+    0 '(.hits | length) == 0 and [.candidates.assistant_chatter[] | {line, token}] == [{"line":1,"token":"let me know"}]'
 
   assert_sweep "AI-source tracking parameters are reported" \
     'Read https://example.test/post?utm_source=chatgpt.com and judge the source yourself.' \
@@ -1001,10 +1006,10 @@ The deploy now finishes quickly enough for the team to watch it complete.
     final 0 \
     '(.hits | length) == 0'
 
-  assert_json_mode "final mode also blocks deterministic assistant residue" \
+  assert_json_mode "final mode routes ambiguous assistant chatter to judgment" \
     'The implementation details are complete. Let me know if you want another version.' \
-    final 1 \
-    'any(.hits[]; .pattern == "WP:ASSISTANT" and .token == "Let me know" and .line == 1)'
+    final 0 \
+    '(.hits | length) == 0 and any(.candidates.assistant_chatter[]; .token == "Let me know" and .line == 1)'
 
   # 15. Entry-point guard — importing runs nothing and prints nothing
   local import_out

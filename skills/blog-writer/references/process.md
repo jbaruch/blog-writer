@@ -690,9 +690,10 @@ conversation — edit the file surgically.
 **The author decides when revision is done.** Their declaration starts the final artifact
 gate. Run `sweep.py --mode final` through the invocation and exit-code contract in SKILL.md
 Step 11. Final mode blocks every supported asset placeholder, unresolved `VERIFY` marker,
-and deterministic assistant-residue hit. Resolve every hit and rerun until the script exits
-0. Citation and link accuracy remain findings from the product-accuracy and
-source-verification passes, not this presence check.
+and deterministic interface-residue hit. Resolve every hit and rerun until the script exits
+0. Review every emitted assistant-chatter candidate in context; remove assistant-to-author
+residue and retain intentional reader-facing prose. Citation and link accuracy remain
+findings from the product-accuracy and source-verification passes, not this presence check.
 
 **Recording the post's shape** is Step 12 of the skill, not part of this phase. Once the
 author declares the post done, that step runs the writer and owns the routing contract.
