@@ -34,6 +34,11 @@ author to confirm. Diagrams earn their place when structure is the point (archit
 request flow, state transitions); a screenshot of the real system wins when it can show
 the same thing with less abstraction.
 
+The mechanical sweep has separate draft and final contracts. Draft mode permits the five
+placeholder types and their VERIFY comments. Final mode blocks every unresolved marker and
+deterministic interface residue before the finished post can be recorded. Phrases such as
+"let me know" are surfaced separately for contextual review.
+
 ## Anti-pattern detection
 
 Drafts are checked against a catalog of named AI writing anti-patterns, each with symptoms,

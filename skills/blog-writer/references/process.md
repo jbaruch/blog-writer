@@ -407,6 +407,8 @@ see. After reconstructing the narrative:
 Before the draft is finalized, ask the author to confirm or replace every placeholder.
 Cover all five types — Screenshot, Code, Link, Fact, Diagram — and treat the `VERIFY`
 comments on reconstructed code and diagrams as open questions rather than resolved content.
+The Phase 3 sweep runs with `--mode draft`, so these supported markers remain permitted
+while the author is still reviewing the artifact.
 
 ### After writing:
 
@@ -685,7 +687,13 @@ conversation — edit the file surgically.
 - Re-run voice calibration and paragraph continuity on new or rewritten prose. Compare the
   pre-edit and post-edit text, then report all four review states independently
 
-**The post is done when the author says it's done. Not before.**
+**The author decides when revision is done.** Their declaration starts the final artifact
+gate. Run `sweep.py --mode final` through the invocation and exit-code contract in SKILL.md
+Step 11. Final mode blocks every supported asset placeholder, unresolved `VERIFY` marker,
+and deterministic interface-residue hit. Resolve every hit and rerun until the script exits
+0. Review every emitted assistant-chatter candidate in context; remove assistant-to-author
+residue and retain intentional reader-facing prose. Citation and link accuracy remain
+findings from the product-accuracy and source-verification passes, not this presence check.
 
 **Recording the post's shape** is Step 12 of the skill, not part of this phase. Once the
 author declares the post done, that step runs the writer and owns the routing contract.
@@ -701,5 +709,5 @@ Do not record it here — invoking the writer from both places would file the po
 | 1: Clarification | All gaps resolved | Author confirms |
 | 2: Editorial Planning | Main idea + CTA + outline approved, voice evidence gated, outline audited | Author approves |
 | 3: First Draft | Draft written; mechanical, manual, voice, continuity, and structure states reported | Delivered to author |
-| 4: Revision | Post meets author's standards | Author declares done |
+| 4: Revision | Author declares done; final artifact sweep exits 0 | Author + automatic gate |
 | Step 12: Record shape | Finished post's skeleton appended to the shape history | Automatic |

@@ -268,11 +268,18 @@ procedure in order, and never invent a pattern the file or mechanical sweep does
 a script, never by reading. Run it over the draft:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py blog-draft-[slug].md
+python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py \
+  --mode draft blog-draft-[slug].md
 ```
 
-Stdout is a JSON object. `.hits[]` carries `pattern`, `label`, `line`, `detail`, `context`
-and `verify_context` per finding. `.coverage.ran` names numbered patterns the script checks.
+Stdout is a JSON object. `.mode` names the requested contract. `.hits[]` carries `pattern`,
+`label`, `line`, `detail`, `context`, `verify_context`, and `token` per finding. `token` is
+the exact matched text for deterministic residue and finalization hits.
+`.candidates.assistant_chatter[]` carries the exact line, token, context, and contextual
+test for phrases that could be assistant residue or intentional reader-facing prose. Review
+every candidate: remove it only when an assistant is addressing the author, and retain it
+when the post intentionally addresses its reader. `.coverage.ran`
+names numbered patterns the script checks.
 `.coverage.supplemental_checks` names fixed-output checks outside the numbered catalog.
 `.coverage` also carries `not_run_judgment`, `patterns_examined`, `patterns_total` and
 `note`. Route on the exit code:
@@ -283,6 +290,8 @@ and `verify_context` per finding. `.coverage.ran` names numbered patterns the sc
   covered by a script that just reported nothing.
 - After Exit 0, read for the sweeps in `.coverage.not_run_judgment`.
 - After Exit 0, read for every remaining pattern in `skills/blog-writer/references/ai-anti-patterns.md`.
+- After either Exit 0 or Exit 1, review every `.candidates.assistant_chatter[]` entry using
+  its emitted `test`; a candidate is not a finding and does not change the exit code.
 - **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
   of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
   the script placed sentence boundaries: read its `context` before rewriting, and if a
@@ -327,7 +336,23 @@ Proceed immediately to Step 11.
 Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
 change. `skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
 
-Gate: the author declares the post done.
+After the author declares the post done, run the final artifact gate:
+
+```bash
+python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py \
+  --mode final blog-draft-[slug].md
+```
+
+Use Step 10's exit-code routing. Exit 1 blocks finalization until every deterministic
+interface-residue hit, supported asset placeholder, and `VERIFY` marker is resolved and the
+final-mode sweep exits 0. Review every assistant-chatter candidate before finalization;
+remove actual assistant-to-author residue and keep intentional reader-facing prose. Exit 2
+stops the workflow with its diagnostic. This gate checks residue and unresolved draft
+machinery; citation and link accuracy remain in the product-accuracy and
+source-verification passes.
+
+Gate: the author declares the post done, the final-mode sweep exits 0, and every
+assistant-chatter candidate has a contextual disposition.
 
 Proceed immediately to Step 12.
 

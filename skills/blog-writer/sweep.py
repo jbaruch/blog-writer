@@ -18,7 +18,7 @@ kinds of work. This script owns one of them.
               (#1). No regex decides any of those. They stay with the agent.
 
 This script covers 6 numbered patterns across 5 sweeps (#3 and #4 share the
-fragment-chain sweep), plus 3 supplemental fixed-output checks. It says so on
+fragment-chain sweep), plus supplemental fixed-output checks. It says so on
 every run. The numbered total is counted from `references/ai-anti-patterns.md`
 rather than restated here.
 Every result carries its coverage, including a result with no findings: silence
@@ -26,18 +26,27 @@ about coverage is what lets a passing script displace the contextual read it
 never performed.
 
 Usage:
-    sweep.py <draft.md>
+    sweep.py [--mode draft|final] <draft.md>
 
 Input:
-    $1  path to the draft. Markdown is parsed, not treated as flat text — see
-        "What is excluded" in parse().
+    --mode  `draft` permits supported asset placeholders and VERIFY comments;
+            `final` reports them as finalization blockers. Defaults to `draft`.
+    draft   path to the draft. Markdown is parsed, not treated as flat text —
+            see "What is excluded" in parse().
 
 Output (stdout):
     A single JSON object (`script-delegation` Script Requirements):
-      {"ok": true, "path": "<file>", "hits": [ ... ], "coverage": { ... }}
+      {"ok": true, "path": "<file>", "hits": [ ... ],
+       "candidates": {"assistant_chatter": [ ... ]}, "coverage": { ... }}
 
-    Each hit carries {"pattern", "label", "line", "detail", "context"}, where
-    `line` is the 1-indexed line of the sentence the finding sits in.
+    Each hit carries {"pattern", "label", "line", "detail", "context",
+    "verify_context", "token"}. `line` is the 1-indexed source line. `token`
+    is the exact matched text for deterministic residue and finalization hits;
+    aggregate counting hits use null.
+
+    Each assistant-chatter candidate carries {"pattern", "label", "line",
+    "detail", "context", "token", "test"}. These ambiguous phrases require
+    contextual review and do not affect the exit code.
 
     `coverage` carries {"ran", "supplemental_checks", "not_run_judgment",
     "patterns_examined", "patterns_total", "note"}. It is present on every run,
@@ -117,8 +126,9 @@ UNICODE_GIVEAWAYS = [
 CITATION_ARTIFACTS = [
     (
         "ChatGPT contentReference",
-        re.compile(r"contentReference\[oaicite:\d+\]\{index=\d+\}"),
+        re.compile(r"\bcontentReference(?:\[oaicite:\d+\]\{index=\d+\}|\b)"),
     ),
+    ("ChatGPT oaicite", re.compile(r"(?<!contentReference\[)\boaicite\b")),
     ("ChatGPT oai_citation", re.compile(r"\boai_citation\b")),
     ("ChatGPT search reference", re.compile(r"\bturn\d+search\d+\b")),
     ("ChatGPT attributableIndex", re.compile(r"\battributableIndex\b")),
@@ -129,10 +139,17 @@ CITATION_ARTIFACTS = [
     ("DeepSeek line citation", re.compile(r"【\d+†L\d+(?:-\d+)?】")),
     ("Perplexity attached file", re.compile(r"\[attached_file:\d+\]")),
     ("Perplexity web citation", re.compile(r"\[web:\d+\]")),
+    ("Perplexity file upload", re.compile(r"\bppl-ai-file-upload\b")),
     (
         "unclassified writing wrapper",
-        re.compile(r':::writing\{variant="document" id=\d+\}'),
+        re.compile(r":::writing\{[^}\r\n]*\}"),
     ),
+]
+
+ASSISTANT_CHATTER_CANDIDATES = [
+    ("assistant sign-off", re.compile(r"\bI hope this helps\b", re.IGNORECASE)),
+    ("assistant offer", re.compile(r"\bWould you like\b", re.IGNORECASE)),
+    ("assistant follow-up", re.compile(r"\blet me know\b", re.IGNORECASE)),
 ]
 
 TRACKING_PARAMETERS = re.compile(
@@ -177,8 +194,14 @@ COUNTING_SWEEPS = [
 SUPPLEMENTAL_SWEEPS = [
     ("WP:OAICITE", "citation-artifact leakage"),
     ("WP:TRACKING", "AI-source tracking parameters"),
+    ("WP:ASSISTANT", "assistant-chatter candidate discovery"),
     ("WP:SECTIONBREAK", "thematic breaks between every section"),
 ]
+
+FINAL_SUPPLEMENTAL_SWEEP = (
+    "WP:FINALIZATION",
+    "unresolved placeholders and VERIFY markers",
+)
 
 JUDGMENT_SWEEPS = [
     ("#1", "contrastive negation — is it the same slot?"),
@@ -508,8 +531,10 @@ def parse(raw):
 
       fenced code, frontmatter, HTML comments
           not prose. `<!-- VERIFY: ... -->` markers and ```d2 diagram sources
-          are draft machinery per `process.md` placeholder conventions. They are
-          made transparent rather than deleted — see read_lines().
+          are draft machinery per `process.md` placeholder conventions. Draft
+          mode makes them transparent rather than deleting them. Final mode also
+          scans unresolved machinery directly from the raw artifact through
+          sweep_finalization_artifacts().
       headings
           not sentences. Counting them inflates the short-sentence runs #3/#4
           looks for. They are still swept for #18, which the reader sees.
@@ -619,7 +644,15 @@ def sentence_units(block):
         yield number, sentence
 
 
-def hit(pattern, label, line, detail, context="", verify_context=False):
+def hit(
+    pattern,
+    label,
+    line,
+    detail,
+    context="",
+    verify_context=False,
+    token=None,
+):
     """One finding.
 
     `verify_context` says whether the finding rests on where this script placed
@@ -637,6 +670,7 @@ def hit(pattern, label, line, detail, context="", verify_context=False):
         "detail": detail,
         "context": " ".join(context.split())[:90],
         "verify_context": verify_context,
+        "token": token,
     }
 
 
@@ -795,8 +829,7 @@ def sweep_citation_artifacts(blocks):
     for number, text in eligible_lines(blocks):
         chatgpt_artifact = False
         for description, pattern in CITATION_ARTIFACTS:
-            found = pattern.search(text)
-            if found:
+            for found in pattern.finditer(text):
                 chatgpt_artifact = chatgpt_artifact or description.startswith("ChatGPT")
                 hits.append(
                     hit(
@@ -805,6 +838,7 @@ def sweep_citation_artifacts(blocks):
                         number,
                         description,
                         found.group(),
+                        token=found.group(),
                     )
                 )
         if chatgpt_artifact and re.search(r"\+1\s*$", text):
@@ -815,6 +849,7 @@ def sweep_citation_artifacts(blocks):
                     number,
                     "ChatGPT trailing +1",
                     "+1",
+                    token="+1",
                 )
             )
     return hits
@@ -833,8 +868,76 @@ def sweep_tracking_parameters(blocks):
                     number,
                     parameter,
                     text,
+                    token=found.group(),
                 )
             )
+    return hits
+
+
+def find_assistant_chatter_candidates(blocks):
+    """Locate phrases that need a reader-facing-prose judgment.
+
+    The same phrase can be leaked assistant chatter or an intentional address to
+    the post's reader. The script reports exact locations; it does not decide
+    which use the author intended.
+    """
+    candidates = []
+    for number, text in eligible_lines(blocks):
+        for description, pattern in ASSISTANT_CHATTER_CANDIDATES:
+            for found in pattern.finditer(text):
+                candidates.append(
+                    {
+                        "pattern": "WP:ASSISTANT",
+                        "label": "possible assistant chatter",
+                        "line": number,
+                        "detail": description,
+                        "context": " ".join(text.split())[:90],
+                        "token": found.group(),
+                        "test": (
+                            "remove only if an assistant is addressing the author; "
+                            "keep intentional prose addressed to the post's reader"
+                        ),
+                    }
+                )
+    return candidates
+
+
+def sweep_finalization_artifacts(raw):
+    """WP:FINALIZATION — unresolved draft machinery in a final artifact."""
+    source = raw.split("\n")
+    hits = []
+
+    for index, text in enumerate(source, start=1):
+        for found in _PLACEHOLDER.finditer(text):
+            token = found.group()
+            hits.append(
+                hit(
+                    "WP:FINALIZATION",
+                    "unresolved asset placeholder",
+                    index,
+                    token,
+                    text,
+                    token=token,
+                )
+            )
+
+    for found in re.finditer(r"<!--\s*VERIFY\b", raw, re.IGNORECASE):
+        line = raw.count("\n", 0, found.start()) + 1
+        close = raw.find("-->", found.end())
+        if close >= 0:
+            token = raw[found.start() : close + 3]
+        else:
+            token = raw[found.start() :].split("\n", 1)[0]
+        hits.append(
+            hit(
+                "WP:FINALIZATION",
+                "unresolved VERIFY marker",
+                line,
+                token,
+                token,
+                token=token,
+            )
+        )
     return hits
 
 
@@ -870,7 +973,7 @@ def sweep_section_breaks(raw):
     ]
 
 
-def run_sweeps(raw):
+def run_sweeps(raw, mode="draft"):
     blocks, sections = parse(raw)
     hits = []
     hits += sweep_fragments(blocks)
@@ -881,8 +984,13 @@ def run_sweeps(raw):
     hits += sweep_citation_artifacts(blocks)
     hits += sweep_tracking_parameters(blocks)
     hits += sweep_section_breaks(raw)
+    if mode == "final":
+        hits += sweep_finalization_artifacts(raw)
     hits.sort(key=lambda h: (h["line"], h["pattern"]))
-    return hits
+    candidates = {
+        "assistant_chatter": find_assistant_chatter_candidates(blocks),
+    }
+    return hits, candidates
 
 
 # --- Result -----------------------------------------------------------------
@@ -937,7 +1045,7 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
     return total
 
 
-def result(path, hits, patterns_total):
+def result(path, hits, candidates, patterns_total, mode="draft"):
     """The full result object.
 
     `coverage` is not decoration. This script examines a minority of the
@@ -949,12 +1057,19 @@ def result(path, hits, patterns_total):
     return {
         "ok": True,
         "path": str(path),
+        "mode": mode,
         "hits": hits,
+        "candidates": candidates,
         "coverage": {
             "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
             "supplemental_checks": [
                 f"{number} {name}" for number, name in SUPPLEMENTAL_SWEEPS
-            ],
+            ]
+            + (
+                [f"{FINAL_SUPPLEMENTAL_SWEEP[0]} {FINAL_SUPPLEMENTAL_SWEEP[1]}"]
+                if mode == "final"
+                else []
+            ),
             "not_run_judgment": [
                 f"{number} {name}" for number, name in JUDGMENT_SWEEPS
             ],
@@ -976,6 +1091,12 @@ def main(argv=None):
         description="Counting sweeps of the Pass 1 anti-pattern check.",
     )
     parser.add_argument("draft", help="path to the draft markdown file")
+    parser.add_argument(
+        "--mode",
+        choices=("draft", "final"),
+        default="draft",
+        help="draft permits placeholders; final reports unresolved draft machinery",
+    )
     args = parser.parse_args(argv)
 
     path = Path(args.draft)
@@ -1015,8 +1136,10 @@ def main(argv=None):
         print(exc, file=sys.stderr)
         return 2
 
-    hits = run_sweeps(raw)
-    print(json.dumps(result(path, hits, patterns_total), indent=2))
+    hits, candidates = run_sweeps(raw, args.mode)
+    print(
+        json.dumps(result(path, hits, candidates, patterns_total, args.mode), indent=2)
+    )
     return 1 if hits else 0
 
 
