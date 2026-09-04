@@ -57,9 +57,10 @@ Rhetorical devices are evidence, never quotas. Naming three devices does not est
 calibration. Adding a joke, aside, or punchline to generic analyst prose does not repair the
 five dimensions above.
 
-Report `voice calibrated` only when readiness is `ready` and the final comparison matches
-the selected passages without copying their wording. Report `voice calibration unresolved`
-when the evidence gate or comparison cannot be completed. Name what is missing.
+Report `Voice calibration: calibrated` only when readiness is `ready` and the final
+comparison matches the selected passages without copying their wording. Report `Voice
+calibration: unresolved` when the evidence gate or comparison cannot be completed. Name
+what is missing.
 
 ## Check paragraph continuity
 

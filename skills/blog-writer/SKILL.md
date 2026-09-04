@@ -249,8 +249,8 @@ Six rules bind this step and Step 11:
 
 **Identity adherence.** When personal identity is selected, re-read its entry point, voice
 resource, and selected calibration passages before every writing action — before this
-draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. Name
-the assignment mode, calibration readiness, and passages used. If corporate identity is
+draft, before every Step 11 revision, and before the anti-pattern rewrite voice-calibration
+check. Name the assignment mode, calibration readiness, and passages used. If corporate identity is
 selected, re-read its entry point and name its consequential requirements too.
 
 **Voice calibration adherence.** Follow `skills/blog-writer/references/voice-calibration.md`.
@@ -278,8 +278,10 @@ the exact matched text for deterministic residue and finalization hits.
 `.candidates.assistant_chatter[]` carries the exact line, token, context, and contextual
 test for phrases that could be assistant residue or intentional reader-facing prose. Review
 every candidate: remove it only when an assistant is addressing the author, and retain it
-when the post intentionally addresses its reader. `.coverage.ran`
-names numbered patterns the script checks.
+when the post intentionally addresses its reader. `.observations.em_dashes` carries paired-aside
+locations and per-section counts for the identity/genre judgments in patterns #7 and #8;
+observations are not findings and do not affect the exit code.
+`.coverage.ran` names numbered patterns the script checks.
 `.coverage.supplemental_checks` names fixed-output checks outside the numbered catalog.
 `.coverage` also carries `not_run_judgment`, `patterns_examined`, `patterns_total` and
 `note`. Route on the exit code:
