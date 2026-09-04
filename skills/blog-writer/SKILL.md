@@ -281,7 +281,8 @@ every candidate: remove it only when an assistant is addressing the author, and 
 when the post intentionally addresses its reader. `.observations.em_dashes` carries paired-aside
 locations and per-section counts for the identity/genre judgments in patterns #7 and #8;
 observations are not findings and do not affect the exit code.
-`.coverage.ran` names numbered patterns the script checks.
+`.coverage.ran` names the mechanical sweeps drawn from the numbered catalog;
+the combined `#3/#4` entry is one sweep covering two patterns.
 `.coverage.supplemental_checks` names fixed-output checks outside the numbered catalog.
 `.coverage` also carries `not_run_judgment`, `patterns_examined`, `patterns_total` and
 `note`. Route on the exit code:

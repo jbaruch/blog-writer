@@ -1023,7 +1023,7 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
     total = len(PATTERN_HEADING.findall(text))
     # The floor is strictly above the examined count, not zero. This script's
     # whole contract is that it covers a minority: at four the note reports zero
-    # unexamined while `not_run_judgment` still names seven sweeps it did not
+    # unexamined while `not_run_judgment` still names twelve checks it did not
     # run, and below four the arithmetic goes negative ("-1 of the 3 patterns
     # were not examined"). Both are structured nonsense, which is worse than no
     # report at all.
