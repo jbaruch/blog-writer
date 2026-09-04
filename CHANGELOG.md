@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.42 — 2026-09-04
+
 ### Fixed
 
 - **The prose catalog now weights current tells by evidence instead of enforcing timeless
