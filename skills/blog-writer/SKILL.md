@@ -183,9 +183,14 @@ Lock the main idea, the CTA, and the section outline. `skills/blog-writer/refere
 the main-idea template and the outline requirements.
 
 Name the assignment mode and select two or three usable passages written for that mode.
-Follow `skills/blog-writer/references/voice-calibration.md`. An approved identity, a list of
-devices, or links without fetched prose do not pass this gate. Record voice calibration as
-unresolved when matching evidence is unavailable.
+Follow `skills/blog-writer/references/voice-calibration.md`. These do not pass the evidence
+gate:
+
+- an approved identity
+- a list of devices
+- links without fetched prose
+
+Record voice calibration as unresolved when matching evidence is unavailable.
 
 Before locking, audit the outline against `skills/blog-writer/references/structural-audits.md`
 audits 1, 2, and 6 — theme explicitness, structural tidiness, shape convergence — one audit
@@ -251,8 +256,9 @@ selected, re-read its entry point and name its consequential requirements too.
 **Voice calibration adherence.** Follow `skills/blog-writer/references/voice-calibration.md`.
 Compare the pre-edit and post-edit prose on narrator presence, spoken cadence, connective
 flow, reader relationship, and argument movement. Run the paragraph continuity check after
-prose edits. Report mechanical sweep, manual anti-pattern review, and voice calibration as
-independent states. Never report voice as calibrated while its evidence gate is unresolved.
+prose edits. Report mechanical sweep, manual anti-pattern review, voice calibration, and
+paragraph continuity as independent states. Never report voice as calibrated while its
+evidence gate is unresolved.
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass

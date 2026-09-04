@@ -64,9 +64,15 @@ variation, off-voice moves, and durable bio facts. Keep explicit preferences sep
 observed patterns. Sample frequency is evidence, not a quota.
 
 Classify representative prose by writing mode and authorship. When the sources support it,
-route contiguous passages through an `examples` resource; URLs, summaries, and isolated
-lines alone do not demonstrate cadence or paragraph flow. Record modes with insufficient
-prose as Unresolved.
+route contiguous passages through an `examples` resource. Do not use these as prose
+evidence:
+
+- URLs whose prose has not been read
+- summaries
+- isolated lines
+
+They do not demonstrate cadence or paragraph flow. Record modes with insufficient prose as
+Unresolved.
 
 Resolve the destination through the shared storage contract. Write the package through the
 contract above, run the approval loop, then finish here.

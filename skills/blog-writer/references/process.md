@@ -683,7 +683,7 @@ conversation — edit the file surgically.
 - Re-run structural audits 3, 4, and 5 on new or rewritten sections. A section added in
   Phase 4 has been through no structural check at all
 - Re-run voice calibration and paragraph continuity on new or rewritten prose. Compare the
-  pre-edit and post-edit text, then report the three review states independently
+  pre-edit and post-edit text, then report all four review states independently
 
 **The post is done when the author says it's done. Not before.**
 

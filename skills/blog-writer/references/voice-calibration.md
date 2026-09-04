@@ -44,7 +44,7 @@ specific passage boundaries and analysis is enough.
 
 ## Compare the draft
 
-Keep the pre-humanizer draft available for comparison. After every anti-pattern rewrite,
+Keep the pre-edit draft available for comparison. After every anti-pattern rewrite,
 compare the pre- and post-rewrite prose with the selected passages on five dimensions:
 
 - narrator presence: where and how the author enters the argument
