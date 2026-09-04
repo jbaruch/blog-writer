@@ -1,6 +1,6 @@
 ---
 name: create-personal-identity
-description: Creates, updates, migrates, and audits evidence-backed personal writing identity packages by inventorying sources, tracing voice and composition guidance to passages, and separating author style from employer branding. Use for requests to build or check an author's persona, voice profile, tone guide, style guide, or reusable writing identity.
+description: Creates, updates, migrates, and audits evidence-backed personal writing identity packages by tracing voice and composition guidance to source passages while excluding employer branding. Use when someone asks to capture their writing style, make a persona from their posts, build an author voice profile or tone guide, refresh an existing writing identity, migrate legacy persona files, or audit whether a profile matches its author.
 ---
 
 # Create Personal Identity
@@ -23,15 +23,17 @@ For Step 1 or Step 2, also read the shared storage contract before writing:
 skills/blog-writer/references/identity-storage.md
 ```
 
+That contract lives with `blog-writer` because every identity type shares its destination,
+discovery, and selection layout.
+
 Use this approval loop for every consequential create or update:
 
 - Set `status` to `draft`.
 - Show the one-paragraph summary, Required and Avoid guidance, high-impact inferences, and
   unresolved items.
 - Ask one focused question at a time for consequential conflicts.
-- When the user rejects or corrects a conclusion, revise it.
-- Re-read each revised conclusion beside its cited sources.
-- Present each corrected conclusion with its cited sources.
+- Apply corrections, re-read each changed conclusion beside its cited sources, and present
+  the corrected conclusion with those sources.
 - Set `status` to `approved` only after explicit approval.
 
 ## Step 1 — Create a Personal Identity
@@ -54,7 +56,11 @@ Use this approval loop for every consequential create or update:
    - isolated lines
 
 6. Resolve the destination through the shared storage contract, write the package through
-   `references/package-contract.md`, run the approval loop, then finish here.
+   `skills/create-personal-identity/references/package-contract.md`, run the approval loop,
+   then finish here.
+
+Before approval, confirm every declared resource and consequential guidance item traces to
+an inventoried source; leave any missing trace Unresolved.
 
 ## Step 2 — Migrate a Legacy Personal Identity
 
@@ -69,9 +75,10 @@ guidance and source history. Identify which conclusions the new sources confirm,
 replace, or leave unresolved; never regenerate the package as if prior decisions did not
 exist. Stop on a non-v1 package; Step 2 owns the only supported older shape.
 
-Apply accepted changes through `references/package-contract.md`. Keep the existing
-status only when changes do not alter consequential guidance. For consequential changes,
-run the approval loop. Finish here.
+Apply accepted changes through
+`skills/create-personal-identity/references/package-contract.md`. Keep the existing status
+only when changes do not alter consequential guidance. For consequential changes, run the
+approval loop. Finish here.
 
 ## Step 4 — Audit a Personal Identity
 
