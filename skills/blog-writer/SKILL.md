@@ -133,20 +133,22 @@ Read these reference files in order:
 3. `persona/framework.md` for a legacy identity, if it exists and has content. It defines
    post-level architecture and overrides `skills/blog-writer/references/blog-anatomy.md`
    and the narrative-density doctrine in `skills/blog-writer/references/tone-guide.md`.
-4. `skills/blog-writer/references/tone-guide.md` — The generic writing framework. Narrative density rules,
+4. `skills/blog-writer/references/voice-calibration.md` — The evidence gate for personal
+   voice, assignment-mode matching, paragraph continuity, and independent completion states.
+5. `skills/blog-writer/references/tone-guide.md` — The generic writing framework. Narrative density rules,
    anti-pattern index, tone calibration, TLDR format.
-5. `skills/blog-writer/references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
+6. `skills/blog-writer/references/ai-anti-patterns.md` — the catalog of named AI writing patterns to never use. Each has
    symptoms, examples, structural variants, and alternatives. The anti-pattern check in
    Phase 3 and 4 scans the draft against this file.
-6. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
+7. `skills/blog-writer/references/structural-audits.md` — Six discourse-level audits that work above the
    sentence: theme explicitness, structural tidiness, emotion mode, reference specificity,
    reader engagement, and shape convergence. Audits 1, 2, and 6 run on the outline in Phase 2;
    audits 3, 4, and 5 run on the prose in Phase 3 and 4.
-7. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
-8. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
+8. `skills/blog-writer/references/process.md` — The workflow from transcript to published draft.
+9. `skills/blog-writer/references/blog-anatomy.md` — Post shape (TLDR, hook, technical meat, CTA, bio) and
    series handling. Fallback only — a selected personal `composition` resource, including
    legacy `persona/framework.md`, overrides it.
-9. Product-context resources from selected identities. Scan an index to know what is
+10. Product-context resources from selected identities. Scan an index to know what is
    available, then fetch only relevant sources during Phase 0. A legacy
    `persona/product.md` remains available but does not activate corporate identity.
 
@@ -180,9 +182,14 @@ Proceed immediately to Step 9.
 Lock the main idea, the CTA, and the section outline. `skills/blog-writer/references/process.md` Phase 2 has
 the main-idea template and the outline requirements.
 
+Name the assignment mode and select two or three usable passages written for that mode.
+Follow `skills/blog-writer/references/voice-calibration.md`. An approved identity, a list of
+devices, or links without fetched prose do not pass this gate. Record voice calibration as
+unresolved when matching evidence is unavailable.
+
 Before locking, audit the outline against `skills/blog-writer/references/structural-audits.md`
 audits 1, 2, and 6 — theme explicitness, structural tidiness, shape convergence — one audit
-at a time. `skills/blog-writer/references/process.md` section 2f has the procedure.
+at a time. `skills/blog-writer/references/process.md` section 2g has the procedure.
 
 For audit 6, ask the script for the verdict rather than reading the shape history yourself:
 
@@ -233,14 +240,19 @@ anti-pattern, structural, accuracy, and tightening checks.
 `skills/blog-writer/references/process.md` Phase 3 has the writing rules, the placeholder
 conventions, and the check procedure.
 
-Five rules bind this step and Step 11:
+Six rules bind this step and Step 11:
 
-**Identity adherence.** When personal identity is selected, re-read its entry point and
-voice resource before every writing action — before this draft, before every Step 11 revision, and before the
-anti-pattern rewrite voice check. If corporate identity is selected, re-read its entry
-point too. At the start of this step and Step 11, confirm you can name at least 3 personal
-rhetorical devices when a personal identity exists, plus the consequential corporate
-requirements when a corporate identity exists; if you cannot, read the relevant resources again.
+**Identity adherence.** When personal identity is selected, re-read its entry point, voice
+resource, and selected calibration passages before every writing action — before this
+draft, before every Step 11 revision, and before the anti-pattern rewrite voice check. Name
+the assignment mode, calibration readiness, and passages used. If corporate identity is
+selected, re-read its entry point and name its consequential requirements too.
+
+**Voice calibration adherence.** Follow `skills/blog-writer/references/voice-calibration.md`.
+Compare the pre-edit and post-edit prose on narrator presence, spoken cadence, connective
+flow, reader relationship, and argument movement. Run the paragraph continuity check after
+prose edits. Report mechanical sweep, manual anti-pattern review, and voice calibration as
+independent states. Never report voice as calibrated while its evidence gate is unresolved.
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
@@ -289,6 +301,9 @@ you read for.
 passes. Read the personal voice resource first when selected. Where the profile already prescribes the human-side
 behavior, the audit is a drift check rather than a new rule. Never apply more than two
 interventions from the menu to one post.
+
+Run paragraph continuity after those audits. It is a voice-calibration check, not a seventh
+structural intervention, and it does not change the two-intervention limit.
 
 **Corporate review adherence.** If the selected corporate identity declares an
 `editorial-review` resource, run it after the generic structural checks. Apply its scoped

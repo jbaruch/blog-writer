@@ -47,6 +47,10 @@ Useful personal roles include `voice`, `composition`, `examples`, and `bio`. Use
 corporate roles include `brand`, `terminology`, `editorial-review`, and `product-context`.
 Roles are extensible lowercase kebab-case strings.
 
+An `examples` resource should identify representative prose by writing mode when the source
+material supports it. A URL or device summary may route the reader to evidence, but it is
+not prose evidence until the passage itself is read.
+
 ## Guidance strength
 
 Compiled guidance distinguishes:
@@ -67,6 +71,7 @@ not automatically rules.
 - location or human-readable identifier
 - source type and relevant date/version when known
 - whether it supplied explicit guidance, observed behavior, or both
+- authorship as solely authored, collaborative, heavily edited, or unresolved
 - conclusions derived from it
 - authority and scope limits
 

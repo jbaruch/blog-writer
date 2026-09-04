@@ -1,0 +1,46 @@
+{
+  "context": "Tests evidence-backed comparison against matching prose and the paragraph card-deck continuity check. The response must repair argument movement while protecting a dependent punchline and related ideas.",
+  "type": "weighted_checklist",
+  "checklist": [
+    {
+      "name": "Matching evidence selected",
+      "description": "The report names analytical opinion as the assignment mode and uses two or three supplied, solely authored passages as calibration evidence.",
+      "max_score": 12
+    },
+    {
+      "name": "Five dimensions compared",
+      "description": "The report compares pre-edit and post-edit prose on narrator presence, spoken cadence, connective paragraph flow, reader relationship, and argument movement.",
+      "max_score": 18
+    },
+    {
+      "name": "Card-deck run diagnosed",
+      "description": "The report identifies the documentation, versioning, error-design, and ownership paragraphs as independent or reorderable cards rather than merely calling them choppy.",
+      "max_score": 14
+    },
+    {
+      "name": "Argument movement repaired",
+      "description": "The revised middle carries subjects, consequences, or qualifications across paragraph boundaries so reordering the paragraphs would change the argument.",
+      "max_score": 18
+    },
+    {
+      "name": "Punchline preserved",
+      "description": "The one-line paragraph 'The interface is internal. The consequences are not.' remains isolated or equivalently punchy and still depends on the preceding argument.",
+      "max_score": 10
+    },
+    {
+      "name": "No transition-word spray",
+      "description": "The revision does not repair every paragraph with repetitive connectors such as additionally, moreover, or furthermore.",
+      "max_score": 8
+    },
+    {
+      "name": "Related ideas may stay together",
+      "description": "The revision does not mechanically split every sentence into one isolated idea and preserves relationships within a spoken thought.",
+      "max_score": 8
+    },
+    {
+      "name": "Independent states reported",
+      "description": "Mechanical sweep, manual anti-pattern review, voice calibration, and paragraph continuity each receive their own explicit state.",
+      "max_score": 12
+    }
+  ]
+}
