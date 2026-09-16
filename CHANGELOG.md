@@ -1,5 +1,13 @@
 # Changelog
 
+### Removed
+
+- Retired the eval scenarios, instruction inventory, and summary metadata at the
+  maintainer's request. Removed the scenario-generator dependency and obsolete
+  packaging exclusion; publish-time evals remain disabled. Script tests continue
+  to run. Eval inventory regeneration ([#33](https://github.com/jbaruch/blog-writer/issues/33))
+  is no longer planned.
+
 ## 1.1.42 — 2026-09-04
 
 ### Fixed
