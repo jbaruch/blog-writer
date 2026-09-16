@@ -6,8 +6,10 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import os
 import runpy
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -113,9 +115,31 @@ class CatalogVersionTests(unittest.TestCase):
         _, code, _ = self.check()
         self.assertEqual(code, 2)
 
-    def test_default_manifest_belongs_to_executing_plugin(self):
+    def test_default_manifest_works_from_an_unrelated_directory(self):
+        # Exercise the actual entry point with no --manifest override. The fake
+        # registry is deterministic; manifest discovery must survive a new cwd.
+        registry = Path(self.temp.name) / "tessl"
+        root_manifest = SCRIPT.parents[2] / ".tessl-plugin/plugin.json"
+        installed = json.loads(root_manifest.read_text(encoding="utf-8"))["version"]
+        registry.write_text(
+            "#!/bin/sh\nprintf '%s\\n' '"
+            + json.dumps(self.registry(installed))
+            + "'\n",
+            encoding="utf-8",
+        )
+        registry.chmod(0o755)
+        response = subprocess.run(
+            [sys.executable, str(SCRIPT)],
+            cwd=self.temp.name,
+            env={**os.environ, "PATH": self.temp.name},
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(response.returncode, 0, response.stderr)
         self.assertEqual(
-            MODULE["MANIFEST"], SCRIPT.parents[2] / ".tessl-plugin/plugin.json"
+            json.loads(response.stdout),
+            {"installed": installed, "latest": installed, "status": "current"},
         )
 
 

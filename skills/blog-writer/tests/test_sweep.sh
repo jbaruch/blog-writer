@@ -317,6 +317,10 @@ The deploy stalled — briefly, that time. The alert stayed quiet — as it alwa
     $'Text — here.\n\n```text\nCode—here\n```\n\n<!-- Hidden—dash -->' \
     0 '.observations.em_dashes.spacing == {"spaced":1,"closed":0,"mixed":0,"boundary":0} and .observations.em_dashes.total == 1'
 
+  assert_json "em-dash spacing and totals exclude headings consistently" \
+    $'## Heading — aside\n\nText — here.\n\n### Another—heading\n\nThe draft uses ordinary punctuation.' \
+    0 '.observations.em_dashes.spacing == {"spaced":1,"closed":0,"mixed":0,"boundary":0} and .observations.em_dashes.total == 1 and ([.observations.em_dashes.spacing[]] | add) == .observations.em_dashes.total'
+
   # 4. #3/#4 fragment chains
   assert_sweep "#3/#4 fires on three short sentences" \
     'It failed. We knew. Nobody cared. Then the pager went off at three in the morning.' \

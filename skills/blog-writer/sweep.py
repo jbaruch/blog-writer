@@ -730,7 +730,7 @@ def observe_emdashes(blocks, sections):
     # line boundary has unknown spacing on one side; do not infer a closed dash.
     spacing = {"spaced": 0, "closed": 0, "mixed": 0, "boundary": 0}
     for block in blocks:
-        if block.kind == "placeholder":
+        if block.kind in ("heading", "placeholder"):
             continue
         for _, text in block.numbered:
             for match in re.finditer(EM_DASH, text):

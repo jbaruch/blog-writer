@@ -43,4 +43,3 @@ parts:
 
 Say so plainly when the article carries nothing new. Then continue the session with the
 current file either way — a finding changes the skill, never this run's draft.
-
