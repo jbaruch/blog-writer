@@ -50,7 +50,8 @@ Output (stdout):
     contextual review and do not affect the exit code.
 
     `observations.em_dashes` carries paired-aside locations and per-section
-    counts. They require the identity/genre judgment in patterns #7 and #8 and
+    counts, plus spacing counts (`spaced`, `closed`, `mixed`, `boundary`).
+    They require the identity/genre judgment in patterns #7 and #8 and
     never affect the exit code on their own.
 
     `coverage` carries {"ran", "supplemental_checks", "not_run_judgment",
@@ -725,6 +726,29 @@ def observe_emdashes(blocks, sections):
                     }
                 )
 
+    # Count source-line neighbors, not normalized sentence text. A dash at a
+    # line boundary has unknown spacing on one side; do not infer a closed dash.
+    spacing = {"spaced": 0, "closed": 0, "mixed": 0, "boundary": 0}
+    for block in blocks:
+        if block.kind in ("heading", "placeholder"):
+            continue
+        for _, text in block.numbered:
+            for match in re.finditer(EM_DASH, text):
+                index = match.start()
+                if index == 0 or index == len(text) - 1:
+                    kind = "boundary"
+                else:
+                    left = text[index - 1].isspace()
+                    right = text[index + 1].isspace()
+                    kind = (
+                        "spaced"
+                        if left and right
+                        else "mixed"
+                        if left or right
+                        else "closed"
+                    )
+                spacing[kind] += 1
+
     section_counts = []
     for heading, line, blocks in sections:
         count = sum(
@@ -740,6 +764,7 @@ def observe_emdashes(blocks, sections):
 
     return {
         "paired_asides": pairs,
+        "spacing": spacing,
         "sections": section_counts,
         "total": sum(section["count"] for section in section_counts),
         "note": (

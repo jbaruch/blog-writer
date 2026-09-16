@@ -434,9 +434,9 @@ figures, is the script's own contract — the run reports them in `.coverage.ran
 named constants under "Decision contract" at the top of `skills/blog-writer/sweep.py` hold
 the numbers. Do not reproduce either here or by reading. The fix for each pattern it
 reports is in `skills/blog-writer/references/ai-anti-patterns.md` under that pattern's number.
-The same object carries `.observations.em_dashes`: paired-aside locations and per-section
-counts. Those figures are inputs to the #7/#8 identity and genre judgment, never findings
-on their own.
+The same object carries `.observations.em_dashes`: paired-aside locations, per-section
+counts, and spacing counts. Those figures are inputs to the #7/#8 identity and genre
+judgment, never findings on their own.
 
 Re-run it after every rewrite: a clean draft plus one edit is an unchecked draft, and the
 most common way a tell ships is being introduced by the fix for something else.
@@ -457,9 +457,12 @@ not a finding.
   pattern #1 only when the two sides are candidates for the same slot, with the negation
   doing the work of "not". The "Not X. Y." form announces itself on a contextual read; this
   one does not, which is why it needs the literal search first and the judgment second.
+- **Manufactured rule of three (#3):** Judge whether each item adds supported content,
+  including neutral triples without a kicker. Use the paired judgment fixtures in #3;
+  retain enumerations of three distinct facts. The fragment sweep cannot judge padding.
 - **Em-dash calibration (#7/#8):** Read `.observations.em_dashes`, then compare its paired
-  asides and section counts with the selected same-mode calibration passages. Judge the
-  punctuation's rhetorical function and the assignment genre. A pair or a high count is a
+  asides, section counts, and spacing with the selected same-mode calibration passages.
+  Judge the punctuation's rhetorical function and the assignment genre. A pair or a high count is a
   candidate, not a finding. Preserve an earned interruption or identity-backed density;
   report the judgment unresolved when usable calibration evidence is unavailable.
 - **Introductory filler words (#10):** Search for the watchlist words from the
@@ -544,21 +547,20 @@ instead of letting the examples show it. Be extra suspicious of numerical summar
 echo the post's theme. If the content already demonstrates the count, the sentence
 announcing it is manufactured symmetry.
 
-**Pass 3 — Soul check:** Step back from the pattern list and ask one holistic question:
-"What makes this draft obviously AI-generated?" Read the draft as a skeptical reader would,
-not checking against specific patterns but reacting to the overall feel. Look for:
-- No opinions anywhere — facts reported but never reacted to
-- No uncertainty or mixed feelings — everything is confidently resolved
-- No first-person voice when the content warrants it
-- No humor, edge, or personality — technically clean but reads like Wikipedia
-- Uniform energy — every paragraph has the same emotional temperature
-- Press-release tone — sounds like it was written to impress rather than to communicate
+**Pass 3 — Soul check:** Read for specific departures from the selected identity and
+assignment. Name the passage and the identity evidence or assignment need it fails:
+- Missing opinions or uncertainty that the author's source material expresses
+- Missing first-person perspective when the assignment and identity call for it
+- Lost humor or rhetorical devices present in the same-mode calibration passages
+- Uniform energy where the source material establishes a change in stakes
+- Promotional claims that obscure the concrete point the reader needs
 
-A draft can pass every pattern and still read as obviously AI because it has no soul. If
-Pass 3 flags the draft as sterile, the fix is not another anti-pattern rewrite. With a
-personal identity, return to its voice and restore the author's actual rhetorical devices,
-opinions, and attitude. With corporate-only writing, restore human specificity and point of
-view using the generic tone and corporate identity without inventing a named persona.
+This pass judges voice fidelity, not AI authorship. Apply the non-findings in the catalog's
+"Running the check" preamble. Formality, blandness, correct grammar, or an absence of humor
+alone warrants no rewrite. Report unresolved calibration instead of inventing a voice.
+With a personal identity, restore evidenced devices, opinions, and attitude. With
+corporate-only writing, use the generic tone and corporate identity without inventing a
+named persona. Preserve neutral exposition when it serves the assignment.
 
 Rewrite any hits. This is not optional.
 

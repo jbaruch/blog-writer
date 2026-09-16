@@ -90,33 +90,10 @@ the resolver and proceed immediately to Step 5.
 
 ## Step 5 — Refresh the Anti-Pattern File
 
-Fetch Wikipedia's "Signs of AI writing" article and compare it against
-`skills/blog-writer/references/ai-anti-patterns.md`.
-
-```bash
-bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/fetch-signs-of-ai-writing.sh
-```
-
-The script writes the raw wikitext to a file and prints `{"ok": true, "path": ..., "bytes": ...}`.
-Read the file at `.path`.
-
-- **Exit 0** — read the article and continue below.
-- **Exit 1** — the fetch failed (network, HTTP error, or a body too short to be the
-  article). Proceed with `skills/blog-writer/references/ai-anti-patterns.md` as-is.
-- **Exit 2** — a tool or usage error (curl missing, destination not writable). Report the
-  script's stderr diagnostic, then proceed with the current anti-pattern file as-is.
-
-Report what the article carries and the anti-pattern file does not. Never edit
-`skills/blog-writer/references/ai-anti-patterns.md` from this step. Give the author each finding in three
-parts:
-
-- what the article names, with its own wording for the tell
-- the closest pattern already in the file, or that there is none
-- whether its verdict is a count or a judgment, per the split in
-  `skills/blog-writer/references/process.md` Phase 3 Pass 1
-
-Say so plainly when the article carries nothing new. Then continue the session with the
-current file either way — a finding changes the skill, never this run's draft.
+Read and execute `skills/blog-writer/references/catalog-refresh.md` in order. Run its
+version check before fetching or comparing. Report the installed and latest versions.
+Only the check's exit 0 permits the comparison; follow its exit 1/2 routes otherwise.
+Never edit the installed catalog during refresh.
 
 Proceed immediately to Step 6.
 
@@ -279,7 +256,7 @@ the exact matched text for deterministic residue and finalization hits.
 test for phrases that could be assistant residue or intentional reader-facing prose. Review
 every candidate: remove it only when an assistant is addressing the author, and retain it
 when the post intentionally addresses its reader. `.observations.em_dashes` carries paired-aside
-locations and per-section counts for the identity/genre judgments in patterns #7 and #8;
+locations, per-section counts, and spacing counts for the identity/genre judgments in patterns #7 and #8;
 observations are not findings and do not affect the exit code.
 `.coverage.ran` names the mechanical sweeps drawn from the numbered catalog;
 the combined `#3/#4` entry is one sweep covering two patterns.

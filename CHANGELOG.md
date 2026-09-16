@@ -1,5 +1,19 @@
 # Changelog
 
+### Fixed
+
+- Guard Wikipedia refresh comparisons with the executing plugin's installed version and
+  registry latest version. Mismatched or unverified versions skip the comparison while
+  drafting continues with the existing catalog, preventing already-shipped patterns from
+  being reported as new (#63).
+- Reconcile `Additionally` with its historical evidence weight; judge padded neutral triples
+  without penalizing real enumerations; include inflated source counts and unsupported
+  non-exhaustive hedges in vague attributions. Pass 3 now checks evidenced voice fidelity,
+  with explicit ineffective-indicator boundaries. Clarify that heading hierarchy is not
+  implemented by the scanner.
+- Report spaced, closed, mixed, and line-boundary em dashes as arithmetic observations for
+  same-mode voice calibration, without converting spacing into automatic findings.
+
 ## 1.1.43 — 2026-09-16
 
 ### Removed

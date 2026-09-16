@@ -15,8 +15,9 @@ general knowledge of AI writing patterns.
 
 **Follow the three-pass procedure exactly as written in `skills/blog-writer/references/process.md`.** Pass 1
 is the surface scan against every pattern in this file. Pass 2 is the skeleton scan on adjacent
-sentence pairs. Pass 3 is the soul check — a holistic read for sterile, voiceless writing
-that passes pattern checks but still reads as AI. Then the rewrite audit. Then voice
+sentence pairs. Pass 3 is the soul check — a read for specific mismatches with the selected
+identity and assignment that survive pattern checks, not a test of AI authorship. Then the
+rewrite audit. Then voice
 calibration. Then the proportionality check — was the amount of rewriting proportional to the
 slop found, and would the author still recognize the draft as their own voice. In that
 order. Do not skip passes, do not merge them, do not substitute your own method.
@@ -27,6 +28,12 @@ counting rather than judgment. If something feels "AI-ish" but doesn't match a p
 defined here, one of its structural variants, or a script finding, leave it alone.
 False positives from improvised rules damage the author's voice more than the pattern
 they're trying to fix.
+
+**Non-findings:** Perfect grammar, mixed casual and formal registers, bland or robotic
+prose, fancy or academic prose, transition words in isolation, and unsourced content do
+not establish AI authorship. Do not flag them as AI-style findings on their own. Verify
+unsupported factual claims in the accuracy pass. Apply voice checks only against the
+selected identity and assignment; do not invent humor or informality as requirements.
 
 ## Evidence classes and boundaries
 
@@ -46,9 +53,10 @@ Keep the origin of a check visible in its verdict:
   product-accuracy or source-verification pass. Do not relabel it as an AI-style finding.
 
 Markdown headings, lists, an H1 repeated from CMS title metadata, and a useful table are
-valid blog constructs. Heading hierarchy and repeated section breaks are structural checks,
-not proof of AI prose. A small table is a judgment finding only when one sentence or a short
-list communicates the same information more clearly.
+valid blog constructs. The scanner checks repeated section breaks; it does not check
+heading hierarchy. Neither formatting choice proves AI authorship. A small table is a
+judgment finding only when one sentence or a short list communicates the same information
+more clearly.
 
 ---
 
@@ -138,12 +146,12 @@ then tell the story of B succeeding. Let the reader draw the conclusion.
 
 ---
 
-## 3. Asyndetic Tricolon with a Kicker
+## 3. Manufactured Rule of Three
 
-**The tell:** Three short fragments in sequence, followed by a punchline.
-"X. Y. Z. And then [dramatic conclusion]."
+**The tell:** Three beats arranged for cadence without three earned contributions.
+The kicker variant is "X. Y. Z. And then [dramatic conclusion]."
 
-**Symptoms:**
+**Kicker symptoms:**
 - Three sentence fragments, usually 1-4 words each
 - Followed by a longer sentence starting with "And"
 - Designed to build rhythm toward a reveal
@@ -167,10 +175,20 @@ The three items don't have to be single words or short fragments.
   three tiers, three layers), the LLM will manufacture tricolons to echo it. The content
   showing three examples is fine; a sentence announcing "Three X, three Y" on top of that
   is the pattern.
+- **Padded neutral triple:** Three phrases or neutral items, with no fourth beat,
+  where an item merely repeats another or adds breadth unsupported by the source.
+  Judge each item's contribution in context; three items alone are not a finding.
 
-**Why it's a tell:** The published posts DO use lists of three sometimes. The difference:
-they occur inside natural paragraphs, not as standalone staccato fragments designed to
-sound dramatic.
+**Judgment fixtures:**
+- Flag for judgment: "The exporter records events, captures occurrences, and logs things
+  that happen." In a description of one event log, the three neutral phrases restate one
+  operation to fill the cadence. Rewrite as "The exporter records events."
+- Retain: "The exporter records timestamps, status codes, and request IDs." The documented
+  schema contains those three distinct fields; every item contributes information.
+
+**The boundary:** Three real contributions can stay, in fragments or a flowing sentence.
+Flag manufactured cadence only when the setup or a padded item substitutes rhythm for
+meaning; do not infer it from the number three alone.
 
 **Instead:** Embed the list in a flowing sentence.
 - ✅ "No tests. No specs. No way to verify if it's doing what you actually wanted."
@@ -320,9 +338,10 @@ carry more weight than the punctuation's presence.
 
 **The test:** Read the same-mode calibration passages selected by
 `skills/blog-writer/references/voice-calibration.md`. Judge whether the pair matches the
-author's cadence and whether the aside earns a hard interruption. If calibration evidence
-is unresolved, report the judgment as unresolved instead of treating the pair as a hard
-finding.
+author's cadence and whether the aside earns a hard interruption. Compare the script's
+spacing observations with those passages too; spaced or closed dashes alone are not findings.
+If calibration evidence is unresolved, report the judgment as unresolved instead of treating
+the pair as a hard finding.
 
 **Instead:** Use commas or parentheses.
 - ✅ "The agent, which had already failed twice, tried again."
@@ -352,8 +371,9 @@ not support one genre-independent count as a hard failure.
 - Similar interruption rhythm repeated across adjacent paragraphs
 
 **The test:** Read the arithmetic observations from `sweep.py`: paired-aside locations and
-the em-dash count for each section. Compare the draft with the selected same-mode passages
-and the genre's needs. The script reports counts, not findings. No universal per-section
+the em-dash count for each section, plus spacing counts. Compare spaced and closed usage
+with the same-mode passages, keeping mixed and line-boundary cases distinct. Consider the
+genre's needs too. The script reports counts, not findings. No universal per-section
 threshold survives the refreshed evidence.
 
 **Instead:** When the calibrated judgment fires, keep the interruptions that carry weight
@@ -498,8 +518,8 @@ history", "rich cultural heritage"), "key" (as adjective: "key role", "key turni
 Inflation phrases: "plays a significant role in shaping", "serves as a testament to",
 "it is important to note", "a vibrant tapestry of", "in the heart of", "setting the stage
 for", "reflects broader", "deeply rooted", "marks/represents a significant shift",
-"evolving landscape", "this is huge", "Additionally," (as sentence opener — research-backed
-strong tell)
+"evolving landscape", "this is huge". "Additionally," as a sentence opener is a historical,
+weak candidate; a transition word alone is not a finding.
 
 **Why it's a tell:** Research tracking word frequency before and after ChatGPT shows
 "delve" spiked 10-50x, "tapestry" and "landscape" (abstract) 5-20x, and "plays a
@@ -1045,6 +1065,11 @@ The attribution doesn't have to be at the start of the sentence.
   standing in for unnamed individuals.
 - "It's widely accepted that..." / "It's generally understood that..." — passive-voice
   attributions to nobody in particular.
+- **Quantity inflation:** One named source becomes "reviewers", or one or two opinions
+  become a widely held view. Compare the claimed breadth with the sources actually cited.
+- **Unsupported non-exhaustive hedges:** "Among others" or "such as" implies further
+  examples the source does not establish. Retain these phrases when the source supports
+  the broader set; do not ban them by literal match.
 
 **Why it's a tell:** LLMs can't cite real sources, so they invent authoritative-sounding
 collectives. A human writer either names the source ("Kelsey Hightower said on stage at
