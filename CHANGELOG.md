@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.44 — 2026-09-16
+
 ### Fixed
 
 - Guard Wikipedia refresh comparisons with the executing plugin's installed version and
