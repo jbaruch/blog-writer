@@ -395,7 +395,7 @@ Before submitting a draft, check:
   No tangents survived the cut.
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
-  (holistic read for sterile, voiceless writing). Rewrite any hits, then re-check each
+  (read for evidenced departures from identity and assignment). Rewrite any hits, then re-check each
   rewrite against every pattern before considering it fixed.
 
 ---

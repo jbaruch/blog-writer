@@ -305,6 +305,18 @@ The build broke — twice that week. Nobody filed a ticket — we all moved on.
 The deploy stalled — briefly, that time. The alert stayed quiet — as it always does.' \
     0 '[.observations.em_dashes.sections[].count] == [2,2] and .observations.em_dashes.total == 4'
 
+  assert_json "em-dash spacing observes all neighbor forms" \
+    'A — B and C—D and E —F and G— H.' \
+    0 '.observations.em_dashes.spacing == {"spaced":1,"closed":1,"mixed":2,"boundary":0} and .observations.em_dashes.total == 4 and (.hits | length) == 0'
+
+  assert_json "em-dash spacing keeps line boundaries separate" \
+    $'—Leading text\nTrailing text—' \
+    0 '.observations.em_dashes.spacing == {"spaced":0,"closed":0,"mixed":0,"boundary":2}'
+
+  assert_json "em-dash spacing excludes code and comments" \
+    $'Text — here.\n\n```text\nCode—here\n```\n\n<!-- Hidden—dash -->' \
+    0 '.observations.em_dashes.spacing == {"spaced":1,"closed":0,"mixed":0,"boundary":0} and .observations.em_dashes.total == 1'
+
   # 4. #3/#4 fragment chains
   assert_sweep "#3/#4 fires on three short sentences" \
     'It failed. We knew. Nobody cared. Then the pager went off at three in the morning.' \

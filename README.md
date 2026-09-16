@@ -48,13 +48,13 @@ in three passes:
 - Surface scan, matching known pattern forms and their structural variants
 - Skeleton scan, comparing the grammatical structure of adjacent sentences to catch
   patterns where the vocabulary differs but the grammar is identical
-- Soul check, a holistic read for sterile, voiceless writing that passes pattern checks
-  but still reads as obviously AI
+- Soul check, a read for evidenced departures from the selected identity or assignment
+  that survive pattern checks
 
 Four patterns are covered by three counting sweeps. They check fragment chains (#3/#4),
 sentence-length uniformity (#14), and unicode giveaways (#18). Those run as a script
 (`sweep.py`) over the draft. The same run
-reports paired em-dash locations and per-section counts as observations for an identity-
+reports paired em-dash locations, per-section counts, and spacing as observations for an identity-
 and genre-calibrated judgment; punctuation counts alone do not fail the draft. Every run
 reports what it did not examine.
 
