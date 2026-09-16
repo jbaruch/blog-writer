@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.43 — 2026-09-16
+
 ### Removed
 
 - Retired the eval scenarios, instruction inventory, and summary metadata at the
