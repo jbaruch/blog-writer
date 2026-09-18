@@ -1,6 +1,6 @@
 {
   "name": "jbaruch/blog-writer",
-  "version": "1.1.45",
+  "version": "1.1.46",
   "private": false,
   "description": "Write and revise developer blog posts or run a humanizer / humanization pass on existing drafts using the AI anti-pattern catalog, structural audits, and reusable personal and explicitly selected corporate writing identities.",
   "skills": [
