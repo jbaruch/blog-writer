@@ -24,7 +24,19 @@ identity supplies audience, terminology, evidence, positioning, and editorial co
 **Script invocation.** Run every script this skill calls through its interpreter: `bash`
 for a `.sh`, `python3` for a `.py`. Never invoke one by bare path.
 
-## Step 1 — Resolve Writing Identities
+**Author preservation.** Before drafting or revising, record the assignment's claim,
+stance, argument progression, and author-supplied wording under the preservation contract
+in `skills/blog-writer/references/voice-calibration.md`. Check it after each completed
+editing pass, including scanner-driven and corporate edits. Apply it to non-blog artifacts
+too, preserving their format and requested scope.
+
+## Step 1 — Route the Assignment
+
+For a scoped humanization pass, review, copyedit, or local revision of an existing artifact,
+read `skills/blog-writer/references/scoped-edit.md`, execute that route, and finish here.
+Use that route for a non-blog writing assignment too. Preserve a review-only request.
+
+For a new blog post or an explicitly requested full blog workflow, continue below.
 
 Ask for or infer the blog home from the current project, then read
 `skills/blog-writer/references/identity-composition.md`. Run its resolver with any
@@ -235,63 +247,19 @@ selected, re-read its entry point and name its consequential requirements too.
 **Voice calibration adherence.** Follow `skills/blog-writer/references/voice-calibration.md`.
 Compare the pre-edit and post-edit prose on narrator presence, spoken cadence, connective
 flow, reader relationship, and argument movement. Run the paragraph continuity check after
-prose edits. Report mechanical sweep, manual anti-pattern review, voice calibration, and
-paragraph continuity as independent states. Never report voice as calibrated while its
-evidence gate is unresolved.
+prose edits. Verify author preservation against source and revision passages before
+delivery. Report author preservation, mechanical sweep, manual anti-pattern review, voice
+calibration, and paragraph continuity as independent states. Never report voice as
+calibrated while its evidence gate is unresolved.
 
 **Anti-pattern check adherence.** Follow the three rules under "Running the check" at the
 top of `skills/blog-writer/references/ai-anti-patterns.md` — re-read the file first, run the three-pass
 procedure in order, and never invent a pattern the file or mechanical sweep does not define.
 
-**Mechanical sweep adherence.** The counting half of the Pass 1 anti-pattern check runs as
-a script, never by reading. Run it over the draft:
-
-```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py \
-  --mode draft blog-draft-[slug].md
-```
-
-Stdout is a JSON object. `.mode` names the requested contract. `.hits[]` carries `pattern`,
-`label`, `line`, `detail`, `context`, `verify_context`, and `token` per finding. `token` is
-the exact matched text for deterministic residue and finalization hits.
-`.candidates.assistant_chatter[]` carries the exact line, token, context, and contextual
-test for phrases that could be assistant residue or intentional reader-facing prose. Review
-every candidate: remove it only when an assistant is addressing the author, and retain it
-when the post intentionally addresses its reader. `.observations.em_dashes` carries paired-aside
-locations, per-section counts, and spacing counts for the identity/genre judgments in patterns #7 and #8;
-observations are not findings and do not affect the exit code.
-`.coverage.ran` names the mechanical sweeps drawn from the numbered catalog;
-the combined `#3/#4` entry is one sweep covering two patterns.
-`.coverage.supplemental_checks` names fixed-output checks outside the numbered catalog.
-`.coverage` also carries `not_run_judgment`, `patterns_examined`, `patterns_total` and
-`note`. Route on the exit code:
-
-- **Exit 0** — `.hits` is empty. This is not a clean draft. `.coverage.note` says how many
-  patterns went unexamined. `.coverage.not_run_judgment` is not that list:
-  it names only the sweeps that look mechanical and are not, so they cannot be assumed
-  covered by a script that just reported nothing.
-- After Exit 0, read for the sweeps in `.coverage.not_run_judgment`.
-- After Exit 0, read for every remaining pattern in `skills/blog-writer/references/ai-anti-patterns.md`.
-- After either Exit 0 or Exit 1, review every `.candidates.assistant_chatter[]` entry using
-  its emitted `test`; a candidate is not a finding and does not change the exit code.
-- **Exit 1** — `.hits` is non-empty. Every predicate is arithmetic, so no hit is a matter
-  of taste. Fix each one, except that a hit carrying `verify_context: true` rests on where
-  the script placed sentence boundaries: read its `context` before rewriting, and if a
-  "sentence" shown there is a split artifact rather than real prose, that hit is the
-  artifact and the prose stays.
-- After Exit 1, re-run until it exits 0.
-- After Exit 1, report findings to the author in your own words. The object is for you, not
-  for them.
-- **Exit 2** — a tool or usage error, with the diagnostic on stderr and no object on
-  stdout. Report the diagnostic to the author.
-- After Exit 2, do not claim the sweep ran.
-
-Re-run it after every rewrite, including the rewrites made to fix its own findings and
-those from any other check. A clean draft plus one edit is an unchecked draft. Never report
-the sweep as clean without having run it. Never report the draft as clean from this sweep;
-it examines a minority of the catalog and `.coverage.note` says how many it left.
-`skills/blog-writer/references/process.md` Phase 3 Pass 1 has the split between what the script owns and what
-you read for.
+**Mechanical sweep adherence.** Run the draft-mode command and exit-code routing in
+`skills/blog-writer/references/sweep-review.md`. Record a disposition for every hit.
+Preserve raw findings when a contextual stylistic hit is retained. Run the catalog's
+manual checks after either successful sweep exit. Rerun after a completed editing pass.
 
 **Structural check adherence.** Run audits 3, 4, and 5 from
 `skills/blog-writer/references/structural-audits.md` one at a time, after the anti-pattern
@@ -304,7 +272,7 @@ structural intervention, and it does not change the two-intervention limit.
 
 **Corporate review adherence.** If the selected corporate identity declares an
 `editorial-review` resource, run it after the generic structural checks. Apply its scoped
-requirements and rerun the mechanical sweep after every resulting prose edit.
+requirements, then rerun the sweep and source-to-revision preservation check.
 
 > **General rule — if you can't find a required file, ask the author. Don't claim it
 > doesn't exist, don't assume its contents, don't skip the step.**
@@ -315,26 +283,17 @@ Proceed immediately to Step 11.
 
 ## Step 11 — Run Phase 4: Revision
 
-Edit the draft file on the author's feedback, and re-run the Step 10 checks after every
-change. `skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
+Edit the draft file on the author's feedback, and rerun the Step 10 checks after each
+completed editing pass. Preserve unaffected wording in local edits.
+`skills/blog-writer/references/process.md` Phase 4 has the revision procedure.
 
-After the author declares the post done, run the final artifact gate:
+After the author declares the post done, execute the final-mode procedure in
+`skills/blog-writer/references/sweep-review.md` on the final file.
 
-```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py \
-  --mode final blog-draft-[slug].md
-```
-
-Use Step 10's exit-code routing. Exit 1 blocks finalization until every deterministic
-interface-residue hit, supported asset placeholder, and `VERIFY` marker is resolved and the
-final-mode sweep exits 0. Review every assistant-chatter candidate before finalization;
-remove actual assistant-to-author residue and keep intentional reader-facing prose. Exit 2
-stops the workflow with its diagnostic. This gate checks residue and unresolved draft
-machinery; citation and link accuracy remain in the product-accuracy and
-source-verification passes.
-
-Gate: the author declares the post done, the final-mode sweep exits 0, and every
-assistant-chatter candidate has a contextual disposition.
+Gate: the author declares the post done, final-mode checks completed, all required hits
+are resolved, and every contextual hit and assistant-chatter candidate has a recorded
+disposition. Retained stylistic hits remain reported findings. Preservation must pass;
+formal voice calibration may remain unresolved with its evidence gap stated.
 
 Proceed immediately to Step 12.
 

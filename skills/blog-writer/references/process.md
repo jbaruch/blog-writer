@@ -423,13 +423,14 @@ halves fail. Keep them apart.
 
 #### The counting half — the script does this, not you
 
-Some patterns have a verdict that falls out of an arithmetic result: word counts
+Some patterns have candidates detectable by an arithmetic result: word counts
 per sentence, occurrences per section, character presence, runs and windows. Reading for
 them does not work. Uniform sentence length is invisible when reading for content and
 obvious when counting.
 
-Run `sweep.py` over the draft. `SKILL.md` Step 10 carries the invocation and the exit-code
-routing, and that is the only place they live. Which patterns it covers, and with what
+Run `sweep.py` over the draft through `skills/blog-writer/references/sweep-review.md`,
+the shared invocation and exit-code contract for both routes. Counts establish matches;
+its contextual disposition determines whether a stylistic match warrants a rewrite. Which patterns it covers, and with what
 figures, is the script's own contract — the run reports them in `.coverage.ran`, and the
 named constants under "Decision contract" at the top of `skills/blog-writer/sweep.py` hold
 the numbers. Do not reproduce either here or by reading. The fix for each pattern it
@@ -438,7 +439,7 @@ The same object carries `.observations.em_dashes`: paired-aside locations, per-s
 counts, and spacing counts. Those figures are inputs to the #7/#8 identity and genre
 judgment, never findings on their own.
 
-Re-run it after every rewrite: a clean draft plus one edit is an unchecked draft, and the
+Rerun it after each completed editing pass: a clean draft plus one edit is an unchecked draft, and the
 most common way a tell ships is being introduced by the fix for something else.
 
 **A clean sweep is not a clean draft.** The script reports its own coverage on every run,
@@ -562,7 +563,8 @@ With a personal identity, restore evidenced devices, opinions, and attitude. Wit
 corporate-only writing, use the generic tone and corporate identity without inventing a
 named persona. Preserve neutral exposition when it serves the assignment.
 
-Rewrite any hits. This is not optional.
+Rewrite contextual findings whose stated test establishes a defect. Preserve justified
+assignment rhetoric under the shared sweep-review procedure; record its disposition.
 
 **Rewrite audit:** After rewriting any anti-pattern hit, re-read the replacement sentence
 in isolation and check it against EVERY pattern. Rewrites frequently introduce the same
@@ -574,10 +576,10 @@ pattern in a different surface form. This is especially true for:
 - #6 (Self-Answering Fragment) — rewrites often turn "The result? Great." into a longer
   question with a longer answer, but the structure is identical.
 
-Do not consider an anti-pattern fixed until the replacement passes a full-catalog scan
-on its own.
+Review the replacement against the full catalog with its contextual boundaries. A new
+match requires a disposition, not an automatic rewrite to remove its surface form.
 
-**Voice calibration:** After confirming the rewrite is anti-pattern clean, apply
+**Voice calibration:** After resolving or documenting the contextual findings, apply
 `skills/blog-writer/references/voice-calibration.md`. For personal identity, re-read the
 selected evidence and compare the pre-edit and post-edit prose on narrator presence, spoken
 cadence, connective flow, reader relationship, and argument movement. Documented devices
@@ -586,16 +588,19 @@ calibration not applicable and check human readability against the generic tone 
 corporate identity instead.
 
 **Proportionality check:** After all rewrites are done, compare the edited draft against
-the pre-scan version and ask two questions at the draft level:
+the pre-scan version and verify the author-preservation contract in
+`skills/blog-writer/references/voice-calibration.md`. Record source and revision passages
+for the protected functions; an assertion that the draft "still sounds like the author"
+is not evidence. Repair lost functions before calling the draft ready. Then ask two
+questions at the draft level:
 - Is the amount of rewriting proportional to the actual slop found? If the scan flagged
-  five sentences and forty changed, the editing pass over-reached. Zero tolerance applies
-  to the named patterns — not to everything in their vicinity.
+  five sentences and forty changed, the editing pass over-reached. Correct established defects, not every stylistic resemblance or neighboring sentence.
 - Would the author recognize this draft as their own voice? The scan's failure mode is
   laundering the voice out along with the patterns: every paragraph equally tidy, every
   edge sanded off, distinctive lines rewritten "for consistency." A voice device that
   merely resembles a pattern (the carve-outs in `ai-anti-patterns.md` list the known
   cases) stays. If the answer to this question is no, restore the human sentences the
-  scan didn't actually flag.
+  scan did not establish as defects, including justified retained stylistic hits.
 
 Run the prose-level structural audits. Open `skills/blog-writer/references/structural-audits.md` and run audits
 3, 4, and 5 **one at a time**, after the anti-pattern check is complete. Read the personal
@@ -621,8 +626,9 @@ posts. Uniform application of the whole menu is the convergence trap the file op
 it trades one detectable shape for another.
 
 Run the paragraph continuity check from `skills/blog-writer/references/voice-calibration.md`
-after the structural audits and every later prose edit. Test adjacent paragraph pairs and
-at least one run of three or more paragraphs. Repair reorderable cards by restoring real
+after the structural audits and each later editing pass. Check sentence order within
+paragraphs as well as adjacent paragraph pairs; inspect longer runs when the artifact
+contains them. Repair reorderable cards by restoring real
 argument movement. Preserve a dependent punchline paragraph, an earned digression,
 connective tissue, and related ideas that belong together.
 
@@ -653,7 +659,8 @@ Run the tightening pass. Re-read the draft sentence by sentence with fresh eyes:
 **Checkpoint:** Write the first draft to `blog-draft-[slug].md` in the working directory.
 Tell the author the file is ready for review. Also display a summary in conversation with
 word count, placeholder counts by type, open questions, mechanical sweep state, manual
-anti-pattern review state, voice calibration state and evidence, assignment mode, and
+anti-pattern review state, author-preservation evidence, voice calibration state and
+evidence, assignment mode, and
 paragraph continuity state. Report each state independently.
 
 ---
@@ -686,8 +693,8 @@ conversation — edit the file surgically.
 - Re-run the anti-pattern check (`skills/blog-writer/references/ai-anti-patterns.md`) after changes — all
   three passes (surface scan + skeleton scan + soul check) for new or rewritten sections.
   Apply the rewrite
-  audit rule: every rewrite must pass a full-catalog scan on its own before it's
-  considered fixed. Then run the applicable personal-identity or corporate-only voice
+  audit rule: check each replacement against the full catalog and record contextual
+  dispositions before considering its defect fixed. Then run the applicable personal-identity or corporate-only voice
   check and redo any rewrite that's clean but flat. New writing can introduce new patterns
 - Re-run the product accuracy check if any product feature descriptions, commands, or
   terminology were added or changed (only if product context is configured) — use
@@ -700,13 +707,15 @@ conversation — edit the file surgically.
 - Re-run structural audits 3, 4, and 5 on new or rewritten sections. A section added in
   Phase 4 has been through no structural check at all
 - Re-run voice calibration and paragraph continuity on new or rewritten prose. Compare the
-  pre-edit and post-edit text, then report all four review states independently
+  original assignment, pre-edit, and post-edit text, then report the preservation and
+  review states from the voice-calibration reference independently
 
 **The author decides when revision is done.** Their declaration starts the final artifact
 gate. Run `sweep.py --mode final` through the invocation and exit-code contract in SKILL.md
-Step 11. Final mode blocks every supported asset placeholder, unresolved `VERIFY` marker,
-and deterministic interface-residue hit. Resolve every hit and rerun until the script exits
-0. Review every emitted assistant-chatter candidate in context; remove assistant-to-author
+Step 11 and `skills/blog-writer/references/sweep-review.md`. Final mode blocks every
+supported asset placeholder, unresolved `VERIFY` marker,
+and deterministic interface-residue hit. Resolve required hits and record contextual
+dispositions under the shared procedure; retained stylistic hits remain reported. Review every emitted assistant-chatter candidate in context; remove assistant-to-author
 residue and retain intentional reader-facing prose. Citation and link accuracy remain
 findings from the product-accuracy and source-verification passes, not this presence check.
 
@@ -723,6 +732,6 @@ Do not record it here — invoking the writer from both places would file the po
 | 0: Intake | Material read, gaps identified | Automatic |
 | 1: Clarification | All gaps resolved | Author confirms |
 | 2: Editorial Planning | Main idea + CTA + outline approved, voice evidence gated, outline audited | Author approves |
-| 3: First Draft | Draft written; mechanical, manual, voice, continuity, and structure states reported | Delivered to author |
-| 4: Revision | Author declares done; final artifact sweep exits 0 | Author + automatic gate |
+| 3: First Draft | Draft written; preservation, mechanical, manual, voice, continuity, and structure states reported | Delivered to author |
+| 4: Revision | Author declares done; final artifact checks pass with retained stylistic hits disclosed | Author + automatic gate |
 | Step 12: Record shape | Finished post's skeleton appended to the shape history | Automatic |

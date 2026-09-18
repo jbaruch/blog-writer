@@ -25,3 +25,6 @@ skills/**/tests/
 
 # The author's own persona lives outside the package; example-persona/ ships instead
 persona/
+
+# Maintainer behavioral prompts and assessment, not runtime skill resources
+validation/

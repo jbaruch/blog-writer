@@ -1,0 +1,8 @@
+Use blog-writer's full blog-writing workflow to write a new short developer blog from the material below. Use the supplied corporate-fixture directory next to cases as the explicitly selected corporate identity. Disable the personal layer. Use your assigned output directory as blog home; do not alter any other project configuration.
+
+All intake questions are answered below. I approve this editorial plan: title, three connected prose paragraphs, then the call to action. Target 180–250 words. No TLDR or biography for this assignment. The main idea is that adding agents shifts coordination work rather than making it disappear. Start with the demo, develop day-two operational work, then show what people need to decide. CTA: ask readers to inspect one approval gate in their own pipeline. Deliver a draft for my review; do not record a published post or ask for another planning approval.
+
+My framing and approved source wording:
+“We used to think the demo was the hard part. Then we had to live with the software. Adding agents creates another coordination problem. Each improvement moves the bottleneck somewhere else. Goldratt would recognize this factory.”
+
+Source facts for the post: a team's prototype worked in a demo. The next work was retaining architectural decisions after agent conversations and coordinating multiple agents. Human approvers needed the proposed change, test results, and unresolved risks to make a useful decision. There is no measurement showing that agents eliminated this work. No product name, fixed project inventory, or invented personal anecdote. The original “we” is the supplied source voice; retain the self-implication without adding experiences.

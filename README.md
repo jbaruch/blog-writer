@@ -5,6 +5,8 @@
 Write developer blog posts from video transcripts, meeting notes, or rough ideas.
 Use the same skill for a humanizer or humanization pass on an existing draft: remove
 AI slop and formulaic phrasing while preserving meaning, technical accuracy, and voice.
+Scoped edits and non-blog assignments use the supplied material without blog setup or
+publication bookkeeping. Review-only requests return findings without changing the source.
 
 ## Skills
 
@@ -38,7 +40,8 @@ the same thing with less abstraction.
 
 The mechanical sweep has separate draft and final contracts. Draft mode permits the five
 placeholder types and their VERIFY comments. Final mode blocks every unresolved marker and
-deterministic interface residue before the finished post can be recorded. Phrases such as
+deterministic interface residue before the finished post can be recorded. Retained
+stylistic matches remain visible; an exit code alone does not establish editorial success. Phrases such as
 "let me know" are surfaced separately for contextual review.
 
 ## Anti-pattern detection
@@ -54,7 +57,9 @@ in three passes:
   that survive pattern checks
 
 Four patterns are covered by three counting sweeps. They check fragment chains (#3/#4),
-sentence-length uniformity (#14), and unicode giveaways (#18). Those run as a script
+sentence-length uniformity (#14), and unicode giveaways (#18). Sentence-length and fragment
+counts require a contextual disposition; justified rhetoric can retain reported hits.
+Required artifact corrections cannot be waived as voice. These checks run as a script
 (`sweep.py`) over the draft. The same run
 reports paired em-dash locations, per-section counts, and spacing as observations for an identity-
 and genre-calibrated judgment; punctuation counts alone do not fail the draft. Every run

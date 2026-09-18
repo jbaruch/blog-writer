@@ -1,7 +1,7 @@
 # AI Writing Anti-Patterns
 
 These are defined checks with different evidence weights. During the anti-pattern check
-(Phase 3 and Phase 4), scan the draft for every pattern listed here. Rewrite a finding;
+(Phase 3 and Phase 4), scan the draft for every pattern listed here. Rewrite an established contextual defect;
 do not turn a candidate phrase or punctuation count into a finding before applying its
 stated test.
 
@@ -612,6 +612,10 @@ for actions — they're not informal, they're alive.
 
 ## 14. Low Burstiness
 
+Sentence-length windows are candidates for contextual review, not proof of bad prose or
+AI authorship. Apply the disposition procedure in `skills/blog-writer/references/sweep-review.md`.
+A supported short question/answer sequence or setup and payoff may retain its counts.
+
 **The tell:** Every sentence is roughly the same length and structure. No rhythm
 variation between short punchy sentences and longer complex ones.
 
@@ -623,16 +627,16 @@ variation between short punchy sentences and longer complex ones.
 
 **Why it's a tell:** Human writers naturally vary sentence length. A short sentence
 after a long one creates emphasis. A long sentence after two short ones builds complexity.
-LLMs produce text with remarkably uniform sentence length — researchers call this "low
-burstiness." It's one of the most reliable structural signals of AI text, even when the
-vocabulary is clean.
+The scanner measures lengths, not monotony, argumentative function, or authorship.
+Judge whether the repeated rhythm obscures relationships or substitutes cadence for
+content in this passage. Do not infer a defect solely from the arithmetic window.
 
 **Instead:** Read your paragraphs out loud. If every sentence takes the same number of
 breaths, rewrite. Break a long sentence into a punchy two-worder. Combine two medium
 sentences into one that flows. The goal is rhythm, not uniformity.
 
-Good target distribution: roughly 20% short (under 10 words), 50% medium (10-20 words),
-30% long (20+ words). You don't need to count — just listen for monotony.
+Do not target a sentence-length distribution. Keep short answers, qualifications, and
+payoffs that serve the assignment; never add padding just to change a count.
 
 ---
 
