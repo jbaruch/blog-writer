@@ -3,6 +3,8 @@
 [![tessl](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.tessl.io%2Fv1%2Fbadges%2Fjbaruch%2Fblog-writer)](https://tessl.io/registry/jbaruch/blog-writer)
 
 Write developer blog posts from video transcripts, meeting notes, or rough ideas.
+Use the same skill for a humanizer or humanization pass on an existing draft: remove
+AI slop and formulaic phrasing while preserving meaning, technical accuracy, and voice.
 
 ## Skills
 
