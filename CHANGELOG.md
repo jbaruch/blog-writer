@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.46 — 2026-09-18
+
 ### Fixed
 
 - Add a source-to-revision preservation check for full drafting and scoped prose work
