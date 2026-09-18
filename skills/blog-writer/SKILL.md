@@ -1,13 +1,15 @@
 ---
 name: blog-writer
 description: >
-  Write developer blog posts from video transcripts, meeting notes, or rough ideas.
-  Extracts narrative from source material, structures content with hooks and technical sections,
-  formats code examples with placeholders, and checks drafts against a catalog of AI anti-patterns.
-  Use this skill whenever the user wants to write a blog post, draft a blog, turn a transcript
-  into a blog, work on blog content, or mentions "blog" in the context of content creation.
-  Also trigger when the user provides a video transcript and wants written content derived from it,
-  or when continuing work on a blog series.
+  Write and revise developer blog posts, and humanize existing drafts using the AI
+  anti-pattern catalog, structural checks, and author voice calibration. Use when asked
+  for a "humanizer", "humanization pass", "humanisation pass", "humanize this",
+  "humanise this", "de-AI this", "remove AI slop", "remove AI tells", "anti-AI pass",
+  "make this sound less AI-generated", "less robotic", or "more natural" in a writing
+  or editing request, even when the user does not mention a blog. Also use for writing
+  a blog post, revising blog content, turning a video transcript, meeting notes, or
+  rough ideas into a blog, and continuing a blog series. Preserve the author's meaning,
+  technical accuracy, and voice while identifying and rewriting formulaic prose.
 ---
 
 # Blog Writer

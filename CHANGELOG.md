@@ -1,5 +1,11 @@
 # Changelog
 
+### Fixed
+
+- Make blog-writer discoverable for humanizer, humanization/humanisation, de-AI, AI-slop
+  removal, and natural-prose editing requests even when the prompt does not mention a
+  blog. Align the plugin description and README with the skill discovery wording.
+
 ## 1.1.44 — 2026-09-16
 
 ### Fixed
