@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.45 — 2026-09-18
+
 ### Fixed
 
 - Make blog-writer discoverable for humanizer, humanization/humanisation, de-AI, AI-slop
