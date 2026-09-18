@@ -338,6 +338,18 @@ The deploy stalled — briefly, that time. The alert stayed quiet — as it alwa
 - a fourth thing' \
     0 no "fragment chain"
 
+  assert_json "Goldratt cadence stays a reported contextual match" \
+    'Can all of this be fixed? And what if each improvement moves the bottleneck somewhere else? Goldratt would recognize this factory.' \
+    1 '(.hits | length) == 1 and .hits[0].pattern == "#14" and .hits[0].review == "contextual" and .hits[0].verify_context == true'
+
+  assert_json "endorsed question and answer cadence is not silently exempted" \
+    'Did AI solve coding? Maybe. Did AI solve software engineering? Not even close. Can we do better software engineering with AI? By the end of this session, you will be the judge.' \
+    1 '([.hits[].pattern] | sort) == ["#14","#3/#4"] and all(.hits[]; .review == "contextual")'
+
+  assert_json_mode "style and final artifact hits have separate dispositions" \
+    $'Did AI solve coding? Maybe. Did AI solve software engineering? Not even close.\n\n[Fact 01: verify the claim]\n\ncontentReference[oaicite:7]{index=12}' \
+    final 1 'any(.hits[]; .review == "contextual") and any(.hits[]; .pattern == "WP:FINALIZATION" and .review == "required") and any(.hits[]; .pattern == "WP:OAICITE" and .review == "required")'
+
   # 5. #14 low burstiness
   assert_sweep "#14 fires on a monotone run" \
     'The system indexes every file on disk. It writes the results to a local cache.
@@ -398,7 +410,7 @@ oaicite' \
 
   assert_json "composite contentReference remains one exact token" \
     'contentReference[oaicite:7]{index=12}' \
-    1 '[.hits[] | select(.pattern == "WP:OAICITE")] == [{"pattern":"WP:OAICITE","label":"citation artifact","line":1,"detail":"ChatGPT contentReference","context":"contentReference[oaicite:7]{index=12}","verify_context":false,"token":"contentReference[oaicite:7]{index=12}"}]'
+    1 '[.hits[] | select(.pattern == "WP:OAICITE")] == [{"pattern":"WP:OAICITE","label":"citation artifact","line":1,"detail":"ChatGPT contentReference","context":"contentReference[oaicite:7]{index=12}","verify_context":false,"review":"required","token":"contentReference[oaicite:7]{index=12}"}]'
 
   assert_json "Perplexity upload residue reports its exact token" \
     'The pasted marker was ppl-ai-file-upload and it must not ship.' \

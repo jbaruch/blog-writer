@@ -2,6 +2,8 @@
 
 The blog writer consumes personal and optional corporate identity packages defined by
 `skills/blog-writer/references/identity-spec.md`.
+This resolution procedure belongs to the full blog workflow. For optional identity use
+in a limited edit or non-blog assignment, follow `skills/blog-writer/references/scoped-edit.md`.
 
 ## Resolve
 

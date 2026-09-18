@@ -395,8 +395,9 @@ Before submitting a draft, check:
   No tangents survived the cut.
 - [ ] Run a final anti-pattern check: surface scan (match examples and structural variants),
   then skeleton scan (compare grammatical structure of adjacent sentences), then soul check
-  (read for evidenced departures from identity and assignment). Rewrite any hits, then re-check each
-  rewrite against every pattern before considering it fixed.
+  (read for evidenced departures from identity and assignment). Apply the contextual
+  dispositions in `skills/blog-writer/references/sweep-review.md`, then check each
+  replacement for new defects and preservation regressions.
 
 ---
 

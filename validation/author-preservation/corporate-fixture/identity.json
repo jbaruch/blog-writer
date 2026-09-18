@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "type": "corporate",
+  "name": "editorial-fixture",
+  "status": "approved",
+  "entrypoint": "identity.md",
+  "resources": [
+    {"role": "editorial-review", "path": "editorial.md"}
+  ],
+  "sources": "sources.md"
+}

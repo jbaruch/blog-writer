@@ -1,5 +1,24 @@
 # Changelog
 
+### Fixed
+
+- Add a source-to-revision preservation check for full drafting and scoped prose work
+  (#69). Assignment-specific framing and endorsed wording protect claims, stance,
+  argument progression, and rhetorical functions independently of formal personal voice
+  readiness. Check within-paragraph placement as well as connections between paragraphs.
+- Route existing-artifact edits, review-only requests, and non-blog writing directly to
+  scoped work without blog setup, repeated planning approvals, or shape bookkeeping (#68).
+  Reuse the same preservation and scanner-disposition procedures in both routes.
+- Keep fragment-chain and sentence-length matches visible with an explicit contextual
+  review classification. Require passage evidence to retain purposeful rhetoric; do not
+  force filler or semantic loss to reach exit 0. Artifact corrections, unsupported facts,
+  and unresolved finalization markers receive no voice waiver. Check preservation after
+  scanner and corporate edits, and retain unaffected wording in local corrections.
+- The motivating CFP session ran 1.1.42. Current-main 1.1.45 already improves the soul
+  check, but reproduces the same three arithmetic hits on the supplied Goldratt and closing
+  excerpts. This change addresses the remaining conflict between mandatory zero-hit
+  rewrites and source-backed rhetoric, rather than attributing every past failure to it.
+
 ## 1.1.45 — 2026-09-18
 
 ### Fixed

@@ -4,7 +4,7 @@
 `references/process.md` Phase 3 Pass 1 splits the anti-pattern check into two
 kinds of work. This script owns one of them.
 
-    Counting  the verdict falls out of an arithmetic result and no reading is
+    Counting  the match falls out of an arithmetic result and no reading is
               involved: word counts per sentence, occurrences per section,
               character presence, runs and windows. A model approximates these
               silently and reports clean; a script does not. That is this file.
@@ -41,9 +41,12 @@ Output (stdout):
        "observations": { ... }, "coverage": { ... }}
 
     Each hit carries {"pattern", "label", "line", "detail", "context",
-    "verify_context", "token"}. `line` is the 1-indexed source line. `token`
+    "verify_context", "token", "review"}. `line` is the 1-indexed source line. `token`
     is the exact matched text for deterministic residue and finalization hits;
-    aggregate counting hits use null.
+    aggregate counting hits use null. `review` is `contextual` for stylistic
+    candidates and `required` for corrections that cannot be waived as voice.
+    See CONTEXTUAL_PATTERNS for classification. The script never decides that
+    a contextual hit may stay; the skill records that editorial disposition.
 
     Each assistant-chatter candidate carries {"pattern", "label", "line",
     "detail", "context", "token", "test"}. These ambiguous phrases require
@@ -63,13 +66,14 @@ Exit codes:
     0  swept, no hits in the counting sweeps. NOT "the draft is clean" — most
        of the patterns were not examined by this script, and `.coverage.note`
        says how many.
-    1  swept, at least one hit. Each is a real finding: every predicate here is
-       arithmetic, so there is no judgment call left for the caller to make.
+    1  swept, at least one hit. Raw matches remain visible even when the skill
+       justifies retaining a contextual stylistic hit. Consult each hit's review
+       field; exit 1 alone is not an editorial rejection.
     2  tool or usage error (no path given, file unreadable, not valid UTF-8,
        or references/ai-anti-patterns.md missing so the coverage total cannot
        be counted).
 
-Re-run after every rewrite. Both misses that motivated this script were
+Re-run after each completed editing pass. Both misses that motivated this script were
 regressions introduced by edits made after a check had already reported clean.
 
 The thresholds below are this script's decision contract per
@@ -88,6 +92,10 @@ from pathlib import Path
 # its sweep. Changing one changes the check; they are not tuning knobs.
 
 # #3/#4 — "every sentence under six words ... whether 3+ appear consecutively"
+# These counts need an editorial disposition even with accurate segmentation.
+# Everything else requires correction; adding a new sweep defaults to required.
+CONTEXTUAL_PATTERNS = frozenset({"#3/#4", "#14"})
+
 FRAGMENT_MAX_WORDS = 6
 FRAGMENT_RUN = 3
 
@@ -666,6 +674,7 @@ def hit(
         "detail": detail,
         "context": " ".join(context.split())[:90],
         "verify_context": verify_context,
+        "review": "contextual" if pattern in CONTEXTUAL_PATTERNS else "required",
         "token": token,
     }
 
