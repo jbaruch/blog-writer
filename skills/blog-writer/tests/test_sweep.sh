@@ -12,6 +12,9 @@
 #      shorter run, and not on a list of short items. Blockquotes count as
 #      prose; sentence boundaries survive a trailing capital.
 #   6. #14 low burstiness — fires on a monotone run, not on varied lengths.
+#   5c. #31 category claims — a subject-copula-category sentence is reported with
+#      the claim as its token so the subject-swap test gets run and recorded; a
+#      concrete claim about the same subject is not matched.
 #   5b. #28/#30 announcement clauses — a cataphoric clause handing over to a
 #      colon is reported with the clause as its token, a colon sentence that
 #      names its own subject is not, and the catalog's fixed openers report as
@@ -239,7 +242,7 @@ which everyone had quietly accepted as simply the cost of shipping anything at a
 We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
-  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 4'
+  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
   assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 4'
   assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 14'
   assert_json "em-dash verdicts are routed to judgment" "$clean_draft" 0 \
@@ -256,7 +259,7 @@ We cut it.'
   elif [ "$defined" -lt 2 ]; then
     fail "references/ai-anti-patterns.md reported only ${defined} pattern(s)"
   else
-    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 6 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
+    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 7 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
   fi
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
@@ -325,13 +328,26 @@ The deploy stalled — briefly, that time. The alert stayed quiet — as it alwa
     $'## Heading — aside\n\nText — here.\n\n### Another—heading\n\nThe draft uses ordinary punctuation.' \
     0 '.observations.em_dashes.spacing == {"spaced":1,"closed":0,"mixed":0,"boundary":0} and .observations.em_dashes.total == 1 and ([.observations.em_dashes.spacing[]] | add) == .observations.em_dashes.total'
 
+  # 4c. #31 category claims
+  assert_sweep "#31 fires on a subject-copula-category claim" \
+    'Context is an engineering problem: artifacts you version, tools you match to the job, and a number that tells you whether any of it helped.' \
+    1 yes "category claim"
+
+  assert_sweep "#31 does not fire on a concrete claim about the same subject" \
+    'Your context window is not a giant drawer. Break it into artifacts you can version and test, then measure what each piece buys you.' \
+    0 no "category claim"
+
+  assert_json "#31 reports the claim as its token and stays contextual" \
+    'Onboarding is a design problem, and the fix is a checklist nobody reads twice.' \
+    1 '[.hits[] | select(.pattern == "#31")] | length == 1 and (.[0].token == "Onboarding is a design problem") and (.[0].review == "contextual")'
+
   # 4b. #28/#30 announcement clauses
   assert_sweep "#28/#30 fires on a cataphoric clause before a colon" \
     'Four things quietly wreck that architecture, and they all have names: the stuffed prompt, the wrong tool, the goldfish, and the eval nobody runs.' \
     1 yes "announcement clause"
 
   assert_sweep "#28/#30 does not fire when the clause names its own subject" \
-    'Context is an engineering problem: artifacts you version, tools you match to the job, and a number that tells you whether any of it helped.' \
+    'The release checklist has three steps: freeze the branch, run the migration on the replica, and tag the build once the smoke tests are green.' \
     0 no "announcement clause"
 
   assert_sweep "#28/#30 fires on a catalog opener" \
@@ -985,12 +1001,12 @@ The third — an aside — is not.' \
   # examined count the note claims zero unexamined while not_run_judgment still
   # names sweeps; below it the arithmetic goes negative. Both must fail rather
   # than report.
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n' >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog of exactly the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 7 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the exactly-examined diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
@@ -1002,14 +1018,14 @@ The third — an aside — is not.' \
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 6 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 7 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
     echo "  a catalog smaller than the examined count exits 2"
   fi
 
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n' >"${iso}/references/ai-anti-patterns.md"
   printf '\xff\xfe not utf-8\n' >>"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?

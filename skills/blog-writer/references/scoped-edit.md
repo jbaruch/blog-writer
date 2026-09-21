@@ -36,6 +36,13 @@ For a narrower copyedit or local correction, inspect the changed passages and th
 context under the same catalog boundaries; keep unaffected wording. Do not broaden an
 edit just to remove every stylistic scanner match elsewhere in the artifact.
 
+Scoped work has no outline phase, so audit 1 (theme explicitness) in
+`skills/blog-writer/references/structural-audits.md` never runs unless it runs here.
+Run it on the prose: mark every sentence that states the artifact's point rather than
+showing it, and keep one. A sentence that names the theme after the material already
+implied it is the most common survivor of a sentence-level pass, because no numbered
+pattern owns it.
+
 Execute `skills/blog-writer/references/sweep-review.md` for mechanical results, contextual
 retention, and the final artifact check. Treat the raw sweep independently from the
 editorial judgment. Preserve neutral exposition and supported attitude alike. Correct or

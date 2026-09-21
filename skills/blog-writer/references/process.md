@@ -544,6 +544,14 @@ structures — any of these in adjacent sentences is a flag, regardless of wheth
 a named pattern. Vary the structure of one sentence in the pair. Pass 2 catches patterns
 that Pass 1 misses because the vocabulary is different but the grammar is identical.
 
+**Pass 2 runs twice: once over adjacent sentence pairs, once inside every series.**
+The second half is the one that gets skipped, because the first half feels like the
+whole pass. Take each list, colon tail, or run of examples with two or more items;
+strip the words and compare the item skeletons. Two of three items sharing a shape
+is the finding — the odd item out is what makes the series read as cadence rather
+than content. Report the series you checked; a Pass 2 reported as complete without
+naming them is a Pass 2 half run.
+
 **Pass 2 must also cover lists and example sequences**, not just adjacent sentence pairs.
 When a paragraph contains 3+ examples, case studies, or items in a series, check whether
 they share an identical grammatical skeleton across items. Full-sentence examples hiding
