@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Added
+
+- New `cfp-abstract` skill for conference talk abstracts and their notes for the program
+  committee. An abstract states what the talk is about and withholds the mechanism; the
+  committee note carries every fact, figure, link and risk in a fixed field order. The
+  skill separates the two readers explicitly, because writing either artifact into the
+  other is the failure it exists to prevent.
+- The skill encodes what a body must never carry: stage directions, interaction
+  mechanics, delivery history, prior-delivery observations from a rhetoric vault, and any
+  sentence that only lands for someone who has seen the speaker before. Framing the
+  author supplies to explain a talk is guidance for the writer, never copy.
+- A never-fabricate list: duration flexibility, recorded fallbacks, ratings, delivery
+  counts, and stage practices the speaker has not stated. Ask or omit.
+- For an undelivered talk, the skill requires establishing the spine before any copy is
+  written, since prose over an undefined session slides under every review.
+
 ### Fixed
 
 - Add #31's category claim: a subject, a copula and a category noun ("Context is an
