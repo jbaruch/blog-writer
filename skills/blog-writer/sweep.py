@@ -130,20 +130,55 @@ ANNOUNCEMENT_CLAUSE_MAX_WORDS = 8
 # Contextual, never required: a personal identity may declare one of these as a
 # spoken connector, and the disposition is the skill's to record.
 ANNOUNCEMENT_PHRASES = [
-    ("telegraph", re.compile(r"\bhere(?:\'s| is) (?:the thing|what I mean|the kicker)\b", re.IGNORECASE)),
-    ("telegraph", re.compile(r"\bhere(?:\'s| is) where it gets (?:interesting|tricky)\b", re.IGNORECASE)),
-    ("telegraph", re.compile(r"\bthis is where (?:things get|it gets)\b", re.IGNORECASE)),
-    ("telegraph", re.compile(r"\bthe important thing to (?:understand|remember|note) is\b", re.IGNORECASE)),
+    (
+        "telegraph",
+        re.compile(
+            r"\bhere(?:\'s| is) (?:the thing|what I mean|the kicker)\b", re.IGNORECASE
+        ),
+    ),
+    (
+        "telegraph",
+        re.compile(
+            r"\bhere(?:\'s| is) where it gets (?:interesting|tricky)\b", re.IGNORECASE
+        ),
+    ),
+    (
+        "telegraph",
+        re.compile(r"\bthis is where (?:things get|it gets)\b", re.IGNORECASE),
+    ),
+    (
+        "telegraph",
+        re.compile(
+            r"\bthe important thing to (?:understand|remember|note) is\b", re.IGNORECASE
+        ),
+    ),
     ("telegraph", re.compile(r"\bthe part that really matters\b", re.IGNORECASE)),
-    ("telegraph", re.compile(r"\bwhat(?:\'s| is) worth paying attention to\b", re.IGNORECASE)),
+    (
+        "telegraph",
+        re.compile(r"\bwhat(?:\'s| is) worth paying attention to\b", re.IGNORECASE),
+    ),
     ("faux-insight", re.compile(r"\bwhat nobody tells you\b", re.IGNORECASE)),
-    ("faux-insight", re.compile(r"\bthe part (?:everyone|most people) miss(?:es)?\b", re.IGNORECASE)),
+    (
+        "faux-insight",
+        re.compile(r"\bthe part (?:everyone|most people) miss(?:es)?\b", re.IGNORECASE),
+    ),
     ("faux-insight", re.compile(r"\bwhat most people get wrong\b", re.IGNORECASE)),
     ("faux-insight", re.compile(r"\bwhat if I told you\b", re.IGNORECASE)),
     ("labelled device", re.compile(r"\bthe irony(?=\s*[?:,]|\s+is\b)", re.IGNORECASE)),
-    ("labelled device", re.compile(r"\bthe (?:beauty|paradox) (?:of it |here )?is\b", re.IGNORECASE)),
-    ("labelled device", re.compile(r"\b(?:the punchline|plot twist)\s*[:?]", re.IGNORECASE)),
-    ("labelled device", re.compile(r"\bthe (?:best part|surprising part)(?=\s*[?:]|\s+is\b)", re.IGNORECASE)),
+    (
+        "labelled device",
+        re.compile(r"\bthe (?:beauty|paradox) (?:of it |here )?is\b", re.IGNORECASE),
+    ),
+    (
+        "labelled device",
+        re.compile(r"\b(?:the punchline|plot twist)\s*[:?]", re.IGNORECASE),
+    ),
+    (
+        "labelled device",
+        re.compile(
+            r"\bthe (?:best part|surprising part)(?=\s*[?:]|\s+is\b)", re.IGNORECASE
+        ),
+    ),
 ]
 
 EM_DASH = "—"
