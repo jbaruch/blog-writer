@@ -1314,6 +1314,19 @@ something is clear, significant, or important without naming what it actually is
 - ❌ "The implications for the industry are significant." (Name one.)
 - ❌ "This fundamentally changes the game." (How? For whom?)
 
+**The category claim:** "Context is an engineering problem." "Onboarding is a
+design problem." "Security is a culture problem." A subject, a copula, and a
+category noun (problem, question, challenge, issue, discipline), usually handing
+over to a colon and a tidy list. It sounds like a thesis and asserts nothing
+checkable.
+
+**The subject-swap test:** replace the subject noun with an unrelated one from
+the same domain. "Testing is an engineering problem." "Deployment is an
+engineering problem." If the sentence still works, it was never about its
+subject — the same move #36 catches in product copy, applied to a thesis. Write
+the specific claim instead, or delete the sentence and let the examples carry
+the point.
+
 **Structural variants:**
 The assertion can be dressed up with specificity that doesn't actually specify.
 - "The future of developer tooling will never be the same." — sounds specific (developer

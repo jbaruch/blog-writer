@@ -4,6 +4,24 @@
 
 ### Fixed
 
+- Add #31's category claim: a subject, a copula and a category noun ("Context is an
+  engineering problem"), usually handing over to a tidy list. `sweep.py` reports the
+  shape; the verdict is a subject swap — replace the subject with an unrelated one from
+  the same domain, and if the sentence still works it was never about its subject. This
+  generalizes #36's interchangeability test, which was scoped to product copy only.
+- Split Pass 2 into its two halves explicitly. The series half — comparing item skeletons
+  inside every list, colon tail, and run of examples — is the half that gets skipped
+  because the adjacent-pair half feels like the whole pass. The checked series must be
+  named, so a half-run Pass 2 cannot be reported as complete.
+- Run audit 1 (theme explicitness) on the prose in scoped work. Audits 1, 2 and 6 are
+  outline audits, and scoped edits have no outline phase, so a sentence that states the
+  artifact's point instead of showing it had no owner: no numbered pattern covers it and
+  the audit never ran.
+- Motivating failure: "Context is an engineering problem: artifacts you version, tools you
+  match to the job, and a number that tells you whether any of it helped" survived a
+  by-the-book pass. It fails the subject swap, two of its three items share one skeleton,
+  and it states the theme the preceding paragraph already implied.
+
 - Mechanize the countable half of #28 (labelling the device) and #30 (telegraphing).
   `sweep.py` now reports two enumerable shapes as contextual hits: a cataphoric clause
   that hands over to a colon ("and they all have names:", "it comes down to this:"), and

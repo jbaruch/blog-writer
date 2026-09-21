@@ -96,7 +96,7 @@ from pathlib import Path
 # #3/#4 — "every sentence under six words ... whether 3+ appear consecutively"
 # These counts need an editorial disposition even with accurate segmentation.
 # Everything else requires correction; adding a new sweep defaults to required.
-CONTEXTUAL_PATTERNS = frozenset({"#3/#4", "#14", "#28/#30"})
+CONTEXTUAL_PATTERNS = frozenset({"#3/#4", "#14", "#28/#30", "#31"})
 
 FRAGMENT_MAX_WORDS = 6
 FRAGMENT_RUN = 3
@@ -181,6 +181,20 @@ ANNOUNCEMENT_PHRASES = [
     ),
 ]
 
+# #31 — the category claim. "Context is an engineering problem." A short subject,
+# a copula, and a category noun. The pattern's test is a swap the script cannot
+# perform (replace the subject with an unrelated one from the same domain and see
+# whether the sentence still works), but the shape is enumerable, and it is the
+# shape a thesis-shaped sentence takes when it asserts nothing checkable.
+CATEGORY_NOUNS = r"problem|question|challenge|issue|discipline|matter|exercise"
+CATEGORY_CLAIM = re.compile(
+    r"\b(?P<subject>[A-Za-z][\w-]*(?:\s+[a-z][\w-]*){0,2})\s+"
+    r"(?:is|are|was|were|becomes?|remains?)\s+"
+    r"(?:a|an|the)\s+[a-z][\w-]*\s+"
+    r"(?:" + CATEGORY_NOUNS + r")\b",
+    re.IGNORECASE,
+)
+
 EM_DASH = "—"
 
 # Blocks whose sentences the fragment and burstiness sweeps read. A blockquote
@@ -261,14 +275,16 @@ ANTI_PATTERNS_FILE = (
 # not a pattern.
 PATTERN_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 
-# Six, not four: #3/#4 and #28/#30 are each two patterns sharing one sweep.
-PATTERNS_EXAMINED = 6
+# Seven: #3/#4 and #28/#30 are each two patterns sharing one sweep, plus #14,
+# #18 and #31 one apiece.
+PATTERNS_EXAMINED = 7
 
 COUNTING_SWEEPS = [
     ("#3/#4", "fragment chains"),
     ("#14", "low burstiness"),
     ("#18", "unicode giveaways"),
     ("#28/#30", "announcement clauses (enumerable shapes only)"),
+    ("#31", "category claims (shape only — the subject swap is the check)"),
 ]
 
 SUPPLEMENTAL_SWEEPS = [
@@ -858,6 +874,35 @@ def sweep_announcements(blocks):
     return hits
 
 
+def sweep_category_claims(blocks):
+    """#31 — a subject, a copula and a category noun, asserting nothing checkable.
+
+    The shape is countable; the verdict is the subject-swap test in #31, which
+    needs a reading. Reported so the swap gets run and recorded rather than
+    skipped because the sentence sounds like a thesis.
+    """
+    hits = []
+    for block in blocks:
+        if block.kind not in PROSE_KINDS:
+            continue
+        for number, sentence in sentence_units(block):
+            found = CATEGORY_CLAIM.search(sentence)
+            if found:
+                hits.append(
+                    hit(
+                        "#31",
+                        "category claim",
+                        number,
+                        "swap the subject for an unrelated one from the same "
+                        "domain; if the sentence still works, it is not about "
+                        "its subject",
+                        sentence,
+                        token=found.group(0),
+                    )
+                )
+    return hits
+
+
 def observe_emdashes(blocks, sections):
     """Count #7/#8 candidates without turning them into findings.
 
@@ -1154,6 +1199,7 @@ def run_sweeps(raw, mode="draft"):
     hits = []
     hits += sweep_fragments(blocks)
     hits += sweep_announcements(blocks)
+    hits += sweep_category_claims(blocks)
     hits += sweep_burstiness(blocks)
     hits += sweep_unicode(blocks)
     hits += sweep_citation_artifacts(blocks)
