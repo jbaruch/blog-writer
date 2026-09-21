@@ -10,15 +10,17 @@ kinds of work. This script owns one of them.
               silently and reports clean; a script does not. That is this file.
 
     Judging   the string match is trivial and the call is the work: the delete
-              test (#10, #35), the interchangeability test (#36), the usage
+              test applied to a clause the script did not match (#28, #30),
+              the delete test (#10, #35), the interchangeability test (#36), the usage
               qualifiers on the #12 watchlist ("key" as adjective, "navigate"
               abstract, "rich" figurative), whether two noun phrases denote one
               concept (#17), whether two numbers make the same point (#32),
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script covers 4 numbered patterns across 3 sweeps (#3 and #4 share the
-fragment-chain sweep), plus supplemental fixed-output checks. It says so on
+This script covers 6 numbered patterns across 4 sweeps (#3 and #4 share the
+fragment-chain sweep; #28 and #30 share the announcement-clause sweep), plus
+supplemental fixed-output checks. It says so on
 every run. The numbered total is counted from `references/ai-anti-patterns.md`
 rather than restated here.
 Every result carries its coverage, including a result with no findings: silence
@@ -94,7 +96,7 @@ from pathlib import Path
 # #3/#4 — "every sentence under six words ... whether 3+ appear consecutively"
 # These counts need an editorial disposition even with accurate segmentation.
 # Everything else requires correction; adding a new sweep defaults to required.
-CONTEXTUAL_PATTERNS = frozenset({"#3/#4", "#14"})
+CONTEXTUAL_PATTERNS = frozenset({"#3/#4", "#14", "#28/#30"})
 
 FRAGMENT_MAX_WORDS = 6
 FRAGMENT_RUN = 3
@@ -102,6 +104,82 @@ FRAGMENT_RUN = 3
 # #14 — "any run of 3+ consecutive sentences within 5 words of each other"
 BURSTINESS_RUN = 3
 BURSTINESS_SPREAD = 5
+
+# #28/#30 — the countable half of "labelling the device" and "telegraphing".
+# Both patterns share one test: delete the clause and re-read the sentence that
+# follows. If it is unchanged, the clause announced rather than said. The test
+# itself needs a reading, but two of its shapes are enumerable, and those two
+# are where a self-reviewing author is weakest — a clause written for effect is
+# read back as intent, not as a candidate.
+#
+# Shape one: a clause that points forward with a pronoun and a light verb, then
+# hands over to a colon ("and they all have names:", "it comes down to this:").
+# The subject must be cataphoric. "Context is an engineering problem:" names its
+# own subject and is not matched.
+ANNOUNCEMENT_CATAPHORIC = re.compile(
+    r"^(?:and\s+|but\s+|so\s+)?"
+    r"(?:they|these|those|it|this|there)\s+"
+    r"(?:all\s+|both\s+)?"
+    r"(?:have|has|had|is|are|was|were|comes?\s+down\s+to|boils?\s+down\s+to"
+    r"|looks?\s+like|goes?\s+like|works?\s+like)\b",
+    re.IGNORECASE,
+)
+ANNOUNCEMENT_CLAUSE_MAX_WORDS = 8
+
+# Shape two: the fixed openers `ai-anti-patterns.md` lists under #28 and #30.
+# Contextual, never required: a personal identity may declare one of these as a
+# spoken connector, and the disposition is the skill's to record.
+ANNOUNCEMENT_PHRASES = [
+    (
+        "telegraph",
+        re.compile(
+            r"\bhere(?:\'s| is) (?:the thing|what I mean|the kicker)\b", re.IGNORECASE
+        ),
+    ),
+    (
+        "telegraph",
+        re.compile(
+            r"\bhere(?:\'s| is) where it gets (?:interesting|tricky)\b", re.IGNORECASE
+        ),
+    ),
+    (
+        "telegraph",
+        re.compile(r"\bthis is where (?:things get|it gets)\b", re.IGNORECASE),
+    ),
+    (
+        "telegraph",
+        re.compile(
+            r"\bthe important thing to (?:understand|remember|note) is\b", re.IGNORECASE
+        ),
+    ),
+    ("telegraph", re.compile(r"\bthe part that really matters\b", re.IGNORECASE)),
+    (
+        "telegraph",
+        re.compile(r"\bwhat(?:\'s| is) worth paying attention to\b", re.IGNORECASE),
+    ),
+    ("faux-insight", re.compile(r"\bwhat nobody tells you\b", re.IGNORECASE)),
+    (
+        "faux-insight",
+        re.compile(r"\bthe part (?:everyone|most people) miss(?:es)?\b", re.IGNORECASE),
+    ),
+    ("faux-insight", re.compile(r"\bwhat most people get wrong\b", re.IGNORECASE)),
+    ("faux-insight", re.compile(r"\bwhat if I told you\b", re.IGNORECASE)),
+    ("labelled device", re.compile(r"\bthe irony(?=\s*[?:,]|\s+is\b)", re.IGNORECASE)),
+    (
+        "labelled device",
+        re.compile(r"\bthe (?:beauty|paradox) (?:of it |here )?is\b", re.IGNORECASE),
+    ),
+    (
+        "labelled device",
+        re.compile(r"\b(?:the punchline|plot twist)\s*[:?]", re.IGNORECASE),
+    ),
+    (
+        "labelled device",
+        re.compile(
+            r"\bthe (?:best part|surprising part)(?=\s*[?:]|\s+is\b)", re.IGNORECASE
+        ),
+    ),
+]
 
 EM_DASH = "—"
 
@@ -183,13 +261,14 @@ ANTI_PATTERNS_FILE = (
 # not a pattern.
 PATTERN_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 
-# Four, not three: #3 and #4 are two patterns sharing one fragment-chain sweep.
-PATTERNS_EXAMINED = 4
+# Six, not four: #3/#4 and #28/#30 are each two patterns sharing one sweep.
+PATTERNS_EXAMINED = 6
 
 COUNTING_SWEEPS = [
     ("#3/#4", "fragment chains"),
     ("#14", "low burstiness"),
     ("#18", "unicode giveaways"),
+    ("#28/#30", "announcement clauses (enumerable shapes only)"),
 ]
 
 SUPPLEMENTAL_SWEEPS = [
@@ -211,6 +290,8 @@ JUDGMENT_SWEEPS = [
     ("#10", "introductory filler — apply the delete test"),
     ("#12", "AI vocabulary — the watchlist qualifiers are the check"),
     ("#17", "synonym cycling — do two phrases denote one concept?"),
+    ("#28", "labelled devices — delete-test the clauses the sweep did not match"),
+    ("#30", "telegraphing — delete-test the clauses the sweep did not match"),
     ("#32", "stacked data points — do two numbers make one point?"),
     ("#35", "temporal filler — apply the delete test"),
     ("#36", "corporate cliche — apply the interchangeability test"),
@@ -712,6 +793,71 @@ def sweep_fragments(blocks):
     return hits
 
 
+def _announcement_clause(sentence):
+    """The clause a cataphoric announcement occupies, or None.
+
+    Takes the text before the first colon, then its last clause, because the
+    announcement is what hands over to the colon: in "Four things wreck it, and
+    they all have names: X, Y", the flagged span is "and they all have names",
+    not the whole sentence.
+    """
+    head, separator, _ = sentence.partition(":")
+    if not separator:
+        return None
+    clause = re.split(r"[,;]", head)[-1].strip()
+    if not clause or count_words(clause) > ANNOUNCEMENT_CLAUSE_MAX_WORDS:
+        return None
+    if not ANNOUNCEMENT_CATAPHORIC.match(clause):
+        return None
+    return clause
+
+
+def sweep_announcements(blocks):
+    """#28/#30 — clauses that announce what the next span is about to say.
+
+    Two enumerable shapes only. The pattern's full test is a reading, and the
+    coverage note says so; what this sweep removes is the case where the author
+    of the clause is also its reviewer and recalls the intent instead of
+    applying the test.
+    """
+    hits = []
+    for block in blocks:
+        if block.kind not in PROSE_KINDS:
+            continue
+        for number, sentence in sentence_units(block):
+            clause = _announcement_clause(sentence)
+            if clause:
+                hits.append(
+                    hit(
+                        "#28/#30",
+                        "announcement clause",
+                        number,
+                        "cataphoric clause before a colon — delete it and "
+                        "re-read what follows; if the rest is unchanged, it "
+                        "announced instead of saying",
+                        sentence,
+                        verify_context=True,
+                        token=clause,
+                    )
+                )
+            for label, expression in ANNOUNCEMENT_PHRASES:
+                found = expression.search(sentence)
+                if found:
+                    hits.append(
+                        hit(
+                            "#28/#30",
+                            f"announcement clause ({label})",
+                            number,
+                            "catalog opener — delete it and re-read what "
+                            "follows; a declared spoken connector in the "
+                            "selected identity is a retention, not a clean pass",
+                            sentence,
+                            token=found.group(0),
+                        )
+                    )
+    return hits
+
+
 def observe_emdashes(blocks, sections):
     """Count #7/#8 candidates without turning them into findings.
 
@@ -1007,6 +1153,7 @@ def run_sweeps(raw, mode="draft"):
     observations = {"em_dashes": observe_emdashes(blocks, sections)}
     hits = []
     hits += sweep_fragments(blocks)
+    hits += sweep_announcements(blocks)
     hits += sweep_burstiness(blocks)
     hits += sweep_unicode(blocks)
     hits += sweep_citation_artifacts(blocks)
