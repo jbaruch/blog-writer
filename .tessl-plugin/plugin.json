@@ -5,6 +5,7 @@
   "description": "Write and revise developer blog posts or run a humanizer / humanization pass on existing drafts using the AI anti-pattern catalog, structural audits, and reusable personal and explicitly selected corporate writing identities.",
   "skills": [
     "skills/blog-writer",
+    "skills/cfp-abstract",
     "skills/create-personal-identity",
     "skills/create-corporate-identity"
   ]
