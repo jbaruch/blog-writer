@@ -47,7 +47,11 @@ the whole passage in its assignment. Record one of:
 - **Segmentation artifact:** cite the actual sentence boundary and the mistaken split.
   A real arithmetic match cannot use this disposition.
 
-"It is the author's voice" without passage evidence is insufficient. Endorsement establishes
+"It is the author's voice" without passage evidence is insufficient. So is "it is
+my deliberate device": a construction the assistant wrote for effect in this
+session carries no retention weight, and a genre the author requested is not a
+source. Retention needs the author's own wording, their explicit direction about
+that passage, or the catalog's own test failing to establish a defect. Endorsement establishes
 an assignment preference, not factual truth or independent authorship. Unsupported claims,
 fabricated experience, citation problems, and scope violations still require correction or
 an explicit unresolved report; they cannot inherit a stylistic retention decision.

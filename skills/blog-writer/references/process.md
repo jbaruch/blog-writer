@@ -466,6 +466,15 @@ not a finding.
   Judge the punctuation's rhetorical function and the assignment genre. A pair or a high count is a
   candidate, not a finding. Preserve an earned interruption or identity-backed density;
   report the judgment unresolved when usable calibration evidence is unavailable.
+- **Announcement clauses (#28/#30):** `sweep.py` reports two enumerable shapes —
+  a cataphoric clause handing over to a colon, and the catalog's fixed openers.
+  The rest is this pass's work, and it is a sweep, not a read: take every clause
+  that could be deleted without cutting a noun, a number or a name — coordinated
+  clauses after `and`/`but`, clauses before a colon, sentence-initial adverbials
+  — delete it, and re-read the span that follows. If that span is unchanged, the
+  clause announced instead of saying, and it goes. Run this over clauses you
+  wrote yourself in this session first: those are the ones you will otherwise
+  read back as intent rather than as candidates.
 - **Introductory filler words (#10):** Search for the watchlist words from the
   "introductory filler words" variant in pattern #10: "of course", "naturally", "obviously",
   "clearly", "certainly", "indeed", "in fact", "honestly", "frankly", "additionally",

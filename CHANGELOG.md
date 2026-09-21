@@ -1,5 +1,32 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Mechanize the countable half of #28 (labelling the device) and #30 (telegraphing).
+  `sweep.py` now reports two enumerable shapes as contextual hits: a cataphoric clause
+  that hands over to a colon ("and they all have names:", "it comes down to this:"), and
+  the catalog's fixed openers ("here's the thing", "what if I told you", "the irony"). A
+  colon sentence that names its own subject is not matched. Coverage rises to 6 patterns
+  across 4 sweeps, and the residual read stays named in `not_run_judgment`.
+- Add the clause-level delete test to Pass 1's judging half. The test applies to every
+  deletable clause — coordinated clauses, clauses before a colon, sentence-initial
+  adverbials — and is run over the assistant's own sentences first.
+- State that drafting intent is not evidence. A clause written to satisfy a brief arrives
+  at the check pre-labelled "deliberate"; that label is not a disposition, and a
+  resemblance check against the catalog's examples passes anything phrased in a genre the
+  examples do not quote.
+- State that a requested register does not exempt its stock phrases. A trailer, a punchy
+  open, or any other requested genre voice supplies the likeliest matches in the draft;
+  name the conflict to the author instead of resolving it silently.
+- Extend the retention rule in `sweep-review.md`: "it is my deliberate device" carries no
+  more weight than an unevidenced voice claim.
+- Motivating failure: a CFP abstract passed a full 42-pattern review with "Four things
+  quietly wreck that architecture, and they all have names:" intact. Deleting the clause
+  left the list untouched, which is #30's own test. The clause was assistant-written for a
+  requested trailer register and was read back as intent rather than as a candidate.
+
 ## 1.1.46 — 2026-09-18
 
 ### Fixed

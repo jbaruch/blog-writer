@@ -29,6 +29,21 @@ defined here, one of its structural variants, or a script finding, leave it alon
 False positives from improvised rules damage the author's voice more than the pattern
 they're trying to fix.
 
+**Your own drafting intent is not evidence.** A clause you wrote minutes ago to
+satisfy a brief arrives at the check already labelled "deliberate", and that
+label is not a disposition — it is the reason the check exists. Recalling why a
+line is there answers a different question from the one the pattern asks. Apply
+the pattern's stated test to your own sentences exactly as written, and where a
+test is mechanical (the delete test, the interchangeability test), run it rather
+than recognising that the line does not resemble the catalog's examples. A
+resemblance check passes anything phrased in a genre the examples do not quote.
+
+**A requested register does not exempt its stock phrases.** When the assignment
+asks for a trailer, a punchy open, or any other genre voice, that genre's stock
+lines are the likeliest matches in the draft, because they are assembled from
+the same corpus the patterns describe. Name the conflict to the author and let
+them rule on it; do not resolve it silently in favour of the brief.
+
 **Non-findings:** Perfect grammar, mixed casual and formal registers, bland or robotic
 prose, fancy or academic prose, transition words in isolation, and unsourced content do
 not establish AI authorship. Do not flag them as AI-style findings on their own. Verify
