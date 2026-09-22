@@ -4,6 +4,22 @@
 
 ### Added
 
+- Pattern #43, intent-only sentences: prose that parses, sounds conclusive, and only means
+  something to someone who already knows what it was meant to say. The other 42 patterns
+  describe shapes, so a sentence can match none of them and still fail to make a claim —
+  a verb taking the wrong object, a pronoun pointing at an abstraction, an aphorism where
+  the mechanism belongs, a wink where the fact belongs. The paraphrase test: restate each
+  load-bearing sentence alone as a claim someone could disagree with; if the restatement
+  needs the writer's intent, the sentence has none of its own.
+- The paraphrase test runs in the craft sweep, before Pass 2, and #43 is named in the
+  script's judgment coverage so it cannot be skipped silently. The `cfp-abstract` skill
+  routes to it explicitly, since one opaque sentence is a large fraction of a 200-word
+  abstract.
+- Motivating failure: "A model that can answer questions can also refuse them. So Alice's
+  company gets one." Both sentences passed a full 43-pattern review, a clean sweep, and a
+  craft sweep. You refuse a request, not a question, so the first sentence says the model
+  declines to answer; "gets one" points at an abstraction two sentences back.
+
 - New `cfp-abstract` skill for conference talk abstracts and their notes for the program
   committee. An abstract states what the talk is about and withholds the mechanism; the
   committee note carries every fact, figure, link and risk in a fixed field order. The
