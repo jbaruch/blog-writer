@@ -314,6 +314,7 @@ JUDGMENT_SWEEPS = [
     ("#40", "vague connection — name the relationship"),
     ("#41", "source-unavailability hedging — cut unsupported claims"),
     ("#42", "ceremonial coverage — use what the source establishes"),
+    ("#43", "intent-only sentences — restate each load-bearing sentence as a claim"),
 ]
 
 # --- Sentence segmentation ---------------------------------------------------

@@ -1835,6 +1835,48 @@ or turn the unavailable source into the subject of another sentence.
 
 ---
 
+## 43. Intent-Only Sentences
+
+**Evidence class:** General developer-blog check. It catches what every other pattern
+misses by construction: the other 42 describe *shapes*, and a sentence can match none of
+them while still failing to mean anything to a reader who was not in the writer's head.
+
+**The tell:** The sentence parses, sounds conclusive, and can only be understood by
+someone who already knows what it was meant to say. Nothing is inflated, nothing is
+padded, no watchlist word appears. It reads as a claim and delivers none.
+
+**Symptoms:**
+- A verb taking the wrong object: "a model that can answer questions can also refuse
+  them" — you refuse a request, not a question, so the sentence says the model declines
+  to answer.
+- A pronoun pointing at an abstraction several sentences back: "So the company gets one."
+  One what?
+- An aphorism standing in for the mechanism: "nobody to blame but the queue." Blame for
+  what?
+- A wink where the fact belongs: "a backend that fails in the least convenient way
+  available." Which way? The writer knows; the reader does not.
+- A closer whose claim cannot be stated: "Alice would like to finish her vacation without
+  approving commands from the beach." Should she approve or not?
+
+**The paraphrase test:** take each load-bearing sentence on its own, without the
+paragraph around it, and restate it in different words as a claim someone could agree or
+disagree with. If the restatement needs a fact from elsewhere in the draft, the sentence
+is leaning on its neighbours and should carry its own weight. If the restatement needs
+the writer's intent, the sentence has none of its own and gets rewritten as the plain
+claim underneath it.
+
+**Why the writer cannot see it:** the author supplies the missing meaning automatically
+on re-reading, which is why this one survives every other pass. Run it hardest on your own
+sentences, and hardest of all on the ones that sound finished.
+
+**Instead:** write the claim, then the consequence.
+- ❌ "A model that can answer questions can also refuse them."
+- ✅ "The same model that answers who owns this is the thing that can say no."
+- ❌ "Nothing was broken, and nobody to blame but the queue."
+- ✅ "Nothing was broken. Nothing in the diffs explained it either."
+
+---
+
 ## 42. Ceremonial Proof by Coverage
 
 **Evidence class:** Current source-derived indicator originating in Wikipedia notability

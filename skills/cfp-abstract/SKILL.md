@@ -129,6 +129,10 @@ in `skills/blog-writer/references/ai-anti-patterns.md` and the sweep contract in
   disposition.
 - A genre the author requested — a trailer, a punchy open — supplies the draft's
   likeliest matches. Name the conflict; do not resolve it silently.
+- Run the paraphrase test (#43) on every load-bearing sentence. An abstract is short
+  enough that one opaque sentence is a large fraction of it, and the shape-based
+  patterns cannot see incoherence. If restating a sentence requires knowing what the
+  talk is about, the reader deciding whether to attend cannot restate it either.
 
 ## Checklist before delivering
 

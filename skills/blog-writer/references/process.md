@@ -537,6 +537,12 @@ section "Sentence & Paragraph Craft":
   Preserve connective tissue and an earned digression that changes how the next beat lands.
   Flag a tangent that changes neither the argument nor the reader's relationship to it.
 
+**Paraphrase test (craft sweep, before Pass 2):** take each load-bearing sentence alone
+and restate it as a claim a reader could agree or disagree with. A restatement that needs
+the writer's intent means the sentence carries none of its own — see pattern #43. This is
+the check the author is least able to perform on their own prose, because re-reading
+supplies the missing meaning for free, so run it deliberately rather than by impression.
+
 **Pass 2 — Skeleton scan:** For each pair of adjacent sentences, strip the content and
 look at the grammatical skeleton only. Ask: "Do these two sentences have the same shape?"
 Subject-verb-object mirroring, parallel prepositional phrases, matching parenthetical

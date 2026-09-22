@@ -244,7 +244,7 @@ We cut it.'
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
   assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
   assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 4'
-  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 14'
+  assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 15'
   assert_json "em-dash verdicts are routed to judgment" "$clean_draft" 0 \
     '([.coverage.ran[] | select(startswith("#7 ") or startswith("#8 "))] | length) == 0 and ([.coverage.not_run_judgment[] | select(startswith("#7 ") or startswith("#8 "))] | length) == 2'
   # The total is read out of the pattern file, never restated here — a literal
@@ -336,6 +336,10 @@ The deploy stalled — briefly, that time. The alert stayed quiet — as it alwa
   assert_sweep "#31 does not fire on a concrete claim about the same subject" \
     'Your context window is not a giant drawer. Break it into artifacts you can version and test, then measure what each piece buys you.' \
     0 no "category claim"
+
+  assert_json "#43 is named in the judgment coverage so it cannot be skipped silently" \
+    'A paragraph of ordinary prose that carries no findings, written plainly so only the coverage object is under test.' \
+    0 '[.coverage.not_run_judgment[] | select(startswith("#43"))] | length == 1'
 
   assert_json "#31 reports the claim as its token and stays contextual" \
     'Onboarding is a design problem, and the fix is a checklist nobody reads twice.' \
