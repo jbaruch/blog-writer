@@ -36,6 +36,15 @@
 
 ### Fixed
 
+- **Script commands resolve from the skill's base directory.** Every command spelled its
+  script as `.tessl/plugins/jbaruch/blog-writer/skills/blog-writer/...`, a path that exists
+  only at the root of a Tessl consumer project. An agent running the skill elsewhere, such
+  as a NanoClaw container whose project root is `/workspace/group` and whose skills live
+  in `~/.claude/skills/tessl__blog-writer`, got file-not-found on the sweep, identity and
+  catalog scripts, so the humanization pass could not finish (jbaruch/nanoclaw#1019). The
+  commands now name `<skill-dir>`, the base directory the runtime announces when it loads
+  the skill, and the preamble says where that is in a Tessl install and in a container.
+
 - Add #31's category claim: a subject, a copula and a category noun ("Context is an
   engineering problem"), usually handing over to a tidy list. `sweep.py` reports the
   shape; the verdict is a subject swap — replace the subject with an unrelated one from

@@ -10,7 +10,7 @@ in a limited edit or non-blog assignment, follow `skills/blog-writer/references/
 Run:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/resolve-identities.py \
+python3 <skill-dir>/resolve-identities.py \
   --blog-home <blog-home>
 ```
 
@@ -44,7 +44,7 @@ After creating or selecting an identity for the project, update the selection th
 owner script:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/configure-identities.py \
+python3 <skill-dir>/configure-identities.py \
   --blog-home <blog-home> [--personal <path-or-empty>] [--corporate <path-or-empty>]
 ```
 

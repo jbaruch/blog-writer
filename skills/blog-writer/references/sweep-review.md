@@ -5,7 +5,7 @@ actual artifact path. For pasted prose, put a working copy in a temporary file; 
 create a blog home or rename the user's artifact merely to run a check.
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/sweep.py --mode draft <draft-path>
+python3 <skill-dir>/sweep.py --mode draft <draft-path>
 ```
 
 Run with `--mode final` on the final artifact before claiming it ready. For a review-only

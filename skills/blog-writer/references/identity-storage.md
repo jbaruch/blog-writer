@@ -5,7 +5,7 @@
 Before creating or migrating an identity, probe the canonical root:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-identity-root.py --probe
+python3 <skill-dir>/setup-identity-root.py --probe
 ```
 
 Exit 0 prints `path`, `exists`, `kind`, resolved `target`, `personal_root`,
@@ -17,13 +17,13 @@ user already has a shared identity directory. Establish the canonical root as a 
 directory when they do not:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-identity-root.py
+python3 <skill-dir>/setup-identity-root.py
 ```
 
 Link the canonical root to their selected shared directory when they do:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/setup-identity-root.py \
+python3 <skill-dir>/setup-identity-root.py \
   --target <shared-identity-directory>
 ```
 
@@ -44,7 +44,7 @@ migration source. Never repoint, delete, or rewrite the legacy path or its targe
 For an unconfigured project, enumerate packages beneath the resolved root:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/discover-identities.py \
+python3 <skill-dir>/discover-identities.py \
   --root <resolved-identity-root>
 ```
 

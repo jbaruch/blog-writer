@@ -24,6 +24,11 @@ identity supplies audience, terminology, evidence, positioning, and editorial co
 **Script invocation.** Run every script this skill calls through its interpreter: `bash`
 for a `.sh`, `python3` for a `.py`. Never invoke one by bare path.
 
+**Script location.** `<skill-dir>` in every command is this skill's base directory, the
+one the runtime names when it loads the skill. In a Tessl install that is
+`.claude/skills/tessl__blog-writer`, a link to `.tessl/plugins/jbaruch/blog-writer/skills/blog-writer`;
+in an agent container it is `~/.claude/skills/tessl__blog-writer`.
+
 **Author preservation.** Before drafting or revising, record the assignment's claim,
 stance, argument progression, and author-supplied wording under the preservation contract
 in `skills/blog-writer/references/voice-calibration.md`. Check it after each completed
@@ -190,7 +195,7 @@ at a time. `skills/blog-writer/references/process.md` section 2g has the procedu
 For audit 6, ask the script for the verdict rather than reading the shape history yourself:
 
 ```bash
-bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-shape-convergence.sh \
+bash <skill-dir>/check-shape-convergence.sh \
   <blog-home>/_blog-skill/post-shapes.json "<opening_mode>" "<arc>" "<closing_mode>"
 ```
 
@@ -303,7 +308,7 @@ Append the finished post's skeleton to the shape history so the next post's audi
 something to compare against. Do not write the file yourself. Run:
 
 ```bash
-bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/record-post-shape.sh \
+bash <skill-dir>/record-post-shape.sh \
   <blog-home>/_blog-skill/post-shapes.json "<slug>" "<YYYY-MM-DD>" \
   "<opening_mode>" "<arc>" "<closing_mode>" [intervention ...]
 ```

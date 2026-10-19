@@ -3,7 +3,7 @@
 Check the executing plugin's catalog version before fetching the article:
 
 ```bash
-python3 .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/check-catalog-version.py
+python3 <skill-dir>/check-catalog-version.py
 ```
 
 The script reads its plugin manifest and the registry. Stdout carries `installed`,
@@ -20,7 +20,7 @@ Fetch Wikipedia's "Signs of AI writing" article and compare it against
 `skills/blog-writer/references/ai-anti-patterns.md`.
 
 ```bash
-bash .tessl/plugins/jbaruch/blog-writer/skills/blog-writer/fetch-signs-of-ai-writing.sh
+bash <skill-dir>/fetch-signs-of-ai-writing.sh
 ```
 
 The script writes the raw wikitext to a file and prints `{"ok": true, "path": ..., "bytes": ...}`.
