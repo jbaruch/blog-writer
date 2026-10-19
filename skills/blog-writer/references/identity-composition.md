@@ -1,5 +1,10 @@
 # Identity Resolution and Composition
 
+`<blog-writer-dir>` in the commands below is blog-writer's own skill directory, whichever skill
+loaded this file: `tessl__blog-writer`, beside the loading skill's base directory. In a Tessl
+install that is `.claude/skills/tessl__blog-writer`; in an agent container,
+`~/.claude/skills/tessl__blog-writer`.
+
 The blog writer consumes personal and optional corporate identity packages defined by
 `skills/blog-writer/references/identity-spec.md`.
 This resolution procedure belongs to the full blog workflow. For optional identity use
@@ -10,7 +15,7 @@ in a limited edit or non-blog assignment, follow `skills/blog-writer/references/
 Run:
 
 ```bash
-python3 <skill-dir>/resolve-identities.py \
+python3 <blog-writer-dir>/resolve-identities.py \
   --blog-home <blog-home>
 ```
 
@@ -44,7 +49,7 @@ After creating or selecting an identity for the project, update the selection th
 owner script:
 
 ```bash
-python3 <skill-dir>/configure-identities.py \
+python3 <blog-writer-dir>/configure-identities.py \
   --blog-home <blog-home> [--personal <path-or-empty>] [--corporate <path-or-empty>]
 ```
 

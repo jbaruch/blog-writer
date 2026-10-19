@@ -42,8 +42,10 @@
   as a NanoClaw container whose project root is `/workspace/group` and whose skills live
   in `~/.claude/skills/tessl__blog-writer`, got file-not-found on the sweep, identity and
   catalog scripts, so the humanization pass could not finish (jbaruch/nanoclaw#1019). The
-  commands now name `<skill-dir>`, the base directory the runtime announces when it loads
-  the skill, and the preamble says where that is in a Tessl install and in a container.
+  commands now name `<blog-writer-dir>`, blog-writer's skill directory: the base directory
+  the runtime announces for blog-writer itself, and `tessl__blog-writer` beside the loading
+  skill in the shared references `cfp-abstract` and the identity skills also load, each of
+  which defines the name so it never resolves to the wrong skill's directory.
 
 - Add #31's category claim: a subject, a copula and a category noun ("Context is an
   engineering problem"), usually handing over to a tidy list. `sweep.py` reports the

@@ -1,11 +1,16 @@
 # Sweep review and delivery
 
+`<blog-writer-dir>` in the commands below is blog-writer's own skill directory, whichever skill
+loaded this file: `tessl__blog-writer`, beside the loading skill's base directory. In a Tessl
+install that is `.claude/skills/tessl__blog-writer`; in an agent container,
+`~/.claude/skills/tessl__blog-writer`.
+
 Shared procedure for a full blog and a scoped artifact. Replace `<draft-path>` with the
 actual artifact path. For pasted prose, put a working copy in a temporary file; do not
 create a blog home or rename the user's artifact merely to run a check.
 
 ```bash
-python3 <skill-dir>/sweep.py --mode draft <draft-path>
+python3 <blog-writer-dir>/sweep.py --mode draft <draft-path>
 ```
 
 Run with `--mode final` on the final artifact before claiming it ready. For a review-only

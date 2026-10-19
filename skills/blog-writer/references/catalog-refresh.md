@@ -1,9 +1,14 @@
 # Catalog refresh
 
+`<blog-writer-dir>` in the commands below is blog-writer's own skill directory, whichever skill
+loaded this file: `tessl__blog-writer`, beside the loading skill's base directory. In a Tessl
+install that is `.claude/skills/tessl__blog-writer`; in an agent container,
+`~/.claude/skills/tessl__blog-writer`.
+
 Check the executing plugin's catalog version before fetching the article:
 
 ```bash
-python3 <skill-dir>/check-catalog-version.py
+python3 <blog-writer-dir>/check-catalog-version.py
 ```
 
 The script reads its plugin manifest and the registry. Stdout carries `installed`,
@@ -20,7 +25,7 @@ Fetch Wikipedia's "Signs of AI writing" article and compare it against
 `skills/blog-writer/references/ai-anti-patterns.md`.
 
 ```bash
-bash <skill-dir>/fetch-signs-of-ai-writing.sh
+bash <blog-writer-dir>/fetch-signs-of-ai-writing.sh
 ```
 
 The script writes the raw wikitext to a file and prints `{"ok": true, "path": ..., "bytes": ...}`.
