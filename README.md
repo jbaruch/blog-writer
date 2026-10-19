@@ -16,6 +16,12 @@ publication bookkeeping. Review-only requests return findings without changing t
 | [`create-personal-identity`](skills/create-personal-identity/SKILL.md) | Compiles a reusable personal writing identity from supplied samples, interviews, personas, and feedback |
 | [`create-corporate-identity`](skills/create-corporate-identity/SKILL.md) | Compiles a reusable corporate identity from supplied guides, skills, examples, product context, and feedback |
 
+## Rules
+
+| Rule | Scope | Purpose |
+|------|-------|---------|
+| [`blog-writer-script-location`](rules/blog-writer-script-location.md) | conditional | Authority for the `<blog-writer-dir>` lookup: which files invoke blog-writer's scripts, the scripts they may name, and how the name resolves for each loader |
+
 ## Installation
 
 ```bash

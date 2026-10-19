@@ -8,5 +8,8 @@
     "skills/cfp-abstract",
     "skills/create-personal-identity",
     "skills/create-corporate-identity"
+  ],
+  "rules": [
+    "rules/blog-writer-script-location.md"
   ]
 }
