@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.1.51 — 2026-10-19
+
 ### Fixed
 
 - **Script commands resolve from the skill's base directory.** Every command spelled its
