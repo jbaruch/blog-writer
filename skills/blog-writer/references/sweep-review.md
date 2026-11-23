@@ -1,9 +1,9 @@
 # Sweep review and delivery
 
-`<blog-writer-dir>` in the commands below is blog-writer's own skill directory, whichever skill
-loaded this file: `tessl__blog-writer`, beside the loading skill's base directory. In a Tessl
-install that is `.claude/skills/tessl__blog-writer`; in an agent container,
-`~/.claude/skills/tessl__blog-writer`.
+`<blog-writer-dir>` in the commands below is blog-writer's own skill directory. If
+blog-writer loaded this file, use its base directory. Otherwise use the sibling
+`acr__jbaruch__blog-writer__blog-writer` directory beside the loading skill. In a source
+checkout the sibling is named `blog-writer`.
 
 Shared procedure for a full blog and a scoped artifact. Replace `<draft-path>` with the
 actual artifact path. For pasted prose, put a working copy in a temporary file; do not

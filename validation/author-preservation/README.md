@@ -1,6 +1,6 @@
 # Author-preservation behavioral checks
 
-These are editorial task fixtures, not Tessl eval scenarios or instruction-string tests.
+These editorial task fixtures support manual validation. They live outside the ACR package.
 Run the same task against an unchanged baseline skill and the candidate in separate fresh
 agent contexts. Allow reading the supplied skill and its references and running its local
 scripts; keep outputs outside either source tree. Record the prompt, source revision,

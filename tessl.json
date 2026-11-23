@@ -1,9 +1,0 @@
-{
-  "name": "my-project",
-  "mode": "vendored",
-  "dependencies": {
-    "jbaruch/coding-policy": {
-      "version": "latest"
-    }
-  }
-}

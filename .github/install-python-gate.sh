@@ -2,16 +2,6 @@
 #
 # Install the engines `.github/lint-python.sh` runs, at pinned versions.
 #
-# The pins live here and only here. They were previously env vars on the
-# `test.yml` step that installed them, which left the publish pipeline with no
-# way to get the same versions: `publish.yml` calls the reusable workflow, whose
-# `pre-publish-script` input runs `.github/pre-publish.sh` on a runner that
-# installs nothing of its own. The gate then exited 2 on a missing engine and
-# skipped the publish — correctly, but the pipeline could never pass.
-#
-# Both callers now come here, so the two paths cannot drift onto different
-# versions of the engines that gate the same code.
-#
 # Renewal cadence for the pins below: reviewed on the first Monday of each
 # quarter, alongside SHELLCHECK_VERSION in `.github/workflows/test.yml`, against
 # https://github.com/astral-sh/ruff/releases and
@@ -78,7 +68,7 @@ ensure_pyright() {
     return 0
   fi
   if ! command -v npm >/dev/null; then
-    echo "error: npm not found on PATH — needed to install pyright ${PYRIGHT_VERSION}; set up Node (the publish workflow's node-version input, or install Node locally) and re-run" >&2
+    echo "error: npm not found on PATH — needed to install pyright ${PYRIGHT_VERSION}; install Node and re-run" >&2
     return 2
   fi
   if ! npm install --global "pyright@${PYRIGHT_VERSION}"; then

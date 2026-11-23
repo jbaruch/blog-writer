@@ -5,8 +5,8 @@
 #   1. Every `bash|python3 <blog-writer-dir>/<target>` command in a skill file
 #      names a target the rule lists, and the target exists in skills/blog-writer/.
 #   2. Every file that uses <blog-writer-dir> defines it above its first command.
-#   3. No command spells the consumer path .tessl/plugins/jbaruch/blog-writer/.
-#   4. In a simulated Tessl install, the lookup from every loader's base
+#   3. Commands avoid hard-coded consumer install paths.
+#   4. In a simulated ACR realization, the lookup from every loader's base
 #      directory (blog-writer's own, the sibling for the others) reaches every
 #      target, and each one parses.
 set -euo pipefail
@@ -48,18 +48,18 @@ cleanup() {
 }
 
 # The rule's lookup: blog-writer's own base directory when blog-writer loaded
-# the file, the sibling tessl__blog-writer directory for any other loader.
+# the file, the sibling acr__jbaruch__blog-writer__blog-writer directory for any other loader.
 resolve_blog_writer_dir() {
   local loader=$1 base=$2
   if [ "$loader" = blog-writer ]; then
     echo "$base"
   else
-    echo "$(dirname "$base")/tessl__blog-writer"
+    echo "$(dirname "$base")/acr__jbaruch__blog-writer__blog-writer"
   fi
 }
 
 main() {
-  cd "$(dirname "${BASH_SOURCE[0]}")/../../.."
+  cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
   # 1. Every command names a listed, existing target.
   run_grep -rhoE "$COMMAND_RE" skills --include='*.md'
@@ -105,7 +105,7 @@ main() {
   done <<<"$files"
 
   # 3. No command spells the consumer path.
-  run_grep -rnE '^(bash|python3) \.tessl/plugins/jbaruch/blog-writer/' skills --include='*.md'
+  run_grep -rnE '^(bash|python3) .*([.]tessl/plugins/jbaruch/blog-writer/|acr__jbaruch__blog-writer__blog-writer/)' skills --include='*.md'
   if [ -n "$GREP_OUT" ]; then fail "commands still spell the consumer path: $GREP_OUT"; fi
 
   # 4. The lookup from every loader in a simulated install.
@@ -113,12 +113,12 @@ main() {
   trap cleanup EXIT
   mkdir -p "$tmp/.claude/skills"
   for skill in "${LOADERS[@]}"; do
-    ln -s "$PWD/skills/$skill" "$tmp/.claude/skills/tessl__$skill"
+    cp -R "$PWD/skills/$skill" "$tmp/.claude/skills/acr__jbaruch__blog-writer__$skill"
   done
   for loader in "${LOADERS[@]}"; do
-    base="$tmp/.claude/skills/tessl__$loader"
+    base="$tmp/.claude/skills/acr__jbaruch__blog-writer__$loader"
     resolved=$(resolve_blog_writer_dir "$loader" "$base")
-    if [ "$resolved" != "$tmp/.claude/skills/tessl__blog-writer" ]; then
+    if [ "$resolved" != "$tmp/.claude/skills/acr__jbaruch__blog-writer__blog-writer" ]; then
       fail "$loader: <blog-writer-dir> resolved to $resolved, not blog-writer's directory"
       continue
     fi

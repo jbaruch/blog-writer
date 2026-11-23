@@ -51,7 +51,7 @@
 # Approach: every fixture is written programmatically into a suite-owned temp
 # directory, so the suite touches no network, clock, randomness, or real draft.
 #
-# Run: bash skills/blog-writer/tests/test_sweep.sh
+# Run: bash tests/test_sweep.sh
 
 # Shell options are set inside main() rather than at file scope: the entry-point
 # guard below makes this file sourceable, and a sourced file must not change the
@@ -64,7 +64,7 @@
 # Every fixture lives inside one suite-owned root, so a single EXIT trap removes
 # them all. `return 0` keeps cleanup from rewriting the suite's exit status.
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../skills/blog-writer" && pwd)
 readonly SCRIPT="${SCRIPT_DIR}/sweep.py"
 
 pass_count=0

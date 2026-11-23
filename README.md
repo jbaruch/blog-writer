@@ -1,6 +1,6 @@
 # blog-writer
 
-[![tessl](https://img.shields.io/endpoint?url=https%3A%2F%2Fapi.tessl.io%2Fv1%2Fbadges%2Fjbaruch%2Fblog-writer)](https://tessl.io/registry/jbaruch/blog-writer)
+[GitHub releases](https://github.com/jbaruch/blog-writer/releases)
 
 Write developer blog posts from video transcripts, meeting notes, or rough ideas.
 Use the same skill for a humanizer or humanization pass on an existing draft: remove
@@ -13,6 +13,7 @@ publication bookkeeping. Review-only requests return findings without changing t
 | Skill | What it does |
 |-------|--------------|
 | [`blog-writer`](skills/blog-writer/SKILL.md) | Composes optional personal and corporate identities while drafting and reviewing a blog post |
+| [`cfp-abstract`](skills/cfp-abstract/SKILL.md) | Writes conference talk abstracts and separate program committee notes |
 | [`create-personal-identity`](skills/create-personal-identity/SKILL.md) | Compiles a reusable personal writing identity from supplied samples, interviews, personas, and feedback |
 | [`create-corporate-identity`](skills/create-corporate-identity/SKILL.md) | Compiles a reusable corporate identity from supplied guides, skills, examples, product context, and feedback |
 
@@ -24,8 +25,26 @@ publication bookkeeping. Review-only requests return findings without changing t
 
 ## Installation
 
+Install the [Agentic Context Registry CLI](https://github.com/jbaruch/agentic-context-registry/blob/main/docs/install.md).
+In the project where you want to use the skills, choose your agent and install the package.
+
 ```bash
-tessl install jbaruch/blog-writer
+acr init --agent codex
+acr install github:jbaruch/blog-writer
+acr realize
+```
+
+Use `--agent claude-code` or `--agent cursor` for those agents. If the project already
+has `agents.yaml`, start with `acr install`. The first ACR release is `v1.1.53`.
+To try the package before that release is published, run `acr install /path/to/blog-writer`
+in a consumer project and then `acr realize`.
+
+For an existing Tessl installation, follow the [ACR consumer migration guide](https://github.com/jbaruch/agentic-context-registry/blob/main/docs/migration-guide.md)
+after the first ACR release is available. Preview the migration from the consumer
+project with an explicit mapping to the first ACR release.
+
+```bash
+acr migrate tessl --dry-run --map jbaruch/blog-writer=github:jbaruch/blog-writer@v1.1.53
 ```
 
 ## What it does
@@ -138,13 +157,20 @@ Blog series state (episode numbers, callbacks, open threads) is tracked across p
 
 ## Getting started
 
-Install via [Tessl](https://tessl.io):
-
-```
-tessl install jbaruch/blog-writer
-```
-
 On first use, establish or select the shared identity root, then create or select at least
 one writing identity. Clarification questions are asked one at a time with numbered options.
 Existing persona users may continue through the legacy fallback or migrate into a v1
 personal package under the shared root.
+
+
+## Development and releases
+
+Run `acr install` and `acr realize` from this checkout to load the repository's
+coding-policy dependency. Validate the authored package with `acr validate`. Run
+`bash .github/lint-shell.sh`, `bash .github/lint-python.sh`, and
+`bash .github/run-script-tests.sh` to run the same checks as CI.
+
+Set the same version in `agent-plugin.yaml` and `skills/blog-writer/catalog-version.txt`.
+Add a matching version heading to `CHANGELOG.md`. After the release commit lands,
+push the matching `v<version>` tag. The tag workflow runs the checks and publishes
+the package as a GitHub Release.

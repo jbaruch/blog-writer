@@ -20,7 +20,7 @@
 # canonical path is real but disposable and no test can touch the developer's
 # actual persona. No network, no clock, no randomness.
 #
-# Run: bash skills/blog-writer/tests/test_setup_persona_dir.sh
+# Run: bash tests/test_setup_persona_dir.sh
 
 # Shell options are set inside main() rather than at file scope: the entry-point
 # guard below makes this file sourceable, and a sourced file must not change the
@@ -31,7 +31,7 @@
 # status (`jbaruch/coding-policy: error-handling`).
 
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../skills/blog-writer" && pwd)
 readonly SCRIPT="${SCRIPT_DIR}/setup-persona-dir.sh"
 
 pass_count=0

@@ -27,7 +27,7 @@
 # The stub reads its scripted behavior from env vars, so no test depends on the
 # network, the clock, or randomness.
 #
-# Run: bash skills/blog-writer/tests/test_fetch_signs_of_ai_writing.sh
+# Run: bash tests/test_fetch_signs_of_ai_writing.sh
 
 # Shell options are set inside main() rather than at file scope: the entry-point
 # guard below makes this file sourceable, and a sourced file must not change the
@@ -38,7 +38,7 @@
 # status (`jbaruch/coding-policy: error-handling`).
 
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../skills/blog-writer" && pwd)
 readonly SCRIPT="${SCRIPT_DIR}/fetch-signs-of-ai-writing.sh"
 
 pass_count=0
