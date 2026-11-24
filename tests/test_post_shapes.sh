@@ -64,7 +64,7 @@
 # clock, so these assertions are as true next year as today. No network, no
 # randomness, no future dates.
 #
-# Run: bash skills/blog-writer/tests/test_post_shapes.sh
+# Run: bash tests/test_post_shapes.sh
 
 # Shell options are set inside main() rather than at file scope: the entry-point
 # guard below makes this file sourceable, and a sourced file must not change the
@@ -75,7 +75,7 @@
 # status (`jbaruch/coding-policy: error-handling`).
 
 
-SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")/../skills/blog-writer" && pwd)
 readonly CHECK="${SCRIPT_DIR}/check-shape-convergence.sh"
 readonly RECORD="${SCRIPT_DIR}/record-post-shape.sh"
 

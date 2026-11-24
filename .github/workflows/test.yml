@@ -1,11 +1,7 @@
 name: Tests
 
-# Runs the shell diagnostics gate and the plugin's script test suites on every
-# pull request and on main. The publish pipeline chains the same two gates
-# through .github/pre-publish.sh, so a failure here also blocks the publish
-# rather than only the merge.
-
 on:
+  workflow_call:
   pull_request:
   push:
     branches:
@@ -59,13 +55,6 @@ jobs:
           tar -x -J -f /tmp/shellcheck.tar.xz -C /tmp
           sudo install -m 0755 "/tmp/shellcheck-${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
 
-      # The Python gate's engines, per language-diagnostics (pyright is the
-      # engine that rule names for Python) and code-formatting (ruff runs the
-      # format check and the lint). The pinned versions and the install itself
-      # live in the script, which .github/pre-publish.sh also calls — the
-      # publish pipeline runs on a runner that installs nothing, and two copies
-      # of the pins would let the two paths gate the same code with different
-      # engines.
       - name: Install Python gate tooling
         run: bash .github/install-python-gate.sh
 
@@ -95,3 +84,19 @@ jobs:
 
       - name: Run script test suites
         run: bash .github/run-script-tests.sh
+
+      # Review these Go and ACR pins on the first Monday of each quarter.
+      # Match Go to the pinned ACR release's go.mod and keep the ACR CLI
+      # version in sync with publish.yml. Run validation and the tag workflow
+      # checks when advancing them.
+      - name: Set up Go for ACR validation
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: "1.27.0"
+          cache: false
+
+      - name: Validate ACR package
+        run: |
+          set -euo pipefail
+          go install github.com/jbaruch/agentic-context-registry/cmd/acr@v0.6.0
+          acr validate

@@ -25,10 +25,9 @@ identity supplies audience, terminology, evidence, positioning, and editorial co
 for a `.sh`, `python3` for a `.py`. Never invoke one by bare path.
 
 **Script location.** `<blog-writer-dir>` in every command is this skill's base directory,
-the one the runtime names when it loads the skill. In a Tessl install that is
-`.claude/skills/tessl__blog-writer`, a link to `.tessl/plugins/jbaruch/blog-writer/skills/blog-writer`;
-in an agent container it is `~/.claude/skills/tessl__blog-writer`. Shared references other
-skills load define the same name for themselves.
+the directory the runtime names when it loads the skill. ACR realizes this directory
+as `acr__jbaruch__blog-writer__blog-writer` under the selected agent's skills directory.
+Shared references loaded by other skills define the same name for themselves.
 
 **Author preservation.** Before drafting or revising, record the assignment's claim,
 stance, argument progression, and author-supplied wording under the preservation contract

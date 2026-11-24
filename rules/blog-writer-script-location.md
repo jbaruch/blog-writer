@@ -22,7 +22,7 @@ applyTo: "skills/**/*.md — when a skill or reference invokes a blog-writer scr
 
 - Input: the base directory of the skill that loaded the file
 - `<blog-writer-dir>` resolves to that directory when the loader is `blog-writer`
-- For any other loader it resolves to the sibling `tessl__blog-writer` directory
+- For any other loader it resolves to the sibling `acr__jbaruch__blog-writer__blog-writer` directory in ACR or `blog-writer` in a source checkout
 - Each shared reference defines `<blog-writer-dir>` before its first command
 - Every command names its interpreter, `bash` or `python3`
 - Every command names one target above under `<blog-writer-dir>/`
@@ -32,9 +32,9 @@ applyTo: "skills/**/*.md — when a skill or reference invokes a blog-writer scr
 
 ## Regression Coverage
 
-- `skills/blog-writer/tests/test_script_location.sh` checks each command names a listed, existing target
+- `tests/test_script_location.sh` checks each command names a listed, existing target
 - It checks each file defines the name above its first command
 - It checks no command spells the consumer path
 - In a simulated install it resolves `blog-writer` to its own base directory
-- It resolves each other loader to the sibling `tessl__blog-writer` directory
+- It resolves each other loader to the sibling `acr__jbaruch__blog-writer__blog-writer` directory
 - It parses every target the lookup reaches

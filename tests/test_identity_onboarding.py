@@ -9,7 +9,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[1]
 SKILL_ROOT = ROOT / "skills/blog-writer"
 SETUP = SKILL_ROOT / "setup-identity-root.py"
 DISCOVER = SKILL_ROOT / "discover-identities.py"

@@ -2,10 +2,8 @@
 #
 # Runs every script test suite in the plugin.
 #
-# Discovers suites by glob, so a suite added later is picked up without editing
-# this file or the workflow. Kept separate from `.github/lint-shell.sh` so CI can
-# run the diagnostics gate as its own step ahead of the tests, and separate from
-# `.github/pre-publish.sh`, which chains both for the publish pipeline.
+# Discovers suites in both test directories. CI runs the diagnostics before
+# invoking this script.
 #
 # Usage:
 #   .github/run-script-tests.sh
@@ -16,10 +14,8 @@
 
 set -euo pipefail
 
-# Both trees hold suites: the plugin's own scripts under skills/, and the CI
-# gate scripts under .github/. A suite in either place is discovered by glob, so
-# one added later needs no edit here.
-readonly TEST_ROOTS=(skills .github)
+# Package tests live outside the published skill trees.
+readonly TEST_ROOTS=(tests .github)
 
 for root in "${TEST_ROOTS[@]}"; do
   if [ ! -d "$root" ]; then

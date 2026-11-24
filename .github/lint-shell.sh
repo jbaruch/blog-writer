@@ -27,8 +27,8 @@ fi
 # that failed part-way — an unreadable directory, a bad predicate — would yield
 # a short list the gate then reports clean, which is the silent under-checking
 # these gates exist to prevent.
-if ! discovered=$(find .github skills -type f -name '*.sh' | sort); then
-  echo "error: could not enumerate shell scripts under .github/ or skills/ — re-run from the repository root and check the search paths are readable" >&2
+if ! discovered=$(find .github skills tests -type f -name '*.sh' | sort); then
+  echo "error: could not enumerate shell scripts under .github/, skills/, or tests/ — re-run from the repository root and check the search paths are readable" >&2
   exit 2
 fi
 
@@ -40,7 +40,7 @@ while IFS= read -r script; do
 done <<<"$discovered"
 
 if [ "${#scripts[@]}" -eq 0 ]; then
-  echo "error: no shell scripts found under .github/ or skills/ — expected at least this repo's own gates" >&2
+  echo "error: no shell scripts found under .github/, skills/, or tests/ — expected at least this repo's own gates" >&2
   exit 1
 fi
 

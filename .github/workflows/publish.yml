@@ -1,55 +1,21 @@
-name: Review & Publish Plugin
-
-# Thin caller for the canonical fleet publish pipeline
-# (jbaruch/coding-policy#206). All steps live in the reusable workflow;
-# this file carries only the triggers and this repo's inputs. The release
-# tooling resolves this run by workflow filename (`publish.yml`), not by
-# display name, so the display name is free to track current terminology.
+name: Publish ACR package
 
 on:
   push:
-    branches:
-      - main
+    tags: ["v*"]
 
-# The reusable workflow's own permissions are capped by what the caller
-# grants — declare the publish pipeline's needs explicitly.
 permissions:
-  id-token: write
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
+  tests:
+    uses: ./.github/workflows/test.yml
+
   publish:
-    uses: jbaruch/coding-policy/.github/workflows/publish-plugin.yml@0ba4f4b0b0441101978ea28fff3af218055303ba
-    # Forward only the token the reusable workflow declares (not `inherit`).
-    secrets:
-      TESSL_TOKEN: ${{ secrets.TESSL_TOKEN }}
+    needs: tests
+    permissions:
+      contents: write
+    uses: jbaruch/agentic-context-registry/.github/workflows/publish-package.yml@18793698a3c82594d225860d1aff5bf1441a7ae9 # v0.6.0
     with:
-      # The runtimes .github/install-python-gate.sh installs onto: pipx needs an
-      # interpreter for ruff, npm needs Node for pyright. Both are pinned rather
-      # than taken from whatever ubuntu-latest happens to ship, per
-      # dependency-management Pinning.
-      #
-      # Every input here must be declared by the revision pinned in `uses:`
-      # above, not merely by the reusable workflow's default branch. A caller
-      # passing an undeclared input fails the run at startup, before any job is
-      # scheduled — so there is no step log to read and it presents as an
-      # Actions outage. `node-version` arrived upstream after the previously
-      # pinned revision, which is why the ref bump and this input move together.
-      python-version: '3.11'
-      node-version: '22'
-      skill-review-credit-outage: skip
-      # Eval scenarios are retired; keep upload and execution disabled.
-      skip-evals: true
-      # Runs every skills/**/test_*.sh suite after checkout and before publish,
-      # so a shipped script whose tests fail never reaches the registry. The
-      # same gate runs on pull requests via .github/workflows/test.yml.
-      pre-publish-script: .github/pre-publish.sh
-      # Every merge publishes, and the version is assigned by the auto-bump at
-      # publish time, so a PR author cannot write the heading themselves. The
-      # stamp step computes the same version and heads the top un-headed `### `
-      # blocks with `## <version> — <date>` immediately before publish. Without
-      # it, context-artifacts "CHANGELOG Hygiene" leaves no legal option: the
-      # `## Unreleased` heading is forbidden, and un-headed blocks are forbidden
-      # when nothing stamps them.
-      stamp-changelog: true
+      # Review with the validation pins in test.yml each quarter.
+      acr-version: v0.6.0

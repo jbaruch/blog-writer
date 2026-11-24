@@ -1,9 +1,9 @@
 # Catalog refresh
 
-`<blog-writer-dir>` in the commands below is blog-writer's own skill directory, whichever skill
-loaded this file: `tessl__blog-writer`, beside the loading skill's base directory. In a Tessl
-install that is `.claude/skills/tessl__blog-writer`; in an agent container,
-`~/.claude/skills/tessl__blog-writer`.
+`<blog-writer-dir>` in the commands below is blog-writer's own skill directory. If
+blog-writer loaded this file, use its base directory. Otherwise use the sibling
+`acr__jbaruch__blog-writer__blog-writer` directory beside the loading skill. In a source
+checkout the sibling is named `blog-writer`.
 
 Check the executing plugin's catalog version before fetching the article:
 
@@ -11,13 +11,15 @@ Check the executing plugin's catalog version before fetching the article:
 python3 <blog-writer-dir>/check-catalog-version.py
 ```
 
-The script reads its plugin manifest and the registry. Stdout carries `installed`,
-`latest`, and `status`. Report both versions, including any unavailable value.
+The script reads its bundled `catalog-version.txt` and the latest stable GitHub release's
+ACR metadata. Stdout carries `installed`, `latest`, and `status`. Report both versions,
+including any unavailable value.
 
 - **Exit 0** — continue with the article comparison below.
 - **Exit 1** — report the update instruction on stderr. Skip the comparison and
-  proceed immediately to Step 6 with the existing catalog. After updating the executing
-  installation, reload its skill and references and rerun the version check before comparing.
+  proceed immediately to Step 6 with the existing catalog. To refresh a latest-tracking
+  installation, run `acr update github:jbaruch/blog-writer` and `acr realize` in its consumer
+  project. Reload the skill and references and rerun the version check before comparing.
 - **Exit 2** — report the diagnostic. Skip the comparison and proceed immediately to
   Step 6 with the existing catalog. Do not report unverified freshness findings.
 
