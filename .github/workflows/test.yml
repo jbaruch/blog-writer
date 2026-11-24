@@ -85,6 +85,10 @@ jobs:
       - name: Run script test suites
         run: bash .github/run-script-tests.sh
 
+      # Review these Go and ACR pins on the first Monday of each quarter.
+      # Match Go to the pinned ACR release's go.mod and keep the ACR CLI
+      # version in sync with publish.yml. Run validation and the tag workflow
+      # checks when advancing them.
       - name: Set up Go for ACR validation
         uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:

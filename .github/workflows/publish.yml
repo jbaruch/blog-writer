@@ -17,4 +17,5 @@ jobs:
       contents: write
     uses: jbaruch/agentic-context-registry/.github/workflows/publish-package.yml@18793698a3c82594d225860d1aff5bf1441a7ae9 # v0.6.0
     with:
+      # Review with the validation pins in test.yml each quarter.
       acr-version: v0.6.0

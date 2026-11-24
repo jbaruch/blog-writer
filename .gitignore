@@ -5,10 +5,8 @@ persona/
 __pycache__/
 *.pyc
 
-# ACR dependency resolutions are shared. Native artifacts and machine state
-# are regenerated locally by acr realize.
-/.agents/*
-!/.agents/registry.lock
+# ACR manages dependency resolutions and native artifacts locally.
+/.agents/
 /.claude/skills/acr__*
 /.claude/rules/acr__*
 /.codex/skills/acr__*
