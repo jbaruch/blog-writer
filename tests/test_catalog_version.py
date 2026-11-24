@@ -10,6 +10,7 @@ import re
 import runpy
 import tempfile
 import unittest
+from http.client import IncompleteRead
 from pathlib import Path
 from unittest.mock import Mock, patch
 
@@ -72,6 +73,14 @@ class CatalogVersionTests(unittest.TestCase):
         self.assertEqual(code, 2)
         self.assertEqual(payload["installed"], "1.1.36")
         self.assertIsNone(payload["latest"])
+        self.assertIn("Skip the refresh", diagnostic)
+
+    def test_truncated_metadata_never_permits_comparison(self):
+        payload, code, diagnostic = self.check(error=IncompleteRead(b"{", 10))
+        self.assertEqual(code, 2)
+        self.assertEqual(
+            payload, {"installed": "1.1.36", "latest": None, "status": "unknown"}
+        )
         self.assertIn("Skip the refresh", diagnostic)
 
     def test_invalid_metadata_never_permits_comparison(self):

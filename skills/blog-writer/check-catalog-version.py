@@ -13,6 +13,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from http.client import HTTPException
 from pathlib import Path
 from urllib.request import urlopen
 
@@ -47,7 +48,7 @@ def check(version_file: Path) -> tuple[dict, int]:
         if remote.get("tag") != f"v{latest}":
             raise ValueError("ACR release tag does not match its package version")
         result["latest"] = latest
-    except (OSError, ValueError) as error:
+    except (HTTPException, OSError, ValueError) as error:
         print(
             f"Catalog version check failed: {error}. Check the bundled version file and "
             "GitHub release access, then retry. Skip the refresh comparison meanwhile.",
