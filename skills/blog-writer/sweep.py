@@ -1246,9 +1246,8 @@ def sweep_reply_shapes(blocks):
     first = split_sentences(before_ellipsis)
     agreement = AGREEMENT_SENTENCE.fullmatch(first[0]) if first else None
     if agreement:
-        hits.append(
-            hit("#44", "Agreement opener", prose[0].line, agreement[0], opening)
-        )
+        first_line = next(number for number, source in opening_lines if source)
+        hits.append(hit("#44", "Agreement opener", first_line, agreement[0], opening))
     else:
         offset = 0
         for number, text in opening_lines:

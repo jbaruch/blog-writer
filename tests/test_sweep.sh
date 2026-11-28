@@ -1154,6 +1154,9 @@ The deploy now finishes quickly enough for the team to watch it complete.
   assert_json "code-only leading paragraphs do not hide an agreement opener" \
     $'`probe`\n\nAgreed. The cache expires after the second read.' \
     1 'any(.hits[]; .pattern == "#44" and .line == 3)'
+  assert_json "an opener below inline code reports its own source line" \
+    $'`probe`\nAgreed. The cache expires after the second read.' \
+    1 'any(.hits[]; .pattern == "#44" and .line == 2)'
   assert_json "Russian reply cues and honest language coverage" \
     'Точно. Этот крайний случай я бы перепроверила на другом сервере.' \
     1 '[.hits[].pattern] == ["#44", "#45"] and any(.coverage.ran[]; startswith("#45 ") and endswith("[English/Russian]")) and any(.coverage.ran[]; startswith("#31 ") and endswith("[English]")) and (.coverage.note | contains("On non-English text"))'
