@@ -1334,9 +1334,11 @@ def sweep_sentence_cap(blocks, cap):
         if block.kind not in PROSE_KINDS:
             continue
         sentences.extend(
-            sentence_units(
-                visible_block(block), abbreviations=_NONTERMINAL_ABBREVIATIONS
+            (line, sentence)
+            for line, sentence in sentence_units(
+                visible_block(block, code=" "), abbreviations=_NONTERMINAL_ABBREVIATIONS
             )
+            if any(character.isalnum() for character in sentence)
         )
     if len(sentences) <= cap:
         return []

@@ -1212,6 +1212,13 @@ The deploy now finishes quickly enough for the team to watch it complete.
     draft 1 'any(.hits[]; .pattern == "FORMAT:SENTENCE-CAP" and .line == 6 and .detail == "3 sentences exceeds the cap of 2")' \
     --sentence-cap 2
 
+  assert_json_mode "thematic separators do not count against a prose cap" \
+    $'The reader stops on the first error.\n\n---\n\nThe next pass starts from the saved cursor.' \
+    draft 0 'all(.hits[]; .pattern != "FORMAT:SENTENCE-CAP")' --sentence-cap 2
+  assert_json_mode "code-only paragraphs do not count against a prose cap" \
+    $'The reader stops on the first error.\n\n`read-stage`\n\nThe next pass starts from the saved cursor.' \
+    draft 0 'all(.hits[]; .pattern != "FORMAT:SENTENCE-CAP")' --sentence-cap 2
+
   printf '\xff' >"${history_dir}/invalid.txt"
   sweep_fixture_mode invalid_history "$reply" draft --history "$history_dir"
   if [[ "$CASE_RC" == 2 && -z "$CASE_OUT" && "$CASE_ERR" == *'invalid.txt is not valid UTF-8'* ]]; then
