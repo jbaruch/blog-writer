@@ -1151,6 +1151,9 @@ The deploy now finishes quickly enough for the team to watch it complete.
   assert_json "conditional ignores punctuation inside inline code and preserves later line numbers" \
     $'The trace contains `stop. I\'d restart\nthen retry` before the parser resumes.\nI’d inspect the trace before restarting.' \
     1 '[.hits[] | select(.pattern == "#45") | [.detail, .line]] == [["I\u2019d inspect", 3]]'
+  assert_json "code-only leading paragraphs do not hide an agreement opener" \
+    $'`probe`\n\nAgreed. The cache expires after the second read.' \
+    1 'any(.hits[]; .pattern == "#44" and .line == 3)'
   assert_json "Russian reply cues and honest language coverage" \
     'Точно. Этот крайний случай я бы перепроверила на другом сервере.' \
     1 '[.hits[].pattern] == ["#44", "#45"] and any(.coverage.ran[]; startswith("#45 ") and endswith("[English/Russian]")) and any(.coverage.ran[]; startswith("#31 ") and endswith("[English]")) and (.coverage.note | contains("On non-English text"))'
@@ -1191,6 +1194,10 @@ The deploy now finishes quickly enough for the team to watch it complete.
   assert_json_mode "a quoted block separates history matches in the earlier piece" \
     'Alpha beta gamma delta epsilon zeta.' draft 0 \
     'all(.hits[]; .pattern != "HISTORY:OVERLAP")' --history "${history_dir}/boundary.md"
+  printf 'the reader replacement before opening the next ticket\n' >"${history_dir}/wrapped-link.md"
+  assert_json_mode "line-wrapped link labels retain their visible history match" \
+    $'Use [the reader\nreplacement](https://example.org/saved) before opening the next ticket.' \
+    draft 1 'any(.hits[]; .pattern == "HISTORY:OVERLAP" and .line == 1)' --history "${history_dir}/wrapped-link.md"
   local self='The draft itself is not an earlier published piece.'
   assert_json_mode "the input draft is not its own history" "$self" draft 0 \
     '(.hits | length) == 0' --history "$SUITE_TMP/the_input_draft_is_not_its_own_history_.md"

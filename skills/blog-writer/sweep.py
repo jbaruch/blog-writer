@@ -723,6 +723,10 @@ def visible_block(block, *, code="code"):
     """Mask inline code before normalizing each line, preserving its number."""
     source = "\n".join(text for _, text in block.numbered)
     masked = _INLINE_CODE.sub(lambda match: code + "\n" * match[0].count("\n"), source)
+    masked = _LINK.sub(
+        lambda match: match[1] + "\n" * (match[0].count("\n") - match[1].count("\n")),
+        masked,
+    )
     numbered = [
         (number, normalize_inline(text))
         for (number, _), text in zip(block.numbered, masked.split("\n"))
@@ -1225,7 +1229,10 @@ def sweep_section_breaks(raw):
 
 
 def sweep_reply_shapes(blocks):
-    prose = [visible_block(block) for block in blocks if block.kind == "prose"]
+    prose = [
+        visible_block(block, code=" ") for block in blocks if block.kind == "prose"
+    ]
+    prose = [block for block in prose if any(char.isalnum() for char in block.text)]
     if not prose:
         return []
 
