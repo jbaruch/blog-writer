@@ -18,21 +18,21 @@ kinds of work. This script owns one of them.
               whether a "rather than" joins two candidates for the same slot
               (#1). No regex decides any of those. They stay with the agent.
 
-This script covers 6 numbered patterns across 4 sweeps (#3 and #4 share the
-fragment-chain sweep; #28 and #30 share the announcement-clause sweep), plus
-supplemental fixed-output checks. It says so on
-every run. The numbered total is counted from `references/ai-anti-patterns.md`
-rather than restated here.
+The result lists the numbered counting sweeps and supplemental checks that ran,
+including their language scope. The numbered total is counted from
+`references/ai-anti-patterns.md` rather than restated here.
 Every result carries its coverage, including a result with no findings: silence
 about coverage is what lets a passing script displace the contextual read it
 never performed.
 
 Usage:
-    sweep.py [--mode draft|final] <draft.md>
+    sweep.py [--mode draft|final] [--history PATH] [--sentence-cap N] <draft.md>
 
 Input:
     --mode  `draft` permits supported asset placeholders and VERIFY comments;
             `final` reports them as finalization blockers. Defaults to `draft`.
+    --history  UTF-8 file or flat directory of earlier pieces to check for overlap.
+    --sentence-cap  caller's positive maximum for prose sentences (including quotes).
     draft   path to the draft. Markdown is parsed, not treated as flat text —
             see "What is excluded" in parse().
 
@@ -86,7 +86,9 @@ than restating them.
 import argparse
 import json
 import re
+import stat
 import sys
+from collections import defaultdict
 from pathlib import Path
 
 # --- Decision contract -------------------------------------------------------
@@ -96,7 +98,22 @@ from pathlib import Path
 # #3/#4 — "every sentence under six words ... whether 3+ appear consecutively"
 # These counts need an editorial disposition even with accurate segmentation.
 # Everything else requires correction; adding a new sweep defaults to required.
-CONTEXTUAL_PATTERNS = frozenset({"#3/#4", "#14", "#28/#30", "#31"})
+CONTEXTUAL_PATTERNS = frozenset(
+    {"#3/#4", "#14", "#28/#30", "#31", "#44", "#45", "HISTORY:OVERLAP"}
+)
+
+AGREEMENT_SENTENCE = re.compile(
+    r"(?:agreed|fair|right|true|exactly|yes|согласен|согласна|верно|точно|да)"
+    r"[.!?…]*",
+    re.IGNORECASE,
+)
+EARLY_AGREE = re.compile(r"\b(?:agree|согласен|согласна)\b", re.IGNORECASE)
+EARLY_AGREEMENT_CHARS = 40
+# This is a construction cue, not a part-of-speech classifier. The review
+# distinguishes a conditional verb from, for example, "I'd rather".
+CONDITIONAL = re.compile(r"\b(?:i['’]d|я\s+бы)\s+[^\W\d_]+", re.IGNORECASE)
+HISTORY_MIN_WORDS = 6
+HISTORY_WORD = re.compile(r"[^\W_]+(?:['’][^\W_]+)*")
 
 FRAGMENT_MAX_WORDS = 6
 FRAGMENT_RUN = 3
@@ -275,29 +292,30 @@ ANTI_PATTERNS_FILE = (
 # not a pattern.
 PATTERN_HEADING = re.compile(r"^## \d+\. ", re.MULTILINE)
 
-# Seven: #3/#4 and #28/#30 are each two patterns sharing one sweep, plus #14,
-# #18 and #31 one apiece.
-PATTERNS_EXAMINED = 7
-
 COUNTING_SWEEPS = [
-    ("#3/#4", "fragment chains"),
-    ("#14", "low burstiness"),
-    ("#18", "unicode giveaways"),
-    ("#28/#30", "announcement clauses (enumerable shapes only)"),
-    ("#31", "category claims (shape only — the subject swap is the check)"),
+    ("#3/#4", "fragment chains [whitespace words]"),
+    ("#14", "low burstiness [whitespace words]"),
+    ("#18", "unicode giveaways [any language]"),
+    ("#28/#30", "announcement clauses (enumerable shapes only) [English]"),
+    ("#31", "category claims (shape only — the subject swap is the check) [English]"),
+    ("#44", "agreement openers [English/Russian]"),
+    ("#45", "first-person conditional construction cues [English/Russian]"),
 ]
+PATTERNS_EXAMINED = sum(len(number.split("/")) for number, _ in COUNTING_SWEEPS)
 
 SUPPLEMENTAL_SWEEPS = [
-    ("WP:OAICITE", "citation-artifact leakage"),
-    ("WP:TRACKING", "AI-source tracking parameters"),
-    ("WP:ASSISTANT", "assistant-chatter candidate discovery"),
-    ("WP:SECTIONBREAK", "thematic breaks between every section"),
+    ("WP:OAICITE", "citation-artifact leakage [any language]"),
+    ("WP:TRACKING", "AI-source tracking parameters [any language]"),
+    ("WP:ASSISTANT", "assistant-chatter candidate discovery [English]"),
+    ("WP:SECTIONBREAK", "thematic breaks between every section [any language]"),
 ]
 
 FINAL_SUPPLEMENTAL_SWEEP = (
     "WP:FINALIZATION",
-    "unresolved placeholders and VERIFY markers",
+    "unresolved placeholders and VERIFY markers [any language]",
 )
+HISTORY_SWEEP = ("HISTORY:OVERLAP", "shared runs of words [Unicode word tokens]")
+SENTENCE_CAP_SWEEP = ("FORMAT:SENTENCE-CAP", "caller-specified sentence cap")
 
 JUDGMENT_SWEEPS = [
     ("#1", "contrastive negation — is it the same slot?"),
@@ -319,22 +337,20 @@ JUDGMENT_SWEEPS = [
 
 # --- Sentence segmentation ---------------------------------------------------
 
-# A period inside one of these does not end a sentence. Fully enumerable, which
-# is what keeps this a script and not a guess (`script-delegation` The Regex
-# Trap). An unlisted abbreviation costs a false split, which inflates the count
-# of short sentences and can only produce a false #3/#4 hit the agent then
-# dismisses — never a miss.
-ABBREVIATIONS = frozenset(
+# The required cap favors a reviewable split at a potentially terminal
+# abbreviation ("We chose Acme Inc. It failed."), but still protects prefixes
+# such as "Dr. James". Keep the broader guard for stylistic sweeps.
+_NONTERMINAL_ABBREVIATIONS = frozenset("e.g. i.e. mr. mrs. ms. dr. prof.".split())
+ABBREVIATIONS = _NONTERMINAL_ABBREVIATIONS | frozenset(
     """
-    e.g. i.e. etc. vs. cf. al. ca. approx.
-    mr. mrs. ms. dr. prof. sr. jr. st.
+    etc. vs. cf. al. ca. approx. sr. jr. st.
     inc. ltd. co. corp. dept. est.
     a.m. p.m. u.s. u.k. e.u.
     fig. no. vol. pp. ed. eds. repr.
     """.split()
 )
 
-_SENTENCE_END = re.compile(r"([.!?])([\"')\]]*)(\s+)")
+_SENTENCE_END = re.compile(r"([.!?])([\"'”’»)\]]*)(\s+)")
 
 # A run of two or more single-letter initials ("J. R. R. ", "H. G. "). Two is
 # the threshold that makes this enumerable: one lone capital before a period is
@@ -343,7 +359,7 @@ _SENTENCE_END = re.compile(r"([.!?])([\"')\]]*)(\s+)")
 _INITIAL_RUN = re.compile(r"(?:\b[A-Z]\.[ \t]+){2,}")
 
 
-def split_sentences(text):
+def split_sentences(text, *, abbreviations=ABBREVIATIONS):
     """Split prose into sentences, guarding abbreviations and runs of initials."""
     protected = [found.span() for found in _INITIAL_RUN.finditer(text)]
     sentences = []
@@ -353,7 +369,7 @@ def split_sentences(text):
         head = text[start:end]
 
         last_token = head.split()[-1].lower() if head.split() else ""
-        if last_token in ABBREVIATIONS:
+        if last_token in abbreviations:
             continue
 
         # No period inside a run of initials ends a sentence, the run's last one
@@ -411,7 +427,8 @@ _BLOCKQUOTE_MARKER = re.compile(r"^\s*>\s?")
 _TABLE_ROW = re.compile(r"^\s*\|")
 
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
-_INLINE_CODE = re.compile(r"`[^`]*`")
+# Delimiters are whole runs of equal length, even around shorter runs in code.
+_INLINE_CODE = re.compile(r"(?<!`)(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)")
 _EMPHASIS = re.compile(r"(\*\*|\*|__|_)")
 
 
@@ -702,7 +719,24 @@ def parse(raw):
 # report render the same finding rather than diverging.
 
 
-def sentence_units(block):
+def visible_block(block, *, code="code"):
+    """Mask inline code before normalizing each line, preserving its number."""
+    source = "\n".join(text for _, text in block.numbered)
+    masked = _INLINE_CODE.sub(lambda match: code + "\n" * match[0].count("\n"), source)
+    masked = _LINK.sub(
+        lambda match: match[1] + "\n" * (match[0].count("\n") - match[1].count("\n")),
+        masked,
+    )
+    numbered = [
+        (number, normalize_inline(text))
+        for (number, _), text in zip(block.numbered, masked.split("\n"))
+    ]
+    return Block(
+        block.kind, block.line, "\n".join(text for _, text in numbered), numbered
+    )
+
+
+def sentence_units(block, *, abbreviations=ABBREVIATIONS):
     """Yield (source line, sentence) for every sentence a sweep may look inside.
 
     A prose paragraph is one unit wrapped across source lines, so it is
@@ -716,7 +750,7 @@ def sentence_units(block):
     """
     if block.kind == "list":
         for number, text in block.numbered:
-            for sentence in split_sentences(text):
+            for sentence in split_sentences(text, abbreviations=abbreviations):
                 yield number, sentence
         return
 
@@ -733,7 +767,7 @@ def sentence_units(block):
     whole = "\n".join(text for _, text in sources)
 
     searched = 0
-    for sentence in split_sentences(whole):
+    for sentence in split_sentences(whole, abbreviations=abbreviations):
         found = whole.find(sentence, searched)
         if found < 0:
             found = searched
@@ -1194,7 +1228,140 @@ def sweep_section_breaks(raw):
     ]
 
 
-def run_sweeps(raw, mode="draft"):
+def sweep_reply_shapes(blocks):
+    prose = [
+        visible_block(block, code=" ") for block in blocks if block.kind == "prose"
+    ]
+    prose = [block for block in prose if any(char.isalnum() for char in block.text)]
+    if not prose:
+        return []
+
+    hits = []
+    opening_lines = [
+        (number, source.strip()) for block in prose for number, source in block.numbered
+    ]
+    opening = "\n".join(text for _, text in opening_lines)
+    # An ellipsis can end an isolated opener without ending prose sentences.
+    before_ellipsis = re.split(r"(?<=…)\s+", prose[0].text, maxsplit=1)[0]
+    first = split_sentences(before_ellipsis)
+    agreement = AGREEMENT_SENTENCE.fullmatch(first[0]) if first else None
+    if agreement:
+        first_line = next(number for number, source in opening_lines if source)
+        hits.append(hit("#44", "Agreement opener", first_line, agreement[0], opening))
+    else:
+        offset = 0
+        for number, text in opening_lines:
+            agreement = EARLY_AGREE.search(text)
+            if agreement and offset + agreement.end() <= EARLY_AGREEMENT_CHARS:
+                hits.append(
+                    hit("#44", "Agreement opener", number, agreement[0], opening)
+                )
+                break
+            offset += len(text) + 1
+            if offset >= EARLY_AGREEMENT_CHARS:
+                break
+
+    for block in prose:
+        source_indices = {number: i for i, (number, _) in enumerate(block.numbered)}
+        for line, sentence in sentence_units(block):
+            for found in CONDITIONAL.finditer(sentence):
+                cue_index = source_indices[line] + sentence.count(
+                    "\n", 0, found.start()
+                )
+                cue_line = block.numbered[cue_index][0]
+                hits.append(
+                    hit("#45", "First-person conditional", cue_line, found[0], sentence)
+                )
+    return hits
+
+
+def history_words(blocks):
+    words = []
+    lines = []
+    for block in blocks:
+        if block.kind != "prose":
+            if words and words[-1] is not None:
+                words.append(None)
+                lines.append(block.line)
+            continue
+        for number, prose in visible_block(block, code=" ").numbered:
+            for word in HISTORY_WORD.findall(prose):
+                words.append(word.casefold().replace("’", "'"))
+                lines.append(number)
+    return words, lines
+
+
+def sweep_history(blocks, history):
+    words, lines = history_words(blocks)
+    size = HISTORY_MIN_WORDS
+    seeds = defaultdict(list)
+    for start in range(len(words) - size + 1):
+        seed = tuple(words[start : start + size])
+        if None not in seed:
+            seeds[seed].append(start)
+
+    hits = []
+    for path, raw in history:
+        earlier, earlier_lines = history_words(parse(raw)[0])
+        for previous in range(len(earlier) - size + 1):
+            seed = tuple(earlier[previous : previous + size])
+            for start in seeds.get(seed, ()):
+                # Interior seeds are part of the same run on this alignment.
+                if (
+                    start
+                    and previous
+                    and words[start - 1] is not None
+                    and words[start - 1] == earlier[previous - 1]
+                ):
+                    continue
+                length = size
+                while (
+                    start + length < len(words)
+                    and previous + length < len(earlier)
+                    and words[start + length] is not None
+                    and words[start + length] == earlier[previous + length]
+                ):
+                    length += 1
+                hits.append(
+                    hit(
+                        HISTORY_SWEEP[0],
+                        "History overlap",
+                        lines[start],
+                        f"{length} shared words with {path}:{earlier_lines[previous]}",
+                        " ".join(words[start : start + length]),
+                    )
+                )
+    return hits
+
+
+def sweep_sentence_cap(blocks, cap):
+    sentences = []
+    for block in blocks:
+        if block.kind not in PROSE_KINDS:
+            continue
+        sentences.extend(
+            (line, sentence)
+            for line, sentence in sentence_units(
+                visible_block(block, code=" "), abbreviations=_NONTERMINAL_ABBREVIATIONS
+            )
+            if any(character.isalnum() for character in sentence)
+        )
+    if len(sentences) <= cap:
+        return []
+    line, sentence = sentences[cap]
+    return [
+        hit(
+            SENTENCE_CAP_SWEEP[0],
+            "Sentence cap exceeded",
+            line,
+            f"{len(sentences)} sentences exceeds the cap of {cap}",
+            sentence,
+            verify_context=True,
+        )
+    ]
+
+
+def run_sweeps(raw, mode="draft", *, history=None, sentence_cap=None):
     blocks, sections = parse(raw)
     observations = {"em_dashes": observe_emdashes(blocks, sections)}
     hits = []
@@ -1206,6 +1373,11 @@ def run_sweeps(raw, mode="draft"):
     hits += sweep_citation_artifacts(blocks)
     hits += sweep_tracking_parameters(blocks)
     hits += sweep_section_breaks(raw)
+    hits += sweep_reply_shapes(blocks)
+    if history is not None:
+        hits += sweep_history(blocks, history)
+    if sentence_cap is not None:
+        hits += sweep_sentence_cap(blocks, sentence_cap)
     if mode == "final":
         hits += sweep_finalization_artifacts(raw)
     hits.sort(key=lambda h: (h["line"], h["pattern"]))
@@ -1267,7 +1439,17 @@ def count_patterns(path=ANTI_PATTERNS_FILE):
     return total
 
 
-def result(path, hits, candidates, observations, patterns_total, mode="draft"):
+def result(
+    path,
+    hits,
+    candidates,
+    observations,
+    patterns_total,
+    mode="draft",
+    *,
+    history=False,
+    sentence_cap=None,
+):
     """The full result object.
 
     `coverage` is not decoration. This script examines a minority of the
@@ -1276,6 +1458,13 @@ def result(path, hits, candidates, observations, patterns_total, mode="draft"):
     in the same object that tells it what was.
     """
     examined = PATTERNS_EXAMINED
+    supplemental = list(SUPPLEMENTAL_SWEEPS)
+    if mode == "final":
+        supplemental.append(FINAL_SUPPLEMENTAL_SWEEP)
+    if history:
+        supplemental.append(HISTORY_SWEEP)
+    if sentence_cap is not None:
+        supplemental.append(SENTENCE_CAP_SWEEP)
     return {
         "ok": True,
         "path": str(path),
@@ -1286,13 +1475,8 @@ def result(path, hits, candidates, observations, patterns_total, mode="draft"):
         "coverage": {
             "ran": [f"{number} {name}" for number, name in COUNTING_SWEEPS],
             "supplemental_checks": [
-                f"{number} {name}" for number, name in SUPPLEMENTAL_SWEEPS
-            ]
-            + (
-                [f"{FINAL_SUPPLEMENTAL_SWEEP[0]} {FINAL_SUPPLEMENTAL_SWEEP[1]}"]
-                if mode == "final"
-                else []
-            ),
+                f"{number} {name}" for number, name in supplemental
+            ],
             "not_run_judgment": [
                 f"{number} {name}" for number, name in JUDGMENT_SWEEPS
             ],
@@ -1300,12 +1484,34 @@ def result(path, hits, candidates, observations, patterns_total, mode="draft"):
             "patterns_total": patterns_total,
             "note": (
                 f"{patterns_total - examined} of the {patterns_total} patterns "
-                "were not examined by this script. An empty hits list is not an "
+                "have no counting sweep. On non-English text, English-only "
+                "matches are not coverage. The reply cues cover English and Russian. "
+                "Counts based on whitespace and sentence punctuation are not "
+                "language-aware. An empty hits list is not an "
                 "anti-pattern check: the judgment sweeps in not_run_judgment and "
                 "the rest of references/ai-anti-patterns.md still need a read."
             ),
         },
     }
+
+
+def read_history(path, draft):
+    mode = path.stat().st_mode
+    if stat.S_ISDIR(mode):
+        files = sorted(entry for entry in path.iterdir() if entry.is_file())
+    elif stat.S_ISREG(mode):
+        files = [path]
+    else:
+        raise ValueError(f"{path} is not a regular file or directory")
+
+    draft = draft.resolve()
+    for piece in files:
+        if piece.resolve() == draft:
+            continue
+        try:
+            yield piece, piece.read_text(encoding="utf-8")
+        except UnicodeDecodeError as exc:
+            raise ValueError(f"{piece} is not valid UTF-8") from exc
 
 
 def main(argv=None):
@@ -1320,7 +1526,13 @@ def main(argv=None):
         default="draft",
         help="draft permits placeholders; final reports unresolved draft machinery",
     )
+    parser.add_argument("--history", type=Path, help="UTF-8 file or flat directory")
+    parser.add_argument(
+        "--sentence-cap", type=int, help="positive prose sentence maximum"
+    )
     args = parser.parse_args(argv)
+    if args.sentence_cap is not None and args.sentence_cap < 1:
+        parser.error("--sentence-cap must be a positive integer")
 
     path = Path(args.draft)
     try:
@@ -1359,7 +1571,18 @@ def main(argv=None):
         print(exc, file=sys.stderr)
         return 2
 
-    hits, candidates, observations = run_sweeps(raw, args.mode)
+    try:
+        hits, candidates, observations = run_sweeps(
+            raw,
+            args.mode,
+            history=read_history(args.history, path)
+            if args.history is not None
+            else None,
+            sentence_cap=args.sentence_cap,
+        )
+    except (OSError, ValueError) as exc:
+        print(f"error: cannot read history at {args.history}: {exc}", file=sys.stderr)
+        return 2
     print(
         json.dumps(
             result(
@@ -1369,6 +1592,8 @@ def main(argv=None):
                 observations,
                 patterns_total,
                 args.mode,
+                history=args.history is not None,
+                sentence_cap=args.sentence_cap,
             ),
             indent=2,
         )

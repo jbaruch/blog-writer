@@ -1905,3 +1905,24 @@ the publication's existence or category does all the argumentative work.
 workflow. If the draft knows only that coverage exists, cut the claim or mark the missing
 evidence for research. Citation correctness and link health remain accuracy checks; this
 pattern judges the sentence's argumentative use of a source.
+
+## 44. Agreement Openers
+
+**What it is:** A reply spends its opening on assent before it says anything about
+the post. For automated cues, see `skills/blog-writer/sweep.py` (`sweep_reply_shapes`,
+`AGREEMENT_SENTENCE`, and `EARLY_AGREE`).
+
+**Test:** Remove the opener. If the reply loses no stance the reader needs, lead
+with the specific claim or evidence. A direct answer to a question or disagreement
+with a particular claim can carry information. The match alone is not the verdict.
+
+## 45. First-Person Conditional as a Selection Frame
+
+**What it is:** The reply frames a point as the thing the author “I'd steal,”
+“I'd underline,” or “I'd push,” often in “the part I'd…” or “the one I'd…”.
+Changing the verb does not change the construction. For the automated cue, see
+`skills/blog-writer/sweep.py` (`CONDITIONAL`).
+
+**Test:** State the point and why it matters without the hypothetical selection.
+Retain a real conditional if the condition and action carry the meaning. The same
+surface cue also appears in unrelated forms such as “I'd already finished.”

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.54
+
+### Fixed
+
+- Flag English and Russian agreement openers and first-person conditional cues in short drafts.
+- Add optional comparisons against earlier pieces and an optional sentence cap.
+- Report the checks run and preserve source lines through Markdown formatting.
+
 ## 1.1.53
 
 ### Changed
