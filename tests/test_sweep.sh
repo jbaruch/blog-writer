@@ -1123,6 +1123,8 @@ The deploy now finishes quickly enough for the team to watch it complete.
   done
   assert_json "early agreement has a source line" $'# Reply\nThe point is that I\n agree with the measured result.' \
     1 'any(.hits[]; .pattern == "#44" and .line == 3)'
+  assert_json "opening ignores agreement inside multiline inline code" \
+    $'The trace is `stop.\nagree now` before reset.' 0 'all(.hits[]; .pattern != "#44")'
   assert_json "only isolated openers and early whole agreement words match" \
     'Right after startup, these logs are agreeable to read. I agree with the maintainer.' \
     0 'all(.hits[]; .pattern != "#44")'
@@ -1157,6 +1159,17 @@ The deploy now finishes quickly enough for the team to watch it complete.
     --history "${history_dir}/ru.txt"
   assert_json_mode "five words do not qualify" 'Beta gamma delta epsilon zeta.' draft 0 \
     '(.hits | length) == 0' --history "${history_dir}/b.txt"
+  local code_overlap=$'Alpha beta gamma `delta\nepsilon` zeta eta.'
+  printf '%s\n' "$code_overlap" >"${history_dir}/inline.md"
+  assert_json_mode "inline code contributes no words in either history match input" \
+    "$code_overlap" draft 0 'all(.hits[]; .pattern != "HISTORY:OVERLAP")' \
+    --history "${history_dir}/inline.md"
+  assert_json_mode "multiline code cannot complete a history run in the draft" \
+    "$code_overlap" draft 0 'all(.hits[]; .pattern != "HISTORY:OVERLAP")' \
+    --history "${history_dir}/a.md"
+  assert_json_mode "multiline code cannot complete a run in the earlier piece" \
+    'Alpha beta gamma delta epsilon zeta eta.' draft 0 \
+    'all(.hits[]; .pattern != "HISTORY:OVERLAP")' --history "${history_dir}/inline.md"
   assert_json_mode "a quoted block separates history matches in the draft" \
     $'Alpha beta gamma.\n\n> Text quoted from someone else.\n\nDelta epsilon zeta.' draft 0 \
     'all(.hits[]; .pattern != "HISTORY:OVERLAP")' --history "${history_dir}/b.txt"
@@ -1176,9 +1189,13 @@ The deploy now finishes quickly enough for the team to watch it complete.
     --sentence-cap 3
   assert_json_mode "a cap equal to the sentence count passes" "$sentences" draft 0 \
     '(.hits | length) == 0' --sentence-cap 4
+  assert_json_mode "sentence cap reports a potentially terminal abbreviation" \
+    'We chose Acme Inc. It failed.' draft 1 \
+    'any(.hits[]; .pattern == "FORMAT:SENTENCE-CAP" and .line == 1 and .review == "required" and .verify_context and .context == "It failed." and .detail == "2 sentences exceeds the cap of 1")' \
+    --sentence-cap 1
   assert_json_mode "sentence cap uses visible prose, including blockquotes" \
-    $'# Heading. Not prose.\n\n**Observers reran the calibration test.** Then they inspected the `stop. start` trace.\n\n> The downstream collector never restarted.\n\n- A checklist entry. A second clause.\n\n```text\nDo not count this.\n```' \
-    draft 1 'any(.hits[]; .pattern == "FORMAT:SENTENCE-CAP" and .line == 5 and .detail == "3 sentences exceeds the cap of 2")' \
+    $'# Heading. Not prose.\n\n**Observers reran the calibration test.** Then they inspected the `stop.\nstart` trace.\n\n> The downstream collector never restarted.\n\n- A checklist entry. A second clause.\n\n```text\nDo not count this.\n```' \
+    draft 1 'any(.hits[]; .pattern == "FORMAT:SENTENCE-CAP" and .line == 6 and .detail == "3 sentences exceeds the cap of 2")' \
     --sentence-cap 2
 
   printf '\xff' >"${history_dir}/invalid.txt"

@@ -1909,9 +1909,8 @@ pattern judges the sentence's argumentative use of a source.
 ## 44. Agreement Openers
 
 **What it is:** A reply spends its opening on assent before it says anything about
-the post. `sweep.py` marks an isolated opening sentence such as “Agreed,” “Fair,”
-“Right,” “True,” “Exactly,” or “Yes” (also Russian cues such as «Согласна» and
-«Точно»). It also marks an early standalone `agree`, `согласен`, or `согласна`.
+the post. For automated cues, see `skills/blog-writer/sweep.py` (`sweep_reply_shapes`,
+`AGREEMENT_SENTENCE`, and `EARLY_AGREE`).
 
 **Test:** Remove the opener. If the reply loses no stance the reader needs, lead
 with the specific claim or evidence. A direct answer to a question or disagreement
@@ -1921,9 +1920,8 @@ with a particular claim can carry information. The match alone is not the verdic
 
 **What it is:** The reply frames a point as the thing the author “I'd steal,”
 “I'd underline,” or “I'd push,” often in “the part I'd…” or “the one I'd…”.
-The Russian counterpart is «я бы» followed by a verb. Changing the verb does not
-change the construction. The sweep marks the cue and following word rather than
-guessing its part of speech or limiting it to a list of verbs.
+Changing the verb does not change the construction. For the automated cue, see
+`skills/blog-writer/sweep.py` (`CONDITIONAL`).
 
 **Test:** State the point and why it matters without the hypothetical selection.
 Retain a real conditional if the condition and action carry the meaning. The same

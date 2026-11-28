@@ -81,14 +81,12 @@ in three passes:
 - Soul check, a read for evidenced departures from the selected identity or assignment
   that survive pattern checks
 
-Four patterns are covered by three counting sweeps. They check fragment chains (#3/#4),
-sentence-length uniformity (#14), and unicode giveaways (#18). Sentence-length and fragment
-counts require a contextual disposition; justified rhetoric can retain reported hits.
-Required artifact corrections cannot be waived as voice. These checks run as a script
-(`sweep.py`) over the draft. The same run
-reports paired em-dash locations, per-section counts, and spacing as observations for an identity-
-and genre-calibrated judgment; punctuation counts alone do not fail the draft. Every run
-reports what it did not examine.
+The draft sweep (`sweep.py`) reports the checks it ran in `coverage.ran` and explains
+what it did not examine. Contextual hits need a disposition, and justified rhetoric
+can retain them. Required artifact corrections cannot be waived as voice. The same
+run reports paired em-dash locations, per-section counts, and spacing as observations
+for a judgment calibrated to identity and genre. Punctuation counts alone do not fail
+the draft.
 
 The rest stay with the model. Their check is a reading, not a match: whether deleting a
 filler word changes the meaning, whether a product claim still works with a competitor's

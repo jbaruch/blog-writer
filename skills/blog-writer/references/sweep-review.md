@@ -17,11 +17,11 @@ Run with `--mode final` on the final artifact before claiming it ready. For a re
 request, run it on the unchanged input and report blockers without modifying that input.
 
 If the assignment sets a sentence limit, pass it as `--sentence-cap N` in both modes.
-This counts prose sentences including blockquotes, not Markdown headings, lists, tables,
-or draft machinery. If the writer provides earlier pieces, add `--history PATH` with a
-UTF-8 file or a flat directory of UTF-8 files. The current draft is skipped. The sweep
-reports maximal shared word runs in author prose with locations in both pieces,
-ignoring case and punctuation at word boundaries. Review a match for recycled phrasing.
+If the writer provides earlier pieces, add `--history PATH` with a UTF-8 file or a flat
+directory of UTF-8 files. The current draft is skipped. History matches report shared
+word runs with locations in both pieces. Review a match for recycled phrasing.
+For counting and matching rules, see `skills/blog-writer/sweep.py`
+(`sweep_sentence_cap`, `history_words`, and `sweep_history`).
 The interchangeability test (#36) still needs a reader even if there are no matches.
 
 ## Read the result
@@ -49,7 +49,9 @@ and checks that work on text shape without detecting its language.
 
 ## Give every hit a disposition
 
-For `review: required`, correct the hit. Author preference is not a waiver for this class.
+For `review: required`, correct every confirmed hit regardless of author preference.
+When `verify_context` is set, record any demonstrated segmentation artifact with the
+actual sentence boundary and the mistaken split.
 For `review: contextual`, verify the segmentation and apply the catalog's actual test to
 the whole passage in its assignment. Record one of:
 
@@ -85,10 +87,10 @@ argument continuity, accuracy, and any selected corporate review. Rerun the swee
 all resulting edits, then verify preservation on that version. A local correction need
 not reopen unrelated wording or ask for a new approval.
 
-Delivery readiness requires a completed final-mode check, no remaining required hits,
+Delivery readiness requires a completed final-mode check, no unresolved required hits,
 a disposition for every contextual hit and assistant-chatter candidate, and no known
 preservation regression or unresolved factual blocker. The raw exit may still be 1 for
-justified stylistic hits. Report those retained hits and their reasons plainly alongside
-the independent states in `skills/blog-writer/references/voice-calibration.md`.
+documented segmentation artifacts or justified stylistic hits. Report the reasons for
+those hits alongside the states in `skills/blog-writer/references/voice-calibration.md`.
 Formal voice calibration may remain unresolved without erasing known assignment evidence.
 A draft or review with unresolved work may be returned as such, never described as ready.

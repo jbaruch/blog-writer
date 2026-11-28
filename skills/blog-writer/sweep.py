@@ -337,15 +337,13 @@ JUDGMENT_SWEEPS = [
 
 # --- Sentence segmentation ---------------------------------------------------
 
-# A period inside one of these does not end a sentence. Fully enumerable, which
-# is what keeps this a script and not a guess (`script-delegation` The Regex
-# Trap). An unlisted abbreviation costs a false split, which inflates the count
-# of short sentences and can only produce a false #3/#4 hit the agent then
-# dismisses — never a miss.
-ABBREVIATIONS = frozenset(
+# The required cap favors a reviewable split at a potentially terminal
+# abbreviation ("We chose Acme Inc. It failed."), but still protects prefixes
+# such as "Dr. James". Keep the broader guard for stylistic sweeps.
+_NONTERMINAL_ABBREVIATIONS = frozenset("e.g. i.e. mr. mrs. ms. dr. prof.".split())
+ABBREVIATIONS = _NONTERMINAL_ABBREVIATIONS | frozenset(
     """
-    e.g. i.e. etc. vs. cf. al. ca. approx.
-    mr. mrs. ms. dr. prof. sr. jr. st.
+    etc. vs. cf. al. ca. approx. sr. jr. st.
     inc. ltd. co. corp. dept. est.
     a.m. p.m. u.s. u.k. e.u.
     fig. no. vol. pp. ed. eds. repr.
@@ -361,7 +359,7 @@ _SENTENCE_END = re.compile(r"([.!?])([\"'”’»)\]]*)(\s+)")
 _INITIAL_RUN = re.compile(r"(?:\b[A-Z]\.[ \t]+){2,}")
 
 
-def split_sentences(text):
+def split_sentences(text, *, abbreviations=ABBREVIATIONS):
     """Split prose into sentences, guarding abbreviations and runs of initials."""
     protected = [found.span() for found in _INITIAL_RUN.finditer(text)]
     sentences = []
@@ -371,7 +369,7 @@ def split_sentences(text):
         head = text[start:end]
 
         last_token = head.split()[-1].lower() if head.split() else ""
-        if last_token in ABBREVIATIONS:
+        if last_token in abbreviations:
             continue
 
         # No period inside a run of initials ends a sentence, the run's last one
@@ -720,7 +718,20 @@ def parse(raw):
 # report render the same finding rather than diverging.
 
 
-def sentence_units(block):
+def visible_block(block, *, code="code"):
+    """Mask inline code before normalizing each line, preserving its number."""
+    source = "\n".join(text for _, text in block.numbered)
+    masked = _INLINE_CODE.sub(lambda match: code + "\n" * match[0].count("\n"), source)
+    numbered = [
+        (number, normalize_inline(text))
+        for (number, _), text in zip(block.numbered, masked.split("\n"))
+    ]
+    return Block(
+        block.kind, block.line, "\n".join(text for _, text in numbered), numbered
+    )
+
+
+def sentence_units(block, *, abbreviations=ABBREVIATIONS):
     """Yield (source line, sentence) for every sentence a sweep may look inside.
 
     A prose paragraph is one unit wrapped across source lines, so it is
@@ -734,7 +745,7 @@ def sentence_units(block):
     """
     if block.kind == "list":
         for number, text in block.numbered:
-            for sentence in split_sentences(text):
+            for sentence in split_sentences(text, abbreviations=abbreviations):
                 yield number, sentence
         return
 
@@ -751,7 +762,7 @@ def sentence_units(block):
     whole = "\n".join(text for _, text in sources)
 
     searched = 0
-    for sentence in split_sentences(whole):
+    for sentence in split_sentences(whole, abbreviations=abbreviations):
         found = whole.find(sentence, searched)
         if found < 0:
             found = searched
@@ -1213,18 +1224,16 @@ def sweep_section_breaks(raw):
 
 
 def sweep_reply_shapes(blocks):
-    prose = [block for block in blocks if block.kind == "prose"]
+    prose = [visible_block(block) for block in blocks if block.kind == "prose"]
     if not prose:
         return []
 
     hits = []
     opening_lines = [
-        (number, normalize_inline(source).strip())
-        for block in prose
-        for number, source in block.numbered
+        (number, source.strip()) for block in prose for number, source in block.numbered
     ]
     opening = "\n".join(text for _, text in opening_lines)
-    first = split_sentences(normalize_inline(prose[0].text))
+    first = split_sentences(prose[0].text)
     agreement = AGREEMENT_SENTENCE.fullmatch(first[0]) if first else None
     if agreement:
         hits.append(
@@ -1244,17 +1253,7 @@ def sweep_reply_shapes(blocks):
                 break
 
     for block in prose:
-        source = "\n".join(text for _, text in block.numbered)
-        masked = _INLINE_CODE.sub(
-            lambda match: "code" + "\n" * match[0].count("\n"), source
-        )
-        visible = [
-            (number, normalize_inline(text))
-            for (number, _), text in zip(block.numbered, masked.split("\n"))
-        ]
-        for line, sentence in sentence_units(
-            Block(block.kind, block.line, "", visible)
-        ):
+        for line, sentence in sentence_units(block):
             for found in CONDITIONAL.finditer(sentence):
                 hits.append(
                     hit("#45", "First-person conditional", line, found[0], sentence)
@@ -1271,8 +1270,7 @@ def history_words(blocks):
                 words.append(None)
                 lines.append(block.line)
             continue
-        for number, source in block.numbered:
-            prose = normalize_inline(_INLINE_CODE.sub(" ", source))
+        for number, prose in visible_block(block, code=" ").numbered:
             for word in HISTORY_WORD.findall(prose):
                 words.append(word.casefold().replace("’", "'"))
                 lines.append(number)
@@ -1327,10 +1325,11 @@ def sweep_sentence_cap(blocks, cap):
     for block in blocks:
         if block.kind not in PROSE_KINDS:
             continue
-        # Split the visible text: link destinations, inline code punctuation,
-        # and closing emphasis markers are not sentence boundaries.
-        visible = [(line, normalize_inline(text)) for line, text in block.numbered]
-        sentences.extend(sentence_units(Block(block.kind, block.line, "", visible)))
+        sentences.extend(
+            sentence_units(
+                visible_block(block), abbreviations=_NONTERMINAL_ABBREVIATIONS
+            )
+        )
     if len(sentences) <= cap:
         return []
     line, sentence = sentences[cap]
