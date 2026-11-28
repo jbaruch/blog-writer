@@ -91,10 +91,11 @@ sweep_fixture_mode() {
   local name=$1
   local body=$2
   local mode=$3
+  shift 3
   local fixture="${SUITE_TMP}/${name}.md"
 
   printf '%s\n' "$body" >"$fixture"
-  CASE_OUT=$("$PYTHON" "$SCRIPT" --mode "$mode" "$fixture" 2>"${SUITE_TMP}/err")
+  CASE_OUT=$("$PYTHON" "$SCRIPT" --mode "$mode" "$@" "$fixture" 2>"${SUITE_TMP}/err")
   CASE_RC=$?
   CASE_ERR=$(cat "${SUITE_TMP}/err")
 }
@@ -159,8 +160,9 @@ assert_json() {
 # Asserts a mode-specific run exits $4 and satisfies jq filter $5.
 assert_json_mode() {
   local label=$1 body=$2 mode=$3 expect_rc=$4 filter=$5
+  shift 5
 
-  sweep_fixture_mode "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body" "$mode"
+  sweep_fixture_mode "$(echo "$label" | tr -c 'a-zA-Z0-9' '_')" "$body" "$mode" "$@"
 
   if [ "$CASE_RC" -ne "$expect_rc" ]; then
     fail "${label}: expected exit ${expect_rc}, got ${CASE_RC} (stderr: ${CASE_ERR})"
@@ -242,7 +244,7 @@ which everyone had quietly accepted as simply the cost of shipping anything at a
 We cut it.'
 
   assert_json "clean draft exits 0 with no hits" "$clean_draft" 0 '(.hits | length) == 0'
-  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 5'
+  assert_json "clean draft still names what ran" "$clean_draft" 0 '(.coverage.ran | length) == 7'
   assert_json "clean draft names supplemental checks" "$clean_draft" 0 '(.coverage.supplemental_checks | length) == 4'
   assert_json "clean draft still names what did not run" "$clean_draft" 0 '(.coverage.not_run_judgment | length) == 15'
   assert_json "em-dash verdicts are routed to judgment" "$clean_draft" 0 \
@@ -259,7 +261,7 @@ We cut it.'
   elif [ "$defined" -lt 2 ]; then
     fail "references/ai-anti-patterns.md reported only ${defined} pattern(s)"
   else
-    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 7 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
+    assert_json "clean draft states partial coverage" "$clean_draft" 0 ".coverage.patterns_examined == 9 and .coverage.patterns_total == ${defined} and (.coverage.note | length) > 0"
   fi
 
   # The contract's core guarantee: a zero-hit run must still carry coverage, so
@@ -976,14 +978,14 @@ The third — an aside — is not.' \
   local probe="${SUITE_TMP}/probe.md"
   printf 'A sentence of ordinary length that trips none of the counting sweeps.\n' >"$probe"
 
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n\n## 8. H\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## %s. A pattern\n' {1..10} >"${iso}/references/ai-anti-patterns.md"
   local iso_out iso_rc
   iso_out=$("$PYTHON" "${iso}/sweep.py" "$probe" 2>"${SUITE_TMP}/iso_err")
   iso_rc=$?
   if [ "$iso_rc" -ne 0 ]; then
     fail "isolated sweep expected exit 0, got ${iso_rc} ($(cat "${SUITE_TMP}/iso_err"))"
-  elif ! jq -e '.coverage.patterns_total == 8' <<<"$iso_out" >/dev/null; then
-    fail "the total ignores the pattern file: expected 8, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
+  elif ! jq -e '.coverage.patterns_total == 10' <<<"$iso_out" >/dev/null; then
+    fail "the total ignores the pattern file: expected 10, got $(jq -r '.coverage.patterns_total' <<<"$iso_out")"
   else
     ok
     echo "  the total is counted from the pattern file"
@@ -1005,12 +1007,12 @@ The third — an aside — is not.' \
   # examined count the note claims zero unexamined while not_run_judgment still
   # names sweeps; below it the arithmetic goes negative. Both must fail rather
   # than report.
-  printf '## 1. A\n\n## 2. B\n\n## 3. C\n\n## 4. D\n\n## 5. E\n\n## 6. F\n\n## 7. G\n' >"${iso}/references/ai-anti-patterns.md"
+  printf '## %s. A pattern\n' {1..9} >"${iso}/references/ai-anti-patterns.md"
   "$PYTHON" "${iso}/sweep.py" "$probe" >/dev/null 2>"${SUITE_TMP}/iso_err"
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog of exactly the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 7 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 9 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the exactly-examined diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
@@ -1022,7 +1024,7 @@ The third — an aside — is not.' \
   iso_rc=$?
   if [ "$iso_rc" -ne 2 ]; then
     fail "a catalog smaller than the examined count expected exit 2, got ${iso_rc}"
-  elif ! grep -qF 'not more than the 7 this script sweeps for' "${SUITE_TMP}/iso_err"; then
+  elif ! grep -qF 'not more than the 9 this script sweeps for' "${SUITE_TMP}/iso_err"; then
     fail "the truncated-catalog diagnostic is not actionable: $(cat "${SUITE_TMP}/iso_err")"
   else
     ok
@@ -1112,6 +1114,85 @@ The deploy now finishes quickly enough for the team to watch it complete.
     'The implementation details are complete. Let me know if you want another version.' \
     final 0 \
     '(.hits | length) == 0 and any(.candidates.assistant_chatter[]; .token == "Let me know" and .line == 1)'
+
+  # 14. Short replies, optional history and format constraints.
+  local opener
+  for opener in Agreed Fair Right True Exactly Yes; do
+    assert_json "$opener as an isolated opener" "**${opener}.** The cache expires after the second read." \
+      1 'any(.hits[]; .pattern == "#44" and .line == 1 and .review == "contextual")'
+  done
+  assert_json "early agreement has a source line" $'# Reply\nThe point is that I\n agree with the measured result.' \
+    1 'any(.hits[]; .pattern == "#44" and .line == 3)'
+  assert_json "only isolated openers and early whole agreement words match" \
+    'Right after startup, these logs are agreeable to read. I agree with the maintainer.' \
+    0 'all(.hits[]; .pattern != "#44")'
+  assert_json "a word crossing the opening window does not become agree" \
+    'The instrument produced one rather agreeable tone.' \
+    0 'all(.hits[]; .pattern != "#44")'
+  assert_json "conditional catches varied verbs and apostrophes anywhere in prose" \
+    "The part I'd catalogue is the write path. I’d recheck the reader next." \
+    1 '[.hits[] | select(.pattern == "#45") | .detail] == ["I\u0027d catalogue", "I\u2019d recheck"]'
+  assert_json "Russian reply cues and honest language coverage" \
+    'Точно. Этот крайний случай я бы перепроверила на другом сервере.' \
+    1 '[.hits[].pattern] == ["#44", "#45"] and any(.coverage.ran[]; startswith("#45 ") and endswith("[English/Russian]")) and any(.coverage.ran[]; startswith("#31 ") and endswith("[English]")) and (.coverage.note | contains("On non-English text"))'
+  assert_json "later assent and quoted examples are not reply cues" \
+    $'> Yes. I\'d replace that verb.\n\nThe second run produced a different result. Yes.' \
+    0 'all(.hits[]; .pattern != "#44" and .pattern != "#45")'
+
+  local history_dir="${SUITE_TMP}/history"
+  mkdir "$history_dir"
+  printf '# Earlier\n\nALPHA beta gamma delta epsilon zeta eta!\nA different transition.\nFirst second third fourth fifth sixth.\n' >"${history_dir}/a.md"
+  printf 'This line supplies a separate prefix.\nAlpha beta gamma delta epsilon zeta.\n' >"${history_dir}/b.txt"
+  local reply=$'# Reply\n\nAlpha beta gamma delta\nepsilon zeta eta.\n\nFirst second third fourth fifth sixth.'
+  assert_json_mode "history reports maximal runs in each earlier piece" "$reply" final 1 \
+    '([.hits[] | select(.pattern == "HISTORY:OVERLAP") | [.line, (.detail | split(" ")[0]), (.detail | split("/")[-1]), .review]] == [[3,"7","a.md:3","contextual"],[3,"6","b.txt:2","contextual"],[6,"6","a.md:5","contextual"]]) and any(.coverage.supplemental_checks[]; startswith("HISTORY:OVERLAP ")) and any(.coverage.not_run_judgment[]; startswith("#36 "))' \
+    --history "$history_dir"
+  printf 'Раз два три четыре пять шесть.\nРаз два три четыре пять шесть.\n' >"${history_dir}/ru.txt"
+  assert_json_mode "one history file reports repeats at different source locations" \
+    'РАЗ, два три четыре пять шесть!' draft 1 \
+    '[.hits[] | select(.pattern == "HISTORY:OVERLAP") | (.detail | split("/")[-1])] == ["ru.txt:1","ru.txt:2"]' \
+    --history "${history_dir}/ru.txt"
+  assert_json_mode "five words do not qualify" 'Beta gamma delta epsilon zeta.' draft 0 \
+    '(.hits | length) == 0' --history "${history_dir}/b.txt"
+  local self='The draft itself is not an earlier published piece.'
+  assert_json_mode "the input draft is not its own history" "$self" draft 0 \
+    '(.hits | length) == 0' --history "$SUITE_TMP/the_input_draft_is_not_its_own_history_.md"
+
+  local sentences=$'# Reply\n\nDr. James reviewed everything on Monday.\nОн сказал: «Это выдержит испытание даже при очень низкой температуре в камере!» Потом он снял датчик.\nThe fourth sentence belongs to another draft.'
+  assert_json "default has no history or sentence cap" "$sentences" 0 \
+    'all(.coverage.supplemental_checks[]; (startswith("FORMAT:") or startswith("HISTORY:")) | not)'
+  assert_json_mode "sentence cap reports the first excess sentence" "$sentences" final 1 \
+    'any(.hits[]; .pattern == "FORMAT:SENTENCE-CAP" and .line == 5 and .review == "required" and .verify_context and .detail == "4 sentences exceeds the cap of 3") and any(.coverage.supplemental_checks[]; startswith("FORMAT:SENTENCE-CAP "))' \
+    --sentence-cap 3
+  assert_json_mode "a cap equal to the sentence count passes" "$sentences" draft 0 \
+    '(.hits | length) == 0' --sentence-cap 4
+  assert_json_mode "sentence cap uses visible prose, including blockquotes" \
+    $'# Heading. Not prose.\n\n**Observers reran the calibration test.** Then they inspected the `stop. start` trace.\n\n> The downstream collector never restarted.\n\n- A checklist entry. A second clause.\n\n```text\nDo not count this.\n```' \
+    draft 1 'any(.hits[]; .pattern == "FORMAT:SENTENCE-CAP" and .line == 5 and .detail == "3 sentences exceeds the cap of 2")' \
+    --sentence-cap 2
+
+  printf '\xff' >"${history_dir}/invalid.txt"
+  sweep_fixture_mode invalid_history "$reply" draft --history "$history_dir"
+  if [[ "$CASE_RC" == 2 && -z "$CASE_OUT" && "$CASE_ERR" == *'invalid.txt is not valid UTF-8'* ]]; then
+    ok
+  else
+    fail "invalid history must exit 2 with the unreadable piece and no result"
+  fi
+  sweep_fixture_mode missing_history "$reply" draft --history "${history_dir}/missing"
+  if [[ "$CASE_RC" == 2 && -z "$CASE_OUT" && "$CASE_ERR" == *'cannot read history'* ]]; then
+    ok
+  else
+    fail "missing history must exit 2 with no result"
+  fi
+  local cap
+  for cap in 0 -2 words; do
+    sweep_fixture_mode invalid_cap "$sentences" draft --sentence-cap "$cap"
+    if [[ "$CASE_RC" == 2 && -z "$CASE_OUT" && "$CASE_ERR" == *'--sentence-cap'* ]]; then
+      ok
+    else
+      fail "invalid sentence cap ${cap} must exit 2 with no result"
+    fi
+  done
 
   # 15. Entry-point guard — importing runs nothing and prints nothing
   local import_out

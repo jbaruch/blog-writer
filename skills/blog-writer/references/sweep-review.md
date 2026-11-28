@@ -16,6 +16,14 @@ python3 <blog-writer-dir>/sweep.py --mode draft <draft-path>
 Run with `--mode final` on the final artifact before claiming it ready. For a review-only
 request, run it on the unchanged input and report blockers without modifying that input.
 
+If the assignment sets a sentence limit, pass it as `--sentence-cap N` in both modes.
+This counts prose sentences including blockquotes, not Markdown headings, lists, tables,
+or draft machinery. If the writer provides earlier pieces, add `--history PATH` with a
+UTF-8 file or a flat directory of UTF-8 files. The current draft is skipped. The sweep
+reports maximal shared word runs in author prose with locations in both pieces,
+ignoring case and punctuation at word boundaries. Review a match for recycled phrasing.
+The interchangeability test (#36) still needs a reader even if there are no matches.
+
 ## Read the result
 
 - Exit 0: no raw hits. Complete the manual catalog review; coverage is partial.
@@ -36,6 +44,8 @@ Remove assistant-to-author residue, retain intentional reader-facing prose, and 
 that decision. Em-dash observations inform the catalog's calibration judgment and never
 constitute findings on their own. `coverage` names what ran and what still needs reading;
 `not_run_judgment` is not an exhaustive list of unexamined catalog patterns.
+The coverage lists distinguish English-only phrase matching, English/Russian reply cues,
+and checks that work on text shape without detecting its language.
 
 ## Give every hit a disposition
 
