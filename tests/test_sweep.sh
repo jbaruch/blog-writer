@@ -1132,6 +1132,9 @@ The deploy now finishes quickly enough for the team to watch it complete.
   assert_json "conditional catches varied verbs and apostrophes anywhere in prose" \
     "The part I'd catalogue is the write path. I’d recheck the reader next." \
     1 '[.hits[] | select(.pattern == "#45") | .detail] == ["I\u0027d catalogue", "I\u2019d recheck"]'
+  assert_json "conditional ignores punctuation inside inline code and preserves later line numbers" \
+    $'The trace contains `stop. I\'d restart\nthen retry` before the parser resumes.\nI’d inspect the trace before restarting.' \
+    1 '[.hits[] | select(.pattern == "#45") | [.detail, .line]] == [["I\u2019d inspect", 3]]'
   assert_json "Russian reply cues and honest language coverage" \
     'Точно. Этот крайний случай я бы перепроверила на другом сервере.' \
     1 '[.hits[].pattern] == ["#44", "#45"] and any(.coverage.ran[]; startswith("#45 ") and endswith("[English/Russian]")) and any(.coverage.ran[]; startswith("#31 ") and endswith("[English]")) and (.coverage.note | contains("On non-English text"))'
@@ -1154,6 +1157,13 @@ The deploy now finishes quickly enough for the team to watch it complete.
     --history "${history_dir}/ru.txt"
   assert_json_mode "five words do not qualify" 'Beta gamma delta epsilon zeta.' draft 0 \
     '(.hits | length) == 0' --history "${history_dir}/b.txt"
+  assert_json_mode "a quoted block separates history matches in the draft" \
+    $'Alpha beta gamma.\n\n> Text quoted from someone else.\n\nDelta epsilon zeta.' draft 0 \
+    'all(.hits[]; .pattern != "HISTORY:OVERLAP")' --history "${history_dir}/b.txt"
+  printf 'Alpha beta gamma.\n\n> Quoted material.\n\nDelta epsilon zeta.\n' >"${history_dir}/boundary.md"
+  assert_json_mode "a quoted block separates history matches in the earlier piece" \
+    'Alpha beta gamma delta epsilon zeta.' draft 0 \
+    'all(.hits[]; .pattern != "HISTORY:OVERLAP")' --history "${history_dir}/boundary.md"
   local self='The draft itself is not an earlier published piece.'
   assert_json_mode "the input draft is not its own history" "$self" draft 0 \
     '(.hits | length) == 0' --history "$SUITE_TMP/the_input_draft_is_not_its_own_history_.md"

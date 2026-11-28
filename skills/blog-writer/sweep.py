@@ -1244,8 +1244,18 @@ def sweep_reply_shapes(blocks):
                 break
 
     for block in prose:
-        for line, sentence in sentence_units(block):
-            for found in CONDITIONAL.finditer(normalize_inline(sentence)):
+        source = "\n".join(text for _, text in block.numbered)
+        masked = _INLINE_CODE.sub(
+            lambda match: "code" + "\n" * match[0].count("\n"), source
+        )
+        visible = [
+            (number, normalize_inline(text))
+            for (number, _), text in zip(block.numbered, masked.split("\n"))
+        ]
+        for line, sentence in sentence_units(
+            Block(block.kind, block.line, "", visible)
+        ):
+            for found in CONDITIONAL.finditer(sentence):
                 hits.append(
                     hit("#45", "First-person conditional", line, found[0], sentence)
                 )
@@ -1257,6 +1267,9 @@ def history_words(blocks):
     lines = []
     for block in blocks:
         if block.kind != "prose":
+            if words and words[-1] is not None:
+                words.append(None)
+                lines.append(block.line)
             continue
         for number, source in block.numbered:
             prose = normalize_inline(_INLINE_CODE.sub(" ", source))
@@ -1271,7 +1284,9 @@ def sweep_history(blocks, history):
     size = HISTORY_MIN_WORDS
     seeds = defaultdict(list)
     for start in range(len(words) - size + 1):
-        seeds[tuple(words[start : start + size])].append(start)
+        seed = tuple(words[start : start + size])
+        if None not in seed:
+            seeds[seed].append(start)
 
     hits = []
     for path, raw in history:
@@ -1280,12 +1295,18 @@ def sweep_history(blocks, history):
             seed = tuple(earlier[previous : previous + size])
             for start in seeds.get(seed, ()):
                 # Interior seeds are part of the same run on this alignment.
-                if start and previous and words[start - 1] == earlier[previous - 1]:
+                if (
+                    start
+                    and previous
+                    and words[start - 1] is not None
+                    and words[start - 1] == earlier[previous - 1]
+                ):
                     continue
                 length = size
                 while (
                     start + length < len(words)
                     and previous + length < len(earlier)
+                    and words[start + length] is not None
                     and words[start + length] == earlier[previous + length]
                 ):
                     length += 1
