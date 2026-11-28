@@ -427,7 +427,8 @@ _BLOCKQUOTE_MARKER = re.compile(r"^\s*>\s?")
 _TABLE_ROW = re.compile(r"^\s*\|")
 
 _LINK = re.compile(r"!?\[([^\]]*)\]\([^)]*\)")
-_INLINE_CODE = re.compile(r"`[^`]*`")
+# Delimiters are whole runs of equal length, even around shorter runs in code.
+_INLINE_CODE = re.compile(r"(?<!`)(`+)(?!`)[\s\S]*?(?<!`)\1(?!`)")
 _EMPHASIS = re.compile(r"(\*\*|\*|__|_)")
 
 
@@ -1233,7 +1234,9 @@ def sweep_reply_shapes(blocks):
         (number, source.strip()) for block in prose for number, source in block.numbered
     ]
     opening = "\n".join(text for _, text in opening_lines)
-    first = split_sentences(prose[0].text)
+    # An ellipsis can end an isolated opener without ending prose sentences.
+    before_ellipsis = re.split(r"(?<=…)\s+", prose[0].text, maxsplit=1)[0]
+    first = split_sentences(before_ellipsis)
     agreement = AGREEMENT_SENTENCE.fullmatch(first[0]) if first else None
     if agreement:
         hits.append(
@@ -1253,10 +1256,15 @@ def sweep_reply_shapes(blocks):
                 break
 
     for block in prose:
+        source_indices = {number: i for i, (number, _) in enumerate(block.numbered)}
         for line, sentence in sentence_units(block):
             for found in CONDITIONAL.finditer(sentence):
+                cue_index = source_indices[line] + sentence.count(
+                    "\n", 0, found.start()
+                )
+                cue_line = block.numbered[cue_index][0]
                 hits.append(
-                    hit("#45", "First-person conditional", line, found[0], sentence)
+                    hit("#45", "First-person conditional", cue_line, found[0], sentence)
                 )
     return hits
 

@@ -1121,6 +1121,14 @@ The deploy now finishes quickly enough for the team to watch it complete.
     assert_json "$opener as an isolated opener" "**${opener}.** The cache expires after the second read." \
       1 'any(.hits[]; .pattern == "#44" and .line == 1 and .review == "contextual")'
   done
+  for opener in Agreed Точно; do
+    assert_json "$opener with a Unicode ellipsis as an isolated opener" \
+      "${opener}… The cache expires after the second read." 1 \
+      '[.hits[] | select(.pattern == "#44") | .line] == [1]'
+  done
+  assert_json "an ellipsis does not turn a longer opening into isolated agreement" \
+    'Right after startup… The cache expires after the second read.' 1 \
+    'all(.hits[]; .pattern != "#44")'
   assert_json "early agreement has a source line" $'# Reply\nThe point is that I\n agree with the measured result.' \
     1 'any(.hits[]; .pattern == "#44" and .line == 3)'
   assert_json "opening ignores agreement inside multiline inline code" \
@@ -1134,6 +1142,12 @@ The deploy now finishes quickly enough for the team to watch it complete.
   assert_json "conditional catches varied verbs and apostrophes anywhere in prose" \
     "The part I'd catalogue is the write path. I’d recheck the reader next." \
     1 '[.hits[] | select(.pattern == "#45") | .detail] == ["I\u0027d catalogue", "I\u2019d recheck"]'
+  assert_json_mode "double-backtick code neither creates a conditional nor adds a sentence" \
+    $'The example is ``trace. I\'d restart`` before continuing.' draft 0 \
+    '(.hits | length) == 0' --sentence-cap 1
+  assert_json "each wrapped conditional reports its cue line, not the sentence start" \
+    $'For the next run\nI\'d inspect the reader.\n\nПри следующем запуске\n<!-- note -->\nя бы проверила датчик.' \
+    1 '[.hits[] | select(.pattern == "#45") | [.detail, .line]] == [["I\u0027d inspect", 2], ["я бы проверила", 6]]'
   assert_json "conditional ignores punctuation inside inline code and preserves later line numbers" \
     $'The trace contains `stop. I\'d restart\nthen retry` before the parser resumes.\nI’d inspect the trace before restarting.' \
     1 '[.hits[] | select(.pattern == "#45") | [.detail, .line]] == [["I\u2019d inspect", 3]]'
